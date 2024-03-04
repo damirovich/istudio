@@ -1,0 +1,26 @@
+﻿using Asp.Versioning;
+using ISTUDIO.Application.Features.Authentication.Commands.AuthUsers;
+using ISTUDIO.Contracts.Features.Authentication.Authorizations;
+using ISTUDIO.Web.Api.Data;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ISTUDIO.Web.Api.Controllers.v1;
+
+[ApiVersion("1.0")]
+public class TestController : BaseController
+{
+    [HttpGet("test")]
+    public async Task<ICsmActionResult> TestWorking()
+    {
+        try
+        {
+            return new CsmActionResult(new CsmReturnStatus(0, "Этот щедерв искусства прекрасно работает"));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+
+    }
+}
