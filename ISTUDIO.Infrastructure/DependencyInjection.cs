@@ -1,6 +1,7 @@
 ﻿using ISTUDIO.Infrastructure.AppDbContext;
 using ISTUDIO.Infrastructure.Identity;
 using ISTUDIO.Infrastructure.Services;
+using ISTUDIO.Infrastructure.Services.Integrations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,17 +44,28 @@ public static class DependencyInjection
             options.User.RequireUniqueEmail = true;
 
         });
-
-        services.AddScoped<IIdentityService, IdentityService>();
-        services.AddScoped<IAppUserService, AppUserServices>();
-        services.AddScoped<IJwtUtils, JwtUtils>();
-        services.AddScoped<ICurrentHttpRequest, CurrentHttpRequest>();
+        services.AddPersistence();
 
         services.AddSingleton<IRedisCacheService>(provider =>
         {
             var redisConnectionString = configuration.GetConnectionString("Redis");
             return new RedisCacheService(redisConnectionString);
         });
+        return services;
+    }
+
+    public static IServiceCollection AddPersistence(
+      this IServiceCollection services)
+    {
+        services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IAppUserService, AppUserServices>();
+        services.AddScoped<IJwtUtils, JwtUtils>();
+        services.AddScoped<ICurrentHttpRequest, CurrentHttpRequest>();
+        services.AddHttpClient<ISmsNikitaService, SmsNikitaService>(client =>
+        {
+            client.BaseAddress = new Uri("https://smspro.nikita.kg/api/message");
+        });
+
         return services;
     }
 }

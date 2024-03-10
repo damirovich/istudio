@@ -16,8 +16,13 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
         builder.Property(e => e.SeriesDocument).HasMaxLength(20).IsRequired(false);
         builder.Property(e => e.NumDocument).HasMaxLength(20).IsRequired(false);
         builder.Property(e => e.Address).IsRequired(false);
-
+        builder.Property(e => e.Email).HasMaxLength(200).IsRequired(false);
+        builder.Property(e => e.NormalizedEmail).HasMaxLength(200).IsRequired(false);
         builder.Property(e => e.UserName).HasMaxLength(250).IsRequired();
+        builder.Property(e => e.CodeOTP).IsRequired(false);
+        builder.Property(e => e.CreatedDate)
+           .HasDefaultValue(DateTime.UtcNow)
+           .ValueGeneratedOnAdd();
 
         builder.HasMany(e => e.FamilyUsers)
             .WithOne()

@@ -1,5 +1,5 @@
 ﻿using Ardalis.GuardClauses;
-using ISTUDIO.Domain.Models;
+using ISTUDIO.Application.Features.ModelsDTO;
 using ISTUDIO.Infrastructure.AppDbContext;
 using ISTUDIO.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -17,19 +17,29 @@ public class AppUserServices : IAppUserService
         _dbContext = dbContext;
     }
 
-    public async Task<UserDetails> GetUserDetailsByEmailAsync(string email)
+    public async Task<List<AppUsersDTO>> GetUsersListAsync()
     {
-        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
-        if (user == null)
+        var users = await _userManager.Users.ToListAsync();
+
+        var userList = new List<AppUsersDTO>();
+
+        foreach (var user in users)
         {
-            throw new Application.Common.Exceptions.NotFoundException("User not found");
+            var roles = await _userManager.GetRolesAsync(user);
+
+            userList.Add(new AppUsersDTO
+            {
+                UserId = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FullName = user.FullName,
+                Roles = roles.ToList()
+            });
         }
-        var roles = await _userManager.GetRolesAsync(user);
 
-        return new UserDetails() { UserId = user.Id!, FullName = user.FullName!, UserName = user.UserName!, Email = user.Email!, Roles = roles };
+        return userList;
     }
-
-    public async Task<UserDetails> GetUserDetailsByUserIdAsync(string userId)
+    public async Task<AppUsersDTO> GetUserDetailsByUserIdAsync(string userId)
     {
         var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -39,10 +49,9 @@ public class AppUserServices : IAppUserService
         }
         var roles = await _userManager.GetRolesAsync(user);
 
-        return new UserDetails() { UserId = user.Id!, FullName = user.FullName!, UserName = user.UserName!, Email = user.Email!, Roles = roles };
+        return new AppUsersDTO() { UserId = user.Id!, FullName = user.FullName!, UserName = user.UserName!, Email = user.Email!, Roles = roles };
     }
-
-    public async Task<UserDetails> GetUserDetailsByUserNameAsync(string userName)
+    public async Task<AppUsersDTO> GetUserDetailsByUserNameAsync(string userName)
     {
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == userName);
         if (user == null)
@@ -51,7 +60,7 @@ public class AppUserServices : IAppUserService
         }
         var roles = await _userManager.GetRolesAsync(user);
 
-        return new UserDetails()
+        return new AppUsersDTO()
         {
             UserId = user.Id!,
             FullName = user.FullName!,
@@ -62,22 +71,32 @@ public class AppUserServices : IAppUserService
             Roles = roles
         };
     }
-
-    public async Task<string?> GetUserNameAsync(string userId)
+    public async Task<(bool, string UserId)> GetUserExistsByPhoneNumber(string phoneNumber)
     {
-        var user = await _userManager.Users.FirstAsync(u => u.Id == userId);
-
-        return user.UserName;
+        var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
+        if(user == null) 
+            return (false, string.Empty);
+        return (true, user.Id);
     }
 
-    public async Task UpdateUserProfile(string userId, string fullName)
+    public async Task<AppUsersDTO> GetUserDetailsByPhoneNumber(string phoneNumber)
     {
-        var entity = await _dbContext.AppUsers.FindAsync(new object[] { userId! });
+        var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
+        if (user == null)
+        {
+            throw new Application.Common.Exceptions.NotFoundException("User not found");
+        }
+        var roles = await _userManager.GetRolesAsync(user);
 
-        Guard.Against.NotFound(userId!, entity);
-
-        entity.FullName = fullName;
-
-        await _dbContext.SaveChangesAsync();
+        return new AppUsersDTO()
+        {
+            UserId = user.Id!,
+            FullName = user.FullName!,
+            UserName = user.UserName!,
+            Email = user.Email!,
+            RefreshToken = user.RefreshToken,
+            RefreshTokenExpiryTime = user.RefreshTokenExpiryTime,
+            Roles = roles
+        };
     }
 }

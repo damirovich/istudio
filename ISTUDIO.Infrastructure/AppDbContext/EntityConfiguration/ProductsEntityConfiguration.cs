@@ -23,11 +23,6 @@ public class ProductsEntityConfiguration : IEntityTypeConfiguration<ProductsEnti
             .HasForeignKey(e => e.CategoryId)
             .IsRequired();
 
-        builder.HasOne(e => e.SubCategory)
-            .WithMany()
-            .HasForeignKey(e => e.SubCategoryId)
-            .IsRequired(false);
-
         builder.HasMany(e => e.Images)
             .WithOne(i => i.Products)
             .HasForeignKey(i => i.ProductId)

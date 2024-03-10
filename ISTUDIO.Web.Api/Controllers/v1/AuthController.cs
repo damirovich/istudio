@@ -2,11 +2,9 @@
 using AutoMapper;
 using ISTUDIO.Application.Common.Interfaces;
 using ISTUDIO.Application.Features.Authentication.Commands.AuthUsers;
-using ISTUDIO.Application.Features.Authentication.Commands.CreateUsers;
 using ISTUDIO.Application.Features.Authentication.Commands.RefreshJWT;
 using ISTUDIO.Contracts.Features.Authentication.Authorizations;
 using ISTUDIO.Contracts.Features.Authentication.JWTTokens;
-using ISTUDIO.Contracts.Features.UserManagement;
 using ISTUDIO.Web.Api.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -27,25 +25,7 @@ public class AuthController : BaseController
         _identityService = identityService;
     }
 
-    /// <summary>
-    /// Метод для создание нового пользователя
-    /// </summary>
-    /// <param name="user">User Data</param>
-    /// <returns>UserId</returns>
-    [HttpPost("Register")]
-    public async Task<ICsmActionResult> CreateUser([FromBody] CreateUserVM user)
-    {
-        try
-        {
-            var command = _mapper.Map<CreateUserCommand>(user);
-
-            return new CsmActionResult(await Mediator.Send(command));
-        }
-        catch (Exception ex)
-        {
-            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
-        }
-    }
+   
     /// <summary>
     /// Метод для аудентификации
     /// </summary>

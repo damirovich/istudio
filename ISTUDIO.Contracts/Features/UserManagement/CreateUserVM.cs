@@ -1,4 +1,5 @@
-﻿using ISTUDIO.Application.Features.Authentication.Commands.CreateUsers;
+﻿using ISTUDIO.Application.Features.UserManagement.Commands.CreateUsers;
+using ISTUDIO.Application.Features.UserManagement.DTOs;
 
 namespace ISTUDIO.Contracts.Features.UserManagement;
 
@@ -20,16 +21,21 @@ public class CreateUserVM : IMapWith<CreateUserCommand>
     public string MiddleName { get; set; }
     public List<string> Roles { get; set; }
 
+    // Изображения пользователя
+    public List<UserImageDTO> Images { get; set; } = new List<UserImageDTO>();
+
+    // Данные о родственниках пользователя
+    public List<FamilyMemberDTO> FamilyMembers { get; set; } = new List<FamilyMemberDTO>();
+
     public void Mapping(Profile profile)
     {
         profile.CreateMap<CreateUserVM, CreateUserCommand>()
-            .ForMember(u => u.FullName, x => x.MapFrom(c => c.FullName))
-            .ForMember(u => u.UserName, x => x.MapFrom(c => c.UserName))
-            .ForMember(u => u.Email, x => x.MapFrom(c => c.Email))
-            .ForMember(u => u.Password, x => x.MapFrom(c => c.Password))
-            .ForMember(u => u.FirstName, x => x.MapFrom(c => c.FirstName))
-            .ForMember(u => u.LastName, x => x.MapFrom(c => c.LastName))
-            .ForMember(u => u.MiddleName, x => x.MapFrom(c => c.MiddleName))
-            .ForMember(u => u.Roles, x => x.MapFrom(c => c.Roles));
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password))
+            .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles))
+            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
+            .ForMember(dest => dest.FamilyMembers, opt => opt.MapFrom(src => src.FamilyMembers));
     }
 }

@@ -32,8 +32,6 @@ public class ProductsEntity
     // Категория, к которой относится продукт
     public CategoryEntity Category { get; set; }
 
-    // Подкатегория, к которой относится продукт
-    public SubCategoryEntity SubCategory { get; set; }
     // Скидка на продукт
     public DiscountEntity Discount { get; set; }
 

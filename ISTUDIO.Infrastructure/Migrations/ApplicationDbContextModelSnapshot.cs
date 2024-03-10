@@ -31,10 +31,12 @@ namespace ISTUDIO.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -43,10 +45,15 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<int?>("ParentCategoryId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
+
+                    b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Categories", (string)null);
                 });
@@ -406,8 +413,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("SubCategoryId");
-
                     b.ToTable("Products", (string)null);
                 });
 
@@ -429,7 +434,39 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("ShoppingCarts", (string)null);
                 });
 
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SubCategoryEntity", b =>
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PhonesNumber")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("SenderCompany")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<byte?>("Test")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("TextSms")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("Time")
+                        .IsRequired()
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SmsNikitaRequests", (string)null);
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaResponse", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -437,30 +474,49 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CategoryId")
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Phones")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                    b.Property<int?>("SmsCount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                    b.Property<Guid>("SmsRequestId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                    b.Property<int>("SmsStatusId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("SmsRequestId");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("SmsStatusId");
 
-                    b.ToTable("SubCategories", (string)null);
+                    b.ToTable("SmsNikitaResponses", (string)null);
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SmsNikitaStatuses", (string)null);
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.UserImagesEntity", b =>
@@ -513,13 +569,21 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("CodeOTP")
+                        .HasColumnType("int");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 3, 10, 14, 18, 41, 3, DateTimeKind.Utc).AddTicks(6659));
+
                     b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -535,8 +599,8 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
@@ -756,6 +820,15 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("OrderProducts", (string)null);
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CategoryEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.CategoryEntity", "ParentCategory")
+                        .WithMany("SubCategories")
+                        .HasForeignKey("ParentCategoryId");
+
+                    b.Navigation("ParentCategory");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.DiscountEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", null)
@@ -867,22 +940,26 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ISTUDIO.Domain.EntityModel.SubCategoryEntity", "SubCategory")
-                        .WithMany()
-                        .HasForeignKey("SubCategoryId");
-
                     b.Navigation("Category");
-
-                    b.Navigation("SubCategory");
                 });
 
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SubCategoryEntity", b =>
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaResponse", b =>
                 {
-                    b.HasOne("ISTUDIO.Domain.EntityModel.CategoryEntity", "Category")
-                        .WithMany("SubCategories")
-                        .HasForeignKey("CategoryId");
+                    b.HasOne("ISTUDIO.Domain.EntityModel.SmsNikitaRequest", "Request")
+                        .WithMany("Responses")
+                        .HasForeignKey("SmsRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Category");
+                    b.HasOne("ISTUDIO.Domain.EntityModel.SmsNikitaStatus", "SmsStatus")
+                        .WithMany("SmsNikitaResponses")
+                        .HasForeignKey("SmsStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Request");
+
+                    b.Navigation("SmsStatus");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.UserImagesEntity", b =>
@@ -994,6 +1071,16 @@ namespace ISTUDIO.Infrastructure.Migrations
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ShoppingCartEntity", b =>
                 {
                     b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaRequest", b =>
+                {
+                    b.Navigation("Responses");
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaStatus", b =>
+                {
+                    b.Navigation("SmsNikitaResponses");
                 });
 
             modelBuilder.Entity("ISTUDIO.Infrastructure.Identity.AppUser", b =>

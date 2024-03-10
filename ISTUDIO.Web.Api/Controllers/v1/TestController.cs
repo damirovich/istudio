@@ -1,8 +1,6 @@
 ﻿using Asp.Versioning;
-using ISTUDIO.Application.Features.Authentication.Commands.AuthUsers;
-using ISTUDIO.Contracts.Features.Authentication.Authorizations;
+using ISTUDIO.Application.Features.SmsNikita.Commands.SendSms;
 using ISTUDIO.Web.Api.Data;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;

@@ -12,6 +12,10 @@ public class AppUser : IdentityUser
     public string? Address { get; set; } 
     public string? RefreshToken { get; set; }
     public DateTime RefreshTokenExpiryTime { get; set; }
+    public int? CodeOTP { get; set; }
+    public string? Email { get; set; }
+    public string? NormalizedEmail { get; set; }
+    public DateTime CreatedDate { get; set; }
     public ICollection<FamilyUserEntity> FamilyUsers { get; set; } = new List<FamilyUserEntity>();
     public ICollection<UserImagesEntity> UserImages { get; set; } = new List<UserImagesEntity>();
   

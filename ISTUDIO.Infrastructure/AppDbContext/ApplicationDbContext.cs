@@ -1,6 +1,4 @@
-﻿
-using ISTUDIO.Application.Common.Interfaces;
-using ISTUDIO.Infrastructure.AppDbContext.EntityConfiguration;
+﻿using ISTUDIO.Infrastructure.AppDbContext.EntityConfiguration;
 using ISTUDIO.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -15,9 +13,11 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<FamilyUserEntity> FamilyUsers { get; set; }
     public DbSet<UserImagesEntity> UserImages { get; set; }
     public DbSet<CategoryEntity> Categories { get; set; }
-    public DbSet<SubCategoryEntity> SubCategories { get; set; }
     public DbSet<DiscountEntity> Discounts { get; set; } 
     public DbSet<AppUser> AppUsers { get; set; }
+    public DbSet<SmsNikitaRequest> SmsNikitaRequests { get; set; }
+    public DbSet<SmsNikitaResponse> SmsNikitaResponses { get; set; }
+    public DbSet<SmsNikitaStatus> SmsNikitaStatuses { get; set; }
 
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
@@ -37,7 +37,6 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new UserImageConfiguration());
         builder.ApplyConfiguration(new FamilyUserConfiguration());
         builder.ApplyConfiguration(new CategoryEntityConfiguration());
-        builder.ApplyConfiguration(new SubCategoryEntityConfiguration());
         builder.ApplyConfiguration(new DiscountEntityConfiguration());
         builder.ApplyConfiguration(new InvoiceDetailEntityConfiguration());
         builder.ApplyConfiguration(new InvoiceDetailEntityConfiguration());
@@ -48,7 +47,9 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new ProducImagesEntityConfiguration());
         builder.ApplyConfiguration(new ProductsEntityConfiguration());
         builder.ApplyConfiguration(new ShoppingCartEntityConfiguration());
-
+        builder.ApplyConfiguration(new SmsNikitaRequestConfiguration());
+        builder.ApplyConfiguration(new SmsNikitaResponseConfiguration());
+        builder.ApplyConfiguration(new SmsNikitaStatusConfiguration());
 
     }
    

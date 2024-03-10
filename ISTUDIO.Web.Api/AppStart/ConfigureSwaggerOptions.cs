@@ -49,7 +49,7 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
     {
         var info = new OpenApiInfo()
         {
-            Title = "My CRM Bank API",
+            Title = "My istudio API",
             Version = description.ApiVersion.ToString(),
         };
 

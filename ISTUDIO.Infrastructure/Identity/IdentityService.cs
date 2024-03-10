@@ -1,6 +1,8 @@
 ﻿using ISTUDIO.Application.Common.Exceptions;
 using ISTUDIO.Infrastructure.AppDbContext;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 namespace ISTUDIO.Infrastructure.Identity;
 
@@ -9,58 +11,52 @@ public class IdentityService : IIdentityService
     private readonly UserManager<AppUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SignInManager<AppUser> _signInManager;
-
+    private readonly ApplicationDbContext _appDbContext;
     public IdentityService(
      UserManager<AppUser> userManager,
      RoleManager<IdentityRole> roleManager,
-     SignInManager<AppUser> signInManager)
+     SignInManager<AppUser> signInManager,
+     ApplicationDbContext appDbContext)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _signInManager = signInManager;
+        _appDbContext = appDbContext;
     }
 
-    public async Task<(Result Result, string UserId)> CreateUserAsync(string fullName, string userName, string email, string password)
+
+    // Добавляет указанного пользователя к указанным ролям.
+    
+    public async Task<Result> AddToRolesAsync(string userId, List<string> roles)
     {
-        var user = new AppUser
+        // Получаем пользователя по его идентификатору
+        var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user == null)
         {
-            FullName = fullName,
-            UserName = userName,
-            Email = email
-        };
-
-        var result = await _userManager.CreateAsync(user, password);
-
-        return (result.ToApplicationResult(), user.Id);
-    }
-
-    public async Task<(Result Result, string UserId)> CreateExternalUserAsync(string fullName, string userName, string email, string loginProvider, string providerKey, string providerName)
-    {
-        var user = new AppUser
-        {
-            FullName = fullName,
-            UserName = userName,
-            Email = email,
-        };
-
-        var userExists = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == email);
-
-        if (userExists == null)
-        {
-            var userCreated = await _userManager.CreateAsync(user);
-            if (userCreated == null)
-            {
-                return (Result.Failure(new List<string> { "Could not create user" }), "");
-            }
+            return Result.Failure(new List<string> { "User not found" });
         }
-        var result = await _userManager.AddLoginAsync(user, new UserLoginInfo(loginProvider, providerKey, providerName));
-        return (result.ToApplicationResult(), user.Id);
+
+        var errors = new List<string>();
+
+        foreach (var roleName in roles)
+        {
+            // Проверяем существует ли роль
+            var role = await _appDbContext.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+            if (role == null)
+            {
+                errors.Add($"Role '{roleName}' not found");
+                continue;
+            }
+            // Добавляем пользователя к роли
+            var userRole = new IdentityUserRole<string> { UserId = userId, RoleId = role.Id };
+            _appDbContext.UserRoles.Add(userRole);
+            await _appDbContext.SaveChangesAsync();
+        }
+
+        return errors.Any() ? Result.Failure(errors) : Result.Success();
     }
 
-    public async Task<bool> UserExists(string email)
-    {
-        return await _userManager.Users.AnyAsync(x => x.Email == email);
-    }
+    //Проверяет, принадлежит ли пользователь определенной роли
     public async Task<bool> IsInRoleAsync(string userId, string role)
     {
         var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
@@ -68,6 +64,7 @@ public class IdentityService : IIdentityService
         return user != null && await _userManager.IsInRoleAsync(user, role);
     }
 
+    //Пытается аутентифицировать пользователя на основе предоставленного имени пользователя и пароля.
     public async Task<bool> AuthenticateAsync(string userName, string password)
     {
         var user = await _userManager.FindByNameAsync(userName);
@@ -81,12 +78,49 @@ public class IdentityService : IIdentityService
         return result.Succeeded;
     }
 
+    //Создание нового пользователя
+    public async Task<(Result Result, string UserId)> CreateUserAsync(string fullName, string userName, string email, string password)
+    {
+        var user = new AppUser
+        {
+            FullName = fullName,
+            UserName = userName,
+            Email = email,
+            LockoutEnabled = true
+        };
+
+        //var result = await _userManager.CreateAsync(user, password);
+        _appDbContext.Add(user);
+        await _appDbContext.SaveChangesAsync();
+
+        return (Result.Success(), user.Id);
+    }
+    //Регистрация пользователя
+    public async Task<(Result Result, string UserId)> CreateUserMoblieAsync(string userName, string phoneNumber, int codeOTP)
+    {
+        var user = new AppUser
+        {
+            UserName = userName,
+            PhoneNumber = phoneNumber,
+            CodeOTP = codeOTP,
+            LockoutEnabled = true
+        };
+        
+        _appDbContext.Add(user);
+        await _appDbContext.SaveChangesAsync();
+
+        return (Result.Success(), user.Id);
+        
+    }
+
+    //Удаляет пользователя по его идентификатору Id.
     public async Task<Result> DeleteUserAsync(string userId)
     {
         var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
 
         return user != null ? await DeleteUserAsync(user) : Result.Success();
     }
+
     public async Task<Result> DeleteUserAsync(AppUser user)
     {
         var result = await _userManager.DeleteAsync(user);
@@ -94,31 +128,8 @@ public class IdentityService : IIdentityService
         return result.ToApplicationResult();
     }
 
-    public async Task<Result> AddToRolesAsync(string userId, List<string> roles)
-    {
-        var administratorRole = new IdentityRole(Roles.Admin);
 
-        if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
-        {
-            await _roleManager.CreateAsync(administratorRole);
-        }
-
-        var user = await _userManager.Users.FirstAsync(u => u.Id == userId);
-        if (user == null)
-            return Result.Failure(new List<string> { "User not found" });
-
-        foreach (var role in roles)
-        {
-            var roleExist = await _roleManager.RoleExistsAsync(role);
-            if (!roleExist)
-                await _roleManager.CreateAsync(new IdentityRole(role));
-        }
-
-        var result = await _userManager.AddToRolesAsync(user, roles);
-
-        return result.ToApplicationResult();
-    }
-
+    // Обновляет пароль пользователя.
     public async Task<Result> UpdatePasswordAsync(string userId, string currentPassword, string newPassword)
     {
         var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
@@ -130,23 +141,8 @@ public class IdentityService : IIdentityService
         return result.ToApplicationResult();
     }
 
-    public async Task<Result> UpdateEmailAsync(string userId, string email)
-    {
-        var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
-        if (user == null)
-        {
-            throw new NotFoundException("User not found");
-        }
-        var token = await _userManager.GenerateChangeEmailTokenAsync(user, email);
-        if (token == null)
-        {
-            throw new NotFoundException("Invalid change email token");
-        }
-        var result = await _userManager.ChangeEmailAsync(user, email, token);
 
-        return result.ToApplicationResult();
-    }
-
+    //Обновляет информацию о токене обновления и времени его истечения для пользователя.
     public async Task<Result> UpdateTokenUsers(string userId, string refreshToken, DateTime refreshTokenTime)
     {
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
@@ -155,16 +151,33 @@ public class IdentityService : IIdentityService
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = refreshTokenTime;
 
-        var result = await _userManager.UpdateAsync(user);
+        _appDbContext.Users.Update(user);
+        //var result = await _userManager.UpdateAsync(user);
+        await _appDbContext.SaveChangesAsync();
 
-        return result.ToApplicationResult();
+        return Result.Success(); //result.ToApplicationResult();
     }
-    public async Task<Result> UpdateTokenUsers(string userId, string refreshToken)
+    // Обновление одноразового пароля 
+    public async Task<(Result Result, string UserId)> UpdateUserOTP(string userId, int codeOTP) 
     {
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
         if (user == null)
             throw new NotFoundException("User not found");
-        user.RefreshToken = refreshToken;
+        user.CodeOTP = codeOTP;
+
+        _appDbContext.Update(user);
+        await _appDbContext.SaveChangesAsync();
+        return (Result.Success(), user.Id);
+    }
+    public async Task<Result> UpdateUserProfile(string userId, string fullName, string userName, string email)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
+        if (user == null)
+            throw new NotFoundException("User not found");
+
+        user.FullName = fullName;
+        user.UserName = userName;
+        user.Email = email;
 
         var result = await _userManager.UpdateAsync(user);
 

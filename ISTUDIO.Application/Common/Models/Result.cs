@@ -4,7 +4,7 @@ public class Result
 {
     public bool Succeeded { get; init; }
     public string[] Errors { get; init; }
-
+    public Result() { }
     internal Result(bool succeeded, IEnumerable<string> errors)
     {
         Succeeded = succeeded;
