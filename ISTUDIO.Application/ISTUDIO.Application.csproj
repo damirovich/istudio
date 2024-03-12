@@ -13,6 +13,7 @@
   <ItemGroup>
     <Folder Include="Features\Customers\" />
     <Folder Include="Features\SmsNikita\Queries\" />
+    <Folder Include="Features\SubCategories\DTOs\" />
   </ItemGroup>
 
   <ItemGroup>
