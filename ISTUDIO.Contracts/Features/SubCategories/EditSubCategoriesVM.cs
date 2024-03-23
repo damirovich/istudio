@@ -9,7 +9,6 @@ public class EditSubCategoriesVM : IMapWith<EditSubCategoriesCommand>
     [Required(ErrorMessage = "Name SubCategory is required.")]
     public string Name { get; set; }
     public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
 
     [Required(ErrorMessage = "CategoryId is required.")]
     public int CategoryId { get; set; }

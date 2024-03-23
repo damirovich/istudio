@@ -1,6 +1,6 @@
 ﻿namespace ISTUDIO.Domain.EntityModel;
 
-public class UserImagesEntity
+public class CustomerImagesEntity
 {
     // Уникальный идентификатор изображения продукта
     public int Id { get; set; }
@@ -13,10 +13,8 @@ public class UserImagesEntity
 
     // Наименование изображения (если применимо)
     public string? Name { get; set; }
-
-    // Тип содержимого изображения (например, image/jpeg, image/png и т. д.)
-    public string? ContentType { get; set; }
-    //Идентификатор User который принадлежит изображение
-
-    public string UsersId { get; set; }
+    public string? UserId { get; set; }
+    //Идентификатор Customer который принадлежит изображение
+    public int? CustomerId { get; set; }
+    public CustomersEntity? Customers { get; set; }  
 }

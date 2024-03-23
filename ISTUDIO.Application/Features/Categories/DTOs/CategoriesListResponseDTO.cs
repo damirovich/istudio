@@ -42,6 +42,7 @@ public class CategoriesListResponseDTO : IMapWith<CategoryEntity>
                 // Создаем новый объект DTO для текущей категории.
                 var categoryDTO = new CategoryDTO
                 {
+                    Id = category.Id,
                     // Устанавливаем название категории из свойства Name категории.
                     Name = category.Name,
                     // Устанавливаем URL изображения категории из свойства ImageUrl категории.
@@ -71,6 +72,7 @@ public class CategoriesListResponseDTO : IMapWith<CategoryEntity>
             // Создаем новый объект DTO для текущей подкатегории.
             var subCategoryDTO = new CategoryDTO
             {
+                Id = subCategory.Id,
                 // Устанавливаем название подкатегории из свойства Name подкатегории.
                 Name = subCategory.Name,
                 // Устанавливаем URL изображения подкатегории из свойства ImageUrl подкатегории.

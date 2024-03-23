@@ -6,7 +6,7 @@ public class CreateSubCategoriesCommand : IRequest<ResModel>
 {
     public string Name { get; set; }
     public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? PhotoFilePath { get; set; }
     public int CategoryId { get; set; }
 
     public class Handler : IRequestHandler<CreateSubCategoriesCommand, ResModel>
@@ -22,7 +22,7 @@ public class CreateSubCategoriesCommand : IRequest<ResModel>
                 {
                     Name = command.Name,
                     Description = command.Description,
-                    ImageUrl = command.ImageUrl,
+                    ImageUrl = command.PhotoFilePath,
                     ParentCategoryId = command.CategoryId
                 };
                 await _appDbContext.Categories.AddAsync(subCategory);

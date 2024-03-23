@@ -44,18 +44,14 @@ public static class DependencyInjection
             options.User.RequireUniqueEmail = true;
 
         });
-        services.AddPersistence();
+        services.AddPersistence(configuration);
 
-        services.AddSingleton<IRedisCacheService>(provider =>
-        {
-            var redisConnectionString = configuration.GetConnectionString("Redis");
-            return new RedisCacheService(redisConnectionString);
-        });
+     
         return services;
     }
 
     public static IServiceCollection AddPersistence(
-      this IServiceCollection services)
+      this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IAppUserService, AppUserServices>();
@@ -65,6 +61,21 @@ public static class DependencyInjection
         {
             client.BaseAddress = new Uri("https://smspro.nikita.kg/api/message");
         });
+        services.AddSingleton<IRedisCacheService>(provider =>
+        {
+            var redisConnectionString = configuration.GetConnectionString("Redis");
+            return new RedisCacheService(redisConnectionString);
+        });
+        var commonStoragePath = Path.Combine("..", "MyFiles", "shared_photos");
+        services.AddSingleton<IFileStoreService>(provider =>
+        {
+            return new FileStoreService(commonStoragePath);
+        });
+        //services.AddSingleton<IFileStoreService>(provider =>
+        //{
+        //    var storagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+        //    return new FileStoreService(storagePath);
+        //});
 
         return services;
     }

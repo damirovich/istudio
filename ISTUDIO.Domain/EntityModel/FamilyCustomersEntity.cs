@@ -1,6 +1,6 @@
 ﻿namespace ISTUDIO.Domain.EntityModel;
 
-public class FamilyUserEntity
+public class FamilyCustomersEntity
 {
     // Уникальный идентификатор пользователя
     public int Id { get; set; }
@@ -20,6 +20,7 @@ public class FamilyUserEntity
     // Степень родства с клиентом
     public string? RelationDegreeClient { get; set; }
 
-    // Идентификатор связанного пользователя (если необходимо)
-    public string? UsersId { get; set; }
+    // Идентификатор связанного клиента (если необходимо)
+    public int? CustomerId { get; set; }
+    public CustomersEntity? Customers { get; set; }
 }

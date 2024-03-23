@@ -9,54 +9,25 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ResMo
     public CreateUserCommandHandler(IIdentityService identityService, IAppDbContext appDbContext) =>
                             (_identityService, _appDbContext) = (identityService, appDbContext);
 
-    public async Task<ResModel> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<ResModel> Handle(CreateUserCommand command, CancellationToken cancellationToken)
     {
         try
         {
-            var result = await _identityService.CreateUserAsync(request.FullName!, request.UserName!, request.Email!, request.Password!);
+            var result = await _identityService.CreateUserAsync(command.UserName!, command.Email!, command.Password!);
 
             if (!result.Result.Succeeded)
             {
                 var errors = string.Join(Environment.NewLine, result.Result.Errors);
-                throw new Exception($"Unable to create {request.UserName}.{Environment.NewLine}{errors}");
-            }
-
-            // Сохраняем изображения клиента
-            foreach (var image in request.Images)
-            {
-                var userImage = new UserImagesEntity
-                {
-                    TypeImg = image.Type,
-                    Url = image.Url,
-                    Name = image.Name,
-                    ContentType = image.ContentType,
-                    UsersId = result.UserId // Привязываем изображение к пользователю
-                };
-                _appDbContext.UserImages.Add(userImage);
-            }
-
-            // Сохраняем данные о родственниках
-            foreach (var familyMember in request.FamilyMembers)
-            {
-                var familyUser = new FamilyUserEntity
-                {
-                    FullName = familyMember.FullName,
-                    PIN = familyMember.PIN,
-                    PhoneNumber = familyMember.PhoneNumber,
-                    PlaceOfWork = familyMember.PlaceOfWork,
-                    RelationDegreeClient = familyMember.RelationDegreeClient,
-                    UsersId = result.UserId // Привязываем родственника к пользователю
-                };
-                _appDbContext.FamilyUsers.Add(familyUser);
+                throw new Exception($"Unable to create {command.UserName}.{Environment.NewLine}{errors}");
             }
 
             await _appDbContext.SaveChangesAsync(cancellationToken);
 
-            var addUserToRole = await _identityService.AddToRolesAsync(result.UserId, request.Roles!);
+            var addUserToRole = await _identityService.AddToRolesAsync(result.UserId, command.Roles!);
             if (!addUserToRole.Succeeded)
             {
                 var errors = string.Join(Environment.NewLine, result.Result.Errors);
-                throw new Exception($"Unable to add {request.UserName} to assigned role/s.{Environment.NewLine}{errors}");
+                throw new Exception($"Unable to add {command.UserName} to assigned role/s.{Environment.NewLine}{errors}");
             }
             return ResModel.Success();
         }

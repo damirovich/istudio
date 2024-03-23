@@ -1,17 +1,16 @@
 ﻿
 using Asp.Versioning;
 using AutoMapper;
+using ISTUDIO.Application.Common.Interfaces;
 using ISTUDIO.Application.Common.Models;
 using ISTUDIO.Application.Features.Categories.Commands.CreateCategories;
 using ISTUDIO.Application.Features.Categories.Commands.DeleteCategories;
 using ISTUDIO.Application.Features.Categories.Commands.EditCategories;
 using ISTUDIO.Application.Features.Categories.Queries;
-using ISTUDIO.Application.Features.UserManagement.Commands.CreateUsers;
 using ISTUDIO.Contracts.Features.Categories;
-using ISTUDIO.Contracts.Features.UserManagement;
 using ISTUDIO.Web.Api.Data;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
@@ -20,9 +19,11 @@ namespace ISTUDIO.Web.Api.Controllers.v1;
 public class CategoriesController : BaseController
 {
     private readonly IMapper _mapper;
-    public CategoriesController(IMapper mapper)
+    private readonly IFileStoreService _fileStoreService;
+    public CategoriesController(IMapper mapper, IFileStoreService fileStoreService)
     {
         _mapper = mapper;
+        _fileStoreService = fileStoreService;
     }
 
     /// <summary>
@@ -52,13 +53,28 @@ public class CategoriesController : BaseController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> CreateCategories([FromBody] CreateCategoriesVM category)
+    public async Task<ICsmActionResult> CreateCategories([FromForm] CreateCategoriesVM category, IFormFile? photoCategory)
     {
         try
         {
+            string photoFilePath = string.Empty;
+
+            if (photoCategory != null)
+            {
+                photoFilePath = await _fileStoreService.SaveImage(photoCategory);
+            }
+
             var command = _mapper.Map<CreateCategoriesCommand>(category);
 
-            return new CsmActionResult<Result>(await Mediator.Send(command));
+            // Передаем путь к фотографии в команду
+            command.PhotoFilePath = photoFilePath;
+
+            var result = await Mediator.Send(command);
+            if(result.Succeeded)
+                return new CsmActionResult(result);
+
+            return new CsmActionResult(result.Errors);
+
         }
         catch (Exception ex)
         {
@@ -74,13 +90,26 @@ public class CategoriesController : BaseController
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> EditCategories([FromBody] EditCategoriesVM category)
+    public async Task<ICsmActionResult> EditCategories([FromForm] EditCategoriesVM category, IFormFile? photoCategory)
     {
         try
         {
+            string photoFilePath = string.Empty;
+
+            if (photoCategory != null)
+            {
+                photoFilePath = await _fileStoreService.SaveImage(photoCategory);
+            }
+
             var command = _mapper.Map<EditCategoriesCommand>(category);
 
-            return new CsmActionResult<Result>(await Mediator.Send(command));
+            // Передаем путь к фотографии в команду
+            command.PhotoFilePath = photoFilePath;
+
+
+            var result = await Mediator.Send(command);
+
+            return new CsmActionResult(result);
         }
         catch (Exception ex)
         {
@@ -106,5 +135,14 @@ public class CategoriesController : BaseController
         {
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
+    }
+
+    private ICsmActionResult BadRequest(string message)
+    {
+        return new CsmActionResult(new CsmReturnStatus
+        {
+            Status = (int)HttpStatusCode.BadRequest,
+            Message = message
+        });
     }
 }

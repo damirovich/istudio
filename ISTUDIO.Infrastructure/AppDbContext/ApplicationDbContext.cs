@@ -10,14 +10,16 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public ApplicationDbContext() { }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
-    public DbSet<FamilyUserEntity> FamilyUsers { get; set; }
-    public DbSet<UserImagesEntity> UserImages { get; set; }
+    public DbSet<FamilyCustomersEntity> FamilyUsers { get; set; }
+    public DbSet<CustomerImagesEntity> UserImages { get; set; }
     public DbSet<CategoryEntity> Categories { get; set; }
     public DbSet<DiscountEntity> Discounts { get; set; } 
     public DbSet<AppUser> AppUsers { get; set; }
     public DbSet<SmsNikitaRequest> SmsNikitaRequests { get; set; }
     public DbSet<SmsNikitaResponse> SmsNikitaResponses { get; set; }
     public DbSet<SmsNikitaStatus> SmsNikitaStatuses { get; set; }
+    public DbSet<CustomersEntity> Customers { get; set; }
+    public DbSet<CustomerImagesEntity> CustomerImages { get; set; }
 
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
@@ -34,8 +36,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.Entity<IdentityRoleClaim<string>>(e => e.ToTable("RoleClaims"));
 
         builder.ApplyConfiguration(new AppUserConfiguration());
-        builder.ApplyConfiguration(new UserImageConfiguration());
-        builder.ApplyConfiguration(new FamilyUserConfiguration());
+        builder.ApplyConfiguration(new CustomerImagesConfiguration());
+        builder.ApplyConfiguration(new FamilyCustomerConfiguration());
         builder.ApplyConfiguration(new CategoryEntityConfiguration());
         builder.ApplyConfiguration(new DiscountEntityConfiguration());
         builder.ApplyConfiguration(new InvoiceDetailEntityConfiguration());
@@ -50,6 +52,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new SmsNikitaRequestConfiguration());
         builder.ApplyConfiguration(new SmsNikitaResponseConfiguration());
         builder.ApplyConfiguration(new SmsNikitaStatusConfiguration());
+        builder.ApplyConfiguration(new CustomersEntityConfiguration());
 
     }
    

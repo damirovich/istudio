@@ -10,7 +10,7 @@ public class EditUserProfileCommandHandler : IRequestHandler<EditUserProfileComm
     {
         try
         {
-            var result = await _identityService.UpdateUserProfile(command.UserId!, command.FullName!, command.UserName!, command.Email!);
+            var result = await _identityService.UpdateUserProfile(command.UserId!, command.UserName!, command.Email!);
             if (!result.Succeeded)
             {
                 var errors = string.Join(Environment.NewLine, result.Errors);

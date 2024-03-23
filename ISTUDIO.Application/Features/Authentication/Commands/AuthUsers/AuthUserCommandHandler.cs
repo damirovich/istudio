@@ -30,7 +30,7 @@ public class AuthUserCommandHandler : IRequestHandler<AuthUserCommand, ResModel>
 
             var userDetails = await _userService.GetUserDetailsByUserNameAsync(request.UserName!);
 
-            string token = await _jwtUtils.GenerateToken(userDetails.UserId, userDetails.FullName, userDetails.UserName, userDetails.Roles);
+            string token = await _jwtUtils.GenerateToken(userDetails.UserId, userDetails.UserName, userDetails.Roles);
 
             var refreshToken = await _jwtUtils.GenerateRefreshToken();
             var refreshTokenExpiryTime = DateTime.UtcNow.AddDays(_configuration.GetSection("JwtOptions:RefreshTokenValidityInDays").Get<int>());
@@ -49,8 +49,7 @@ public class AuthUserCommandHandler : IRequestHandler<AuthUserCommand, ResModel>
                 UserSession = new UserSessions
                 {
                     UserId = userDetails.UserId,
-                    Name = userDetails.FullName,
-                    Email = userDetails.Email,
+                    Name = userDetails.UserName,
                     Roles = userDetails.Roles,
                     AccessToken = token,
                     RefreshToken = refreshToken

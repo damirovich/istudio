@@ -5,12 +5,14 @@ namespace ISTUDIO.Application.Common.Interfaces;
 
 public interface IAppDbContext
 {
-    DbSet<FamilyUserEntity> FamilyUsers { get; set; }
-    DbSet<UserImagesEntity> UserImages { get; set; }
+    DbSet<FamilyCustomersEntity> FamilyUsers { get; set; }
+    DbSet<CustomerImagesEntity> UserImages { get; set; }
     DbSet<SmsNikitaRequest> SmsNikitaRequests { get; set; }
     DbSet<SmsNikitaResponse> SmsNikitaResponses { get; set; }
     DbSet<SmsNikitaStatus> SmsNikitaStatuses { get; set; }
     DbSet<CategoryEntity> Categories { get; set; }
+    DbSet<CustomersEntity> Customers { get; set; }
+    DbSet<CustomerImagesEntity> CustomerImages { get; set; }
     
     DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);

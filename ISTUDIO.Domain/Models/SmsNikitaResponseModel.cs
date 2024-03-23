@@ -1,5 +1,4 @@
-﻿using ISTUDIO.Domain.Enums;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace ISTUDIO.Domain.Models;
 

@@ -15,7 +15,7 @@ public class JwtUtils : IJwtUtils
     {
         _configProvider = configProvider;
     }
-    public async Task<string> GenerateToken(string userId, string fullName, string userName, IList<string> roles)
+    public async Task<string> GenerateToken(string userId, string userName, IList<string> roles)
     {
         // Получение настроек JWT из конфигурации
         var jwtSettings = _configProvider.GetSection("JwtOptions");
@@ -38,7 +38,6 @@ public class JwtUtils : IJwtUtils
             new Claim(JwtRegisteredClaimNames.Jti, userId),
             new (ClaimTypes.NameIdentifier, userId),
             new (ClaimTypes.Name, userName!),
-            new Claim("FullName", fullName),
             new Claim("UserId", userId)
         };
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));

@@ -58,6 +58,123 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("Categories", (string)null);
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CustomerImagesEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(350)
+                        .HasColumnType("nvarchar(350)");
+
+                    b.Property<string>("TypeImg")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("CustomerImages", (string)null);
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CustomersEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Authority")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateOfExpiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateOfIssue")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Ethnicity")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Nationality")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PIN")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Patronymic")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PlaceOfBirth")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("SeriesNumDocument")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Sex")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Surname")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("PIN")
+                        .IsUnique();
+
+                    b.ToTable("Customers", (string)null);
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.DiscountEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -94,13 +211,16 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("Discounts", (string)null);
                 });
 
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FamilyUserEntity", b =>
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FamilyCustomersEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("FullName")
                         .HasMaxLength(250)
@@ -123,17 +243,14 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("UsersId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("FamilyUsers", (string)null);
+                    b.ToTable("FamilyCustomers", (string)null);
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.InvoiceDetailEntity", b =>
@@ -519,45 +636,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("SmsNikitaStatuses", (string)null);
                 });
 
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.UserImagesEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(350)
-                        .HasColumnType("nvarchar(350)");
-
-                    b.Property<string>("TypeImg")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UsersId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("UserImages", (string)null);
-                });
-
             modelBuilder.Entity("ISTUDIO.Infrastructure.Identity.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -565,9 +643,6 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CodeOTP")
                         .HasColumnType("int");
@@ -579,7 +654,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 3, 10, 14, 18, 41, 3, DateTimeKind.Utc).AddTicks(6659));
+                        .HasDefaultValue(new DateTime(2024, 3, 19, 3, 2, 59, 426, DateTimeKind.Utc).AddTicks(7752));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)
@@ -587,10 +662,6 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("FullName")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -605,14 +676,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NumDocument")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("PIN")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -631,10 +694,6 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SeriesDocument")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -656,10 +715,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("PIN")
-                        .IsUnique()
-                        .HasFilter("[PIN] IS NOT NULL");
 
                     b.ToTable("AppUsers", (string)null);
                 });
@@ -829,6 +884,17 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("ParentCategory");
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CustomerImagesEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.CustomersEntity", "Customers")
+                        .WithMany("CustomerImages")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customers");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.DiscountEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", null)
@@ -844,11 +910,13 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FamilyUserEntity", b =>
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FamilyCustomersEntity", b =>
                 {
-                    b.HasOne("ISTUDIO.Infrastructure.Identity.AppUser", null)
-                        .WithMany("FamilyUsers")
-                        .HasForeignKey("UsersId");
+                    b.HasOne("ISTUDIO.Domain.EntityModel.CustomersEntity", "Customers")
+                        .WithMany("FamilyCustomers")
+                        .HasForeignKey("CustomerId");
+
+                    b.Navigation("Customers");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.InvoiceDetailEntity", b =>
@@ -962,13 +1030,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("SmsStatus");
                 });
 
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.UserImagesEntity", b =>
-                {
-                    b.HasOne("ISTUDIO.Infrastructure.Identity.AppUser", null)
-                        .WithMany("UserImages")
-                        .HasForeignKey("UsersId");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1042,6 +1103,13 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("SubCategories");
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CustomersEntity", b =>
+                {
+                    b.Navigation("CustomerImages");
+
+                    b.Navigation("FamilyCustomers");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.InvoiceEntity", b =>
                 {
                     b.Navigation("InvoiceDetails");
@@ -1081,13 +1149,6 @@ namespace ISTUDIO.Infrastructure.Migrations
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaStatus", b =>
                 {
                     b.Navigation("SmsNikitaResponses");
-                });
-
-            modelBuilder.Entity("ISTUDIO.Infrastructure.Identity.AppUser", b =>
-                {
-                    b.Navigation("FamilyUsers");
-
-                    b.Navigation("UserImages");
                 });
 #pragma warning restore 612, 618
         }

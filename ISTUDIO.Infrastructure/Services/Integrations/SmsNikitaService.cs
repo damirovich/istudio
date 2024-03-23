@@ -1,7 +1,5 @@
 ﻿using Azure;
-using ISTUDIO.Domain.Enums;
 using ISTUDIO.Domain.Models;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;

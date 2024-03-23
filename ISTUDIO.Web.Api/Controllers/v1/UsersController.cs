@@ -19,6 +19,7 @@ namespace ISTUDIO.Web.Api.Controllers.v1;
 public class UsersController : BaseController
 {
     private readonly IMapper _mapper;
+
     public UsersController(IMapper mapper)
     {
         _mapper = mapper;

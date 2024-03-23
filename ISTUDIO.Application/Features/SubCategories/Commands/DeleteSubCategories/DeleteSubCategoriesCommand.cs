@@ -8,7 +8,9 @@ public class DeleteSubCategoriesCommand : IRequest<ResModel>
     public class Handler : IRequestHandler<DeleteSubCategoriesCommand, ResModel>
     {
         private readonly IAppDbContext _appDbContext;
-        public Handler(IAppDbContext appDbContext) => _appDbContext = appDbContext;
+        private readonly IFileStoreService _fileStoreService;
+        public Handler(IAppDbContext appDbContext, IFileStoreService fileStoreService) =>
+                      (_appDbContext, _fileStoreService) = (appDbContext, fileStoreService);
 
         public async Task<ResModel> Handle(DeleteSubCategoriesCommand command, CancellationToken cancellationToken)
         {
@@ -21,6 +23,8 @@ public class DeleteSubCategoriesCommand : IRequest<ResModel>
 
                 _appDbContext.Categories.Remove(existingSubCategory);
                 await _appDbContext.SaveChangesAsync(cancellationToken);
+
+                _fileStoreService.DeleteImage(existingSubCategory.ImageUrl);
 
                 return ResModel.Success();
             }

@@ -12,7 +12,6 @@ public class EditCategoriesVM : IMapWith<EditCategoriesCommand>
     [Required(ErrorMessage = "Name Category is required.")]
     public string Name { get; set; }
     public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
 
     public void Mapping(Profile profile)
     {

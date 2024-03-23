@@ -39,7 +39,7 @@ public class RefreshJWTCommandHandler : IRequestHandler<RefreshJWTCommand, ResMo
                 throw new BadRequestException("Не правильный RefreshToken или время Refresh Token истек");
             }
             // Генерация новых токенов 
-            var newAccessToken = await _jwtUtils.GenerateToken(user.UserId, user.FullName, user.UserName, user.Roles);
+            var newAccessToken = await _jwtUtils.GenerateToken(user.UserId,  user.UserName, user.Roles);
             var newRefreshToken = await _jwtUtils.GenerateRefreshToken();
 
             //Обновление токена в базе 

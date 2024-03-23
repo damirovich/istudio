@@ -17,6 +17,8 @@ public class EditCategoriesCommandHandler : IRequestHandler<EditCategoriesComman
 
             _mapper.Map(command, existingCategory);
 
+            existingCategory.ImageUrl = command.PhotoFilePath;
+
             _appDbContext.Categories.Update(existingCategory);
 
             await _appDbContext.SaveChangesAsync(cancellationToken);
