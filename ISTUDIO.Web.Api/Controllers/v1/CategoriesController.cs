@@ -27,7 +27,7 @@ public class CategoriesController : BaseController
     }
 
     /// <summary>
-    /// Получение список всех пользователей системы
+    /// Получение список категорий
     /// </summary>
     /// <returns></returns>
     [HttpGet]

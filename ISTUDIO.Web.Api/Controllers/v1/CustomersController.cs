@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
+using ISTUDIO.Application.Common.Exceptions;
 using ISTUDIO.Application.Common.Interfaces;
 using ISTUDIO.Application.Common.Models;
 using ISTUDIO.Application.Features.CustomerImages.Commands;
@@ -74,6 +75,34 @@ public class CustomersController : BaseController
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
+
+    /// <summary>
+    /// Метод для проверки клиент прошел ли идентификацию 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetCustomerIdentification([FromQuery] string userId)
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetCustomersIdentificationQuery
+            {
+                UserId = userId
+            }));
+        }
+        catch (NotFoundException ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(StatusCodes.Status404NotFound, ex.Message));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
 
     /// <summary>
     /// Получение списка Клиентов

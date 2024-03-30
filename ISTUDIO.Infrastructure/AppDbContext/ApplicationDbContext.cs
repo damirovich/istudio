@@ -13,14 +13,16 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<FamilyCustomersEntity> FamilyUsers { get; set; }
     public DbSet<CustomerImagesEntity> UserImages { get; set; }
     public DbSet<CategoryEntity> Categories { get; set; }
-    public DbSet<DiscountEntity> Discounts { get; set; } 
     public DbSet<AppUser> AppUsers { get; set; }
     public DbSet<SmsNikitaRequest> SmsNikitaRequests { get; set; }
     public DbSet<SmsNikitaResponse> SmsNikitaResponses { get; set; }
     public DbSet<SmsNikitaStatus> SmsNikitaStatuses { get; set; }
     public DbSet<CustomersEntity> Customers { get; set; }
     public DbSet<CustomerImagesEntity> CustomerImages { get; set; }
-
+    public DbSet<ProductsEntity> Products { get; set; }
+    public DbSet<DiscountEntity> Discounts { get; set; }
+    public DbSet<ProductImagesEntity> ProductImages { get; set; }
+    public DbSet<ShoppingCartEntity> ShoppingCarts { get; set; }
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
     protected override void OnModelCreating(ModelBuilder builder)

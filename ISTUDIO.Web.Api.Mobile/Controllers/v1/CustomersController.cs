@@ -2,8 +2,10 @@
 
 using Asp.Versioning;
 using AutoMapper;
+using ISTUDIO.Application.Common.Exceptions;
 using ISTUDIO.Application.Common.Interfaces;
 using ISTUDIO.Application.Features.CustomerImages.Commands;
+using ISTUDIO.Application.Features.Customers.Queries;
 using ISTUDIO.Application.Features.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,6 +63,32 @@ public class CustomersController : BaseController
                 return Ok(result);
 
             return StatusCode(StatusCodes.Status503ServiceUnavailable, result.Errors);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Метод для проверки клиент прошел ли идентификацию 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetCustomerIdentification([FromQuery] string userId)
+    {
+        try
+        {
+            var result = await Mediator.Send(new GetCustomersIdentificationQuery { UserId = userId });
+
+            return Ok(result);
+        }
+        catch (NotFoundException ex)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, ex.Message);
         }
         catch (Exception ex)
         {

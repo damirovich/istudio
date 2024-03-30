@@ -26,8 +26,8 @@ public class ProductsEntity
     // Идентификатор категории, к которой относится продукт
     public int? CategoryId { get; set; }
 
-    // Идентификатор подкатегории, к которой относится продукт
-    public int? SubCategoryId { get; set; }
+    // Идентификатор скидки, к которой относится продукт
+    public int? DiscountId { get; set; }
 
     // Категория, к которой относится продукт
     public CategoryEntity Category { get; set; }
@@ -36,6 +36,7 @@ public class ProductsEntity
     public DiscountEntity Discount { get; set; }
 
     // Коллекция изображений продукта
-    public ICollection<ProducImagesEntity> Images { get; set; } = new List<ProducImagesEntity>();
+    public ICollection<ProductImagesEntity> Images { get; set; } = new List<ProductImagesEntity>();
     public ICollection<OrderEntity> Orders { get; set; } = new List<OrderEntity>();
+    public ICollection<ShoppingCartEntity> ShoppingCarts { get; set;} = new List<ShoppingCartEntity>();
 }

@@ -41,7 +41,7 @@ internal class CreateCustomersCommandValidator : AbstractValidator<CreateCustome
             .NotNull().WithMessage("Date of expiry is required.");
 
         RuleFor(command => command.PlaceOfBirth)
-            .NotNull().WithMessage("Place Of Birth  is required.");
+            .NotEmpty().WithMessage("Place Of Birth  is required.");
 
         RuleFor(command => command.Authority)
             .MaximumLength(100).WithMessage("Authority cannot exceed 100 characters.");

@@ -10,24 +10,18 @@ public class EditUserProfileCommandHandler : IRequestHandler<EditUserProfileComm
     {
         try
         {
-            var result = await _identityService.UpdateUserProfile(command.UserId!, command.UserName!, command.Email!);
+            var result = await _identityService.UpdateUserProfile(command.UserId!, command.PhoneNumber!, command.Email!);
             if (!result.Succeeded)
             {
                 var errors = string.Join(Environment.NewLine, result.Errors);
+                throw new BadRequestException($"Unable to edit {command.PhoneNumber}.{Environment.NewLine}{errors}");
+            }
 
-                throw new BadRequestException($"Unable to edit {command.UserName}.{Environment.NewLine}{errors}");
-            }
-            var editUserToRole = await _identityService.AddToRolesAsync(command.UserId, command.Roles!);
-            if (editUserToRole == null)
-            {
-                var errors = string.Join(Environment.NewLine, result.Errors);
-                throw new BadRequestException($"Unable to add {command.UserName} to assigned role/s.{Environment.NewLine}{errors}");
-            }
             return ResModel.Success();
         }
         catch (Exception ex)
         {
-            return ResModel.Failure(new[] { ex.InnerException?.Message ?? ex.Message });
+            return ResModel.Failure(new[] { $" Errors {ex.Message} {ex.InnerException?.Message}"});
         }
     }
 }

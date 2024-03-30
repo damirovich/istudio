@@ -14,9 +14,6 @@ public class DiscountEntity
     // Время окончания действия скидки
     public DateTime EndTime { get; set; }
 
-    // Идентификатор продукта, к которому относится данная скидка
-    public int ProductId { get; set; }
-
-    // Продукт, к которому относится данная скидка
-    public ProductsEntity Products { get; set; }
+    // Продукты данной скидки
+    public ICollection<ProductsEntity> Products { get; set; } = new List<ProductsEntity>();
 }

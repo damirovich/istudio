@@ -3,8 +3,11 @@ using AutoMapper;
 using ISTUDIO.Application.Common.Interfaces;
 using ISTUDIO.Application.Features.Authentication.Commands.AuthUsers;
 using ISTUDIO.Application.Features.Authentication.Commands.RefreshJWT;
+using ISTUDIO.Application.Features.SmsNikita.Commands.SendSms;
+using ISTUDIO.Application.Features.UserManagement.Commands.RegistrUserMobile;
 using ISTUDIO.Contracts.Features.Authentication.Authorizations;
 using ISTUDIO.Contracts.Features.Authentication.JWTTokens;
+using ISTUDIO.Contracts.Features.UserManagement;
 using ISTUDIO.Web.Api.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -71,8 +74,8 @@ public class AuthController : BaseController
     /// </summary>
     /// <param name="userId">userId пользователя</param>
     /// <returns>Ok</returns>
-    [HttpPost("revoke/{userId}")]
-    public async Task<ICsmActionResult> Revoke(string userId)
+    [HttpPost("revoke")]
+    public async Task<ICsmActionResult> Revoke([FromForm] string userId)
     {
         try
         {
@@ -88,6 +91,46 @@ public class AuthController : BaseController
         catch (Exception ex)
         {
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message, ex.InnerException ?? ex));
+        }
+    }
+    /// <summary>
+    /// Отправка ОТП кода в номер телефона
+    /// </summary>
+    /// <param name="phonesNumber"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ICsmActionResult> SendOTP([FromForm]string phonesNumber)
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new SendSmsCommand { PhonesNumber = phonesNumber }));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+
+        }
+    }
+    /// <summary>
+    /// Регистрация клиента по номеру в мобильном приложении
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ICsmActionResult> RegistrUser([FromBody] CreateUserMobleVM user)
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new RegistrUsersMobileCommand
+            {
+                PhoneNumber = user.PhoneNumber,
+                OTPCode = user.CodeOTP,
+                Roles = new List<string> { "MobileUser" }
+            }));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
     private ICsmActionResult BadRequest(string message)

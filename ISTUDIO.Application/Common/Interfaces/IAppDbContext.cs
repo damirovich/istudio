@@ -13,7 +13,10 @@ public interface IAppDbContext
     DbSet<CategoryEntity> Categories { get; set; }
     DbSet<CustomersEntity> Customers { get; set; }
     DbSet<CustomerImagesEntity> CustomerImages { get; set; }
-    
+    DbSet<ProductsEntity> Products { get; set; }
+    DbSet<DiscountEntity> Discounts { get; set; }
+    DbSet<ProductImagesEntity> ProductImages { get; set; }
+    DbSet<ShoppingCartEntity> ShoppingCarts { get; set; }
     DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

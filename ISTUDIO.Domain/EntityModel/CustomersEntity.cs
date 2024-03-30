@@ -19,6 +19,7 @@ public class CustomersEntity
     public string? Ethnicity { get; set; }
     public string? Address { get; set; }
     public string? UserId {  get; set; }
+    public bool? Identification { get; set; }
     public ICollection<CustomerImagesEntity> CustomerImages { get; set; } = new List<CustomerImagesEntity>();
     public ICollection<FamilyCustomersEntity> FamilyCustomers { get; set; } = new List<FamilyCustomersEntity>();
 }

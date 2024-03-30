@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
-[Authorize]
+//[Authorize]
 [ApiVersion("1.0")]
 public class UsersController : BaseController
 {

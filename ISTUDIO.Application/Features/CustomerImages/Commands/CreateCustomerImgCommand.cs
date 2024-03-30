@@ -1,6 +1,5 @@
 ﻿namespace ISTUDIO.Application.Features.CustomerImages.Commands;
 
-using ISTUDIO.Application.Features.Customers.Commands.CreateCustomers;
 using ISTUDIO.Application.Features.ModelsDTO;
 using ISTUDIO.Domain.EntityModel;
 using System.ComponentModel.DataAnnotations;

@@ -19,7 +19,7 @@ public class CreateCustomersVM : IMapWith<CreateCustomersCommand>
     [Required]
     public string SeriesNumDocument { get; set; }
     public DateTime DateOfExpiry { get; set; }
-    public DateTime PlaceOfBirth { get; set; }
+    public string PlaceOfBirth { get; set; }
     public string Authority { get; set; }
     public DateTime DateOfIssue { get; set; }
     public string Ethnicity { get; set; }

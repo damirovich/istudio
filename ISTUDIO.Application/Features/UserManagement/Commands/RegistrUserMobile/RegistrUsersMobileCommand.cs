@@ -1,10 +1,14 @@
 ﻿
+using ISTUDIO.Application.Features.UserManagement.DTOs;
+
 namespace ISTUDIO.Application.Features.UserManagement.Commands.RegistrUserMobile;
 
 using ISTUDIO.Application.Common.Interfaces;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
-public class RegistrUsersMobileCommand : IRequest<string>
+
+using ResModel = UserRegistrResponseDTO;
+public class RegistrUsersMobileCommand : IRequest<ResModel>
 {
     [Required]
     public string PhoneNumber { get; set; }
@@ -13,14 +17,14 @@ public class RegistrUsersMobileCommand : IRequest<string>
 
     public List<string>? Roles { get; set; } = new List<string>();
 
-    public class Handler : IRequestHandler<RegistrUsersMobileCommand, string>
+    public class Handler : IRequestHandler<RegistrUsersMobileCommand, ResModel>
     {
         public readonly IIdentityService _identityService;
         private readonly IAppUserService _appUserService;
         public Handler(IIdentityService identityService, IAppUserService appUserService) => 
             (_identityService, _appUserService )= (identityService, appUserService);
 
-        public async Task<string> Handle(RegistrUsersMobileCommand command, CancellationToken cancellationToken)
+        public async Task<ResModel> Handle(RegistrUsersMobileCommand command, CancellationToken cancellationToken)
         {
             // Проверяем, существует ли пользователь с этим номером телефона
             var (userExists, userId) = await _appUserService.GetUserExistsByPhoneNumber(command.PhoneNumber);
@@ -33,7 +37,7 @@ public class RegistrUsersMobileCommand : IRequest<string>
                     var errors = string.Join(Environment.NewLine, updateResult.Result.Errors);
                     throw new BadRequestException($"Unable to update OTP Code for {command.PhoneNumber}.{Environment.NewLine}{errors}");
                 }
-                return updateResult.UserId;
+                return new ResModel { PhoneNumber = command.PhoneNumber, UserId = updateResult.UserId };
             }
 
             // Если пользователя нет с этим номером телефона, создаем нового пользователя
@@ -52,7 +56,7 @@ public class RegistrUsersMobileCommand : IRequest<string>
                 throw new BadRequestException($"Unable to add {command.PhoneNumber} to assigned role/s.{Environment.NewLine}{errors}");
             }
 
-            return creationResult.UserId;
+            return new ResModel { PhoneNumber = command.PhoneNumber, UserId = creationResult.UserId };
         }
     }
 }

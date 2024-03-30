@@ -58,7 +58,7 @@ public class AuthUserCommandHandler : IRequestHandler<AuthUserCommand, ResModel>
         }
         catch (BadRequestException ex)
         {
-            throw;
+            throw new BadRequestException($"Ошибка {ex.Message}", ex.InnerException);
         }
         catch (Exception ex)
         {

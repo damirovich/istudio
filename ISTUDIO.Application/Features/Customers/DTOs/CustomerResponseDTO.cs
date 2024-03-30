@@ -21,6 +21,7 @@ public class CustomerResponseDTO : IMapWith<CustomersEntity>
     public string? Ethnicity { get; set; }
     public string? Address { get; set; }
     public string? UserId { get; set; }
+    public bool? Identification { get; set; }
 
     public void Mapping(Profile profile)
     {

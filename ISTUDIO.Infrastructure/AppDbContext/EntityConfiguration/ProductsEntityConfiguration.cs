@@ -18,21 +18,36 @@ public class ProductsEntityConfiguration : IEntityTypeConfiguration<ProductsEnti
         builder.Property(e => e.QuantityInStock).IsRequired();
         builder.Property(e => e.Description).IsRequired();
 
-        builder.HasOne(e => e.Category)
-            .WithMany(c => c.Products)
-            .HasForeignKey(e => e.CategoryId)
-            .IsRequired();
+        // Определение связи с категорией
+        builder.HasOne(p => p.Category)
+               .WithMany(c => c.Products)
+               .HasForeignKey(p => p.CategoryId)
+               .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(e => e.Images)
-            .WithOne(i => i.Products)
-            .HasForeignKey(i => i.ProductId)
-            .IsRequired();
 
-        builder.HasOne(e => e.Discount)
-            .WithOne()
-            .HasForeignKey<DiscountEntity>(d => d.ProductId)
-            .IsRequired(false);
+        // Определяем внешний ключ для связи со скидкой
+        builder.HasOne(p => p.Discount)
+            .WithMany(d => d.Products)
+            .HasForeignKey(p => p.DiscountId)
+             .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict); // Устанавливаем ограничение на удаление каскадом
 
+
+        //// Определение связи с изображениями
+        builder.HasMany(p => p.Images)
+               .WithOne(pi => pi.Products)
+               .HasForeignKey(pi => pi.ProductId)
+                .IsRequired()
+               .OnDelete(DeleteBehavior.Cascade);
+
+        // Определение связи с заказами
+        builder.HasMany(o => o.Orders)
+             .WithMany(p => p.Products)
+             .UsingEntity(j => j.ToTable("OrderProducts"));
+
+        builder.HasMany(e => e.ShoppingCarts)
+               .WithMany(p => p.Products)
+               .UsingEntity(j => j.ToTable("ShoppingCartProducts"));
 
         builder.HasIndex(e => e.Id).IsUnique();
     }

@@ -59,7 +59,6 @@ public class RefreshJWTCommandHandler : IRequestHandler<RefreshJWTCommand, ResMo
                 UserSession = new UserSessions
                 {
                     UserId = user.UserId,
-                    Name = user.FullName,
                     Email = user.Email,
                     Roles = user.Roles,
                     AccessToken = newAccessToken,

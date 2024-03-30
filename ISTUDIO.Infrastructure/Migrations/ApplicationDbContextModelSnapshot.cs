@@ -128,6 +128,9 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<bool?>("Identification")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -189,12 +192,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<decimal>("PercenTage")
                         .HasColumnType("decimal(5, 2)");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductsId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
@@ -202,11 +199,6 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     b.HasIndex("Id")
                         .IsUnique();
-
-                    b.HasIndex("ProductId")
-                        .IsUnique();
-
-                    b.HasIndex("ProductsId");
 
                     b.ToTable("Discounts", (string)null);
                 });
@@ -336,9 +328,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("ShoppingCartEntityId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18, 2)");
 
@@ -350,8 +339,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("ShoppingCartEntityId");
 
                     b.ToTable("OrderDetails", (string)null);
                 });
@@ -441,7 +428,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("PaymentTypes", (string)null);
                 });
 
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProducImagesEntity", b =>
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductImagesEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -459,14 +446,8 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("ProductId")
-                        .IsRequired()
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
-
-                    b.Property<string>("TypeImg")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -492,7 +473,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CategoryId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("Color")
@@ -503,6 +483,9 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DiscountId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Model")
                         .IsRequired()
@@ -520,12 +503,11 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<int>("QuantityInStock")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SubCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("DiscountId");
 
                     b.HasIndex("Id")
                         .IsUnique();
@@ -541,10 +523,12 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("QuantyProduct")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -654,7 +638,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 3, 19, 3, 2, 59, 426, DateTimeKind.Utc).AddTicks(7752));
+                        .HasDefaultValue(new DateTime(2024, 3, 29, 8, 59, 37, 293, DateTimeKind.Utc).AddTicks(3604));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)
@@ -875,6 +859,21 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("OrderProducts", (string)null);
                 });
 
+            modelBuilder.Entity("ProductsEntityShoppingCartEntity", b =>
+                {
+                    b.Property<int>("ProductsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShoppingCartsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductsId", "ShoppingCartsId");
+
+                    b.HasIndex("ShoppingCartsId");
+
+                    b.ToTable("ShoppingCartProducts", (string)null);
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CategoryEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.CategoryEntity", "ParentCategory")
@@ -893,21 +892,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Customers");
-                });
-
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.DiscountEntity", b =>
-                {
-                    b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", null)
-                        .WithOne("Discount")
-                        .HasForeignKey("ISTUDIO.Domain.EntityModel.DiscountEntity", "ProductId");
-
-                    b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", "Products")
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FamilyCustomersEntity", b =>
@@ -967,12 +951,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ISTUDIO.Domain.EntityModel.ShoppingCartEntity", null)
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("ShoppingCartEntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Order");
 
                     b.Navigation("Product");
@@ -989,7 +967,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("PaymentType");
                 });
 
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProducImagesEntity", b =>
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductImagesEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", "Products")
                         .WithMany("Images")
@@ -1005,10 +983,16 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.HasOne("ISTUDIO.Domain.EntityModel.CategoryEntity", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ISTUDIO.Domain.EntityModel.DiscountEntity", "Discount")
+                        .WithMany("Products")
+                        .HasForeignKey("DiscountId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
+
+                    b.Navigation("Discount");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaResponse", b =>
@@ -1096,6 +1080,21 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ProductsEntityShoppingCartEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ISTUDIO.Domain.EntityModel.ShoppingCartEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ShoppingCartsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CategoryEntity", b =>
                 {
                     b.Navigation("Products");
@@ -1108,6 +1107,11 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("CustomerImages");
 
                     b.Navigation("FamilyCustomers");
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.DiscountEntity", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.InvoiceEntity", b =>
@@ -1130,15 +1134,7 @@ namespace ISTUDIO.Infrastructure.Migrations
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductsEntity", b =>
                 {
-                    b.Navigation("Discount")
-                        .IsRequired();
-
                     b.Navigation("Images");
-                });
-
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ShoppingCartEntity", b =>
-                {
-                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaRequest", b =>

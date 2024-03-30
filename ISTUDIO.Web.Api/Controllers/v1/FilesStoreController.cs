@@ -1,12 +1,12 @@
 ﻿using Asp.Versioning;
 using ISTUDIO.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
 public class FilesStoreController : BaseController
 {
-
     private readonly IFileStoreService _fileStoreService;
 
     public FilesStoreController(IFileStoreService fileStoreService)
@@ -32,10 +32,10 @@ public class FilesStoreController : BaseController
             // Ловим исключение, если переданный путь к файлу пуст или null
             return BadRequest(ex.Message);
         }
-        catch (FileNotFoundException)
+        catch (FileNotFoundException ex)
         {
             // Ловим исключение, если файл не найден
-            return NotFound();
+            return StatusCode(StatusCodes.Status404NotFound, ex.Message);
         }
         catch (Exception)
         {

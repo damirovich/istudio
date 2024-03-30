@@ -10,11 +10,13 @@ public class ShoppingCartEntityConfiguration : IEntityTypeConfiguration<Shopping
 
         builder.HasKey(e => e.Id);
 
-        builder.Property(e => e.UserId).HasMaxLength(500).IsRequired();
 
-        // Определение связи с деталями заказа
-        builder.HasMany(e => e.OrderDetails)
-               .WithOne()
-               .IsRequired();
+        builder.Property(e => e.UserId).IsRequired();
+        builder.Property(e => e.QuantyProduct).IsRequired();
+
+        // Определяем связь многие ко многим с сущностью ProductsEntity
+        builder.HasMany(e => e.Products)
+               .WithMany(p => p.ShoppingCarts)
+               .UsingEntity(j => j.ToTable("ShoppingCartProducts"));
     }
 }

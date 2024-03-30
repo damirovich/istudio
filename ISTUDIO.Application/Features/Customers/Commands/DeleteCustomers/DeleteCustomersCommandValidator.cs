@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace ISTUDIO.Application.Features.Customers.Commands.DeleteCustomers;
 
-namespace ISTUDIO.Application.Features.Customers.Commands.DeleteCustomers
+public class DeleteCustomersCommandValidator : AbstractValidator<DeleteCustomersCommand>
 {
-    internal class DeleteCustomersCommandValidator
+    public DeleteCustomersCommandValidator() 
     {
+        RuleFor(v => v.CustomerId).NotEmpty().WithMessage("CustomerId не должен быть пустым.")
+            .GreaterThan(0).WithMessage("CustomerId должен быть положительным числом.");
     }
 }

@@ -1,0 +1,62 @@
+﻿namespace ISTUDIO.Application.Features.ShoppingCarts.Commands.CreateShoppingCarts;
+
+using ISTUDIO.Domain.EntityModel;
+using ResModel = Result;
+public class AddProductToCartsCommand : IRequest<ResModel>
+{
+    public string UserId { get; set; }
+    public int ProductId { get; set; }
+
+    public class Handler : IRequestHandler<AddProductToCartsCommand, ResModel>
+    {
+        private readonly IAppDbContext _appDbContext;
+        public Handler(IAppDbContext appDbContext) => _appDbContext = appDbContext;
+
+        public async Task<ResModel> Handle(AddProductToCartsCommand command, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var existingCarts = await _appDbContext.ShoppingCarts
+                        .Include(cart => cart.Products)
+                        .Where(cart => cart.UserId == command.UserId)
+                        .ToListAsync();
+
+                foreach (var cart in existingCarts)
+                {
+                    var existingProductInCart = cart.Products.FirstOrDefault(p => p.Id == command.ProductId);
+                    if (existingProductInCart != null)
+                    {
+                        // Если продукт уже есть в текущей корзине, увеличиваем количество
+                        cart.QuantyProduct++;
+
+                        await _appDbContext.SaveChangesAsync(cancellationToken);
+                        return ResModel.Success();
+                    }
+                }
+
+                var product = await _appDbContext.Products.FirstOrDefaultAsync(p => p.Id == command.ProductId);
+
+                if (product == null)
+                {
+                    throw new NotFoundException("Продукт не найден.");
+                }
+
+                var shoppingCart = new ShoppingCartEntity
+                {
+                    UserId = command.UserId,
+                    Products = new List<ProductsEntity> { product },
+                    QuantyProduct = 1
+                };
+
+                _appDbContext.ShoppingCarts.Add(shoppingCart);
+                await _appDbContext.SaveChangesAsync(cancellationToken);
+
+                return ResModel.Success();
+            }
+            catch (Exception ex)
+            {
+                return ResModel.Failure(new[] { ex.Message });
+            }
+        }
+    }
+}

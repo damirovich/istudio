@@ -8,6 +8,8 @@ public class ShoppingCartEntity
     // Идентификатор пользователя, которому принадлежит корзина
     public string UserId { get; set; }
 
-    // Список деталей заказа в корзине
-    public ICollection<OrderDetailEntity> OrderDetails { get; set; } = new List<OrderDetailEntity>();
+    public int QuantyProduct {  get; set; }
+
+    // Список Продуктов
+    public ICollection<ProductsEntity> Products { get; set; } = new List<ProductsEntity>();
 }

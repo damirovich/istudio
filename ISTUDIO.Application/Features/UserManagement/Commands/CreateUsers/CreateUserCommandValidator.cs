@@ -4,11 +4,10 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
     public CreateUserCommandValidator()
     {
-        RuleFor(v => v.FullName).NotEmpty().WithMessage("ФИО не должно быть пустым.");
         RuleFor(v => v.Email)
             .NotEmpty().WithMessage("Email не должен быть пустым.")
             .EmailAddress().WithMessage("Неправильный формат адреса электронной почты.");
-        RuleFor(v => v.UserName).NotEmpty().WithMessage("Имя пользователя не должно быть пустым.");
+        RuleFor(v => v.PhoneNumber).NotEmpty().WithMessage("Имя пользователя не должно быть пустым.");
         RuleFor(v => v.Password).NotEmpty().WithMessage("Пароль не должен быть пустым.")
             .MinimumLength(8).WithMessage("Пароль должен содержать как минимум 8 символов.")
             .Matches("[A-Z]").WithMessage("Пароль должен содержать хотя бы одну заглавную букву.")

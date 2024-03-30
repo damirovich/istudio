@@ -1,5 +1,4 @@
 ﻿namespace ISTUDIO.Application.Features.UserManagement.Commands.CreateUsers;
-using ISTUDIO.Domain.EntityModel;
 
 using ResModel = Result;
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ResModel>
@@ -13,21 +12,19 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ResMo
     {
         try
         {
-            var result = await _identityService.CreateUserAsync(command.UserName!, command.Email!, command.Password!);
+            var result = await _identityService.CreateUserAsync(command.PhoneNumber!, command.Email!, command.Password!);
 
             if (!result.Result.Succeeded)
             {
                 var errors = string.Join(Environment.NewLine, result.Result.Errors);
-                throw new Exception($"Unable to create {command.UserName}.{Environment.NewLine}{errors}");
+                throw new Exception($"Unable to create {command.PhoneNumber}.{Environment.NewLine}{errors}");
             }
-
-            await _appDbContext.SaveChangesAsync(cancellationToken);
 
             var addUserToRole = await _identityService.AddToRolesAsync(result.UserId, command.Roles!);
             if (!addUserToRole.Succeeded)
             {
                 var errors = string.Join(Environment.NewLine, result.Result.Errors);
-                throw new Exception($"Unable to add {command.UserName} to assigned role/s.{Environment.NewLine}{errors}");
+                throw new Exception($"Unable to add {command.PhoneNumber} to assigned role/s.{Environment.NewLine}{errors}");
             }
             return ResModel.Success();
         }

@@ -2,15 +2,14 @@
 
 namespace ISTUDIO.Infrastructure.AppDbContext.EntityConfiguration;
 
-public class ProducImagesEntityConfiguration : IEntityTypeConfiguration<ProducImagesEntity>
+public class ProducImagesEntityConfiguration : IEntityTypeConfiguration<ProductImagesEntity>
 {
-    public void Configure(EntityTypeBuilder<ProducImagesEntity> builder)
+    public void Configure(EntityTypeBuilder<ProductImagesEntity> builder)
     {
         builder.ToTable("ProductImages");
 
         builder.HasKey(e => e.Id);
 
-        builder.Property(e => e.TypeImg).HasMaxLength(50).IsRequired();
         builder.Property(e => e.Url).HasMaxLength(500).IsRequired();
         builder.Property(e => e.Name).HasMaxLength(100).IsRequired();
         builder.Property(e => e.ContentType).HasMaxLength(50).IsRequired();

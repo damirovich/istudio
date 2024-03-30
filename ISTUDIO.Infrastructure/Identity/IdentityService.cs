@@ -6,18 +6,15 @@ namespace ISTUDIO.Infrastructure.Identity;
 
 public class IdentityService : IIdentityService
 {
-    private readonly UserManager<AppUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly UserManager<AppUser> _userManager;    
     private readonly SignInManager<AppUser> _signInManager;
     private readonly ApplicationDbContext _appDbContext;
     public IdentityService(
-     UserManager<AppUser> userManager,
-     RoleManager<IdentityRole> roleManager,
-     SignInManager<AppUser> signInManager,
-     ApplicationDbContext appDbContext)
+         UserManager<AppUser> userManager,
+         SignInManager<AppUser> signInManager,
+         ApplicationDbContext appDbContext)
     {
         _userManager = userManager;
-        _roleManager = roleManager;
         _signInManager = signInManager;
         _appDbContext = appDbContext;
     }
@@ -27,31 +24,37 @@ public class IdentityService : IIdentityService
     
     public async Task<Result> AddToRolesAsync(string userId, List<string> roles)
     {
-        // Получаем пользователя по его идентификатору
-        var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        if (user == null)
+        try
         {
-            return Result.Failure(new List<string> { "User not found" });
-        }
-
-        var errors = new List<string>();
-
-        foreach (var roleName in roles)
-        {
-            // Проверяем существует ли роль
-            var role = await _appDbContext.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
-            if (role == null)
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
             {
-                errors.Add($"Role '{roleName}' not found");
-                continue;
+                return Result.Failure(new List<string> { "User not found" });
             }
-            // Добавляем пользователя к роли
-            var userRole = new IdentityUserRole<string> { UserId = userId, RoleId = role.Id };
-            _appDbContext.UserRoles.Add(userRole);
-            await _appDbContext.SaveChangesAsync();
-        }
 
-        return errors.Any() ? Result.Failure(errors) : Result.Success();
+            var errors = new List<string>();
+
+            foreach (var roleName in roles)
+            {
+                var role = await _appDbContext.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+                if (role == null)
+                {
+                    errors.Add($"Role '{roleName}' not found");
+                    continue;
+                }
+
+                var userRole = new IdentityUserRole<string> { UserId = userId, RoleId = role.Id };
+                _appDbContext.UserRoles.Add(userRole);
+                await _appDbContext.SaveChangesAsync();
+            }
+
+            return errors.Any() ? Result.Failure(errors) : Result.Success();
+        }
+        catch (Exception ex)
+        {
+            // Здесь вы можете выполнить логирование исключения или любые другие необходимые действия
+            return Result.Failure(new[] { ex.InnerException?.Message ?? ex.Message });
+        }
     }
 
     //Проверяет, принадлежит ли пользователь определенной роли
@@ -65,7 +68,9 @@ public class IdentityService : IIdentityService
     //Пытается аутентифицировать пользователя на основе предоставленного имени пользователя и пароля.
     public async Task<bool> AuthenticateAsync(string userName, string password)
     {
-        var user = await _userManager.FindByNameAsync(userName);
+        var user = await _appDbContext.AppUsers.FirstOrDefaultAsync(u => u.PhoneNumber == userName);
+
+        // Если пользователь не найден, возвращаем false
         if (user == null)
         {
             return false;
@@ -77,16 +82,16 @@ public class IdentityService : IIdentityService
     }
 
     //Создание нового пользователя
-    public async Task<(Result Result, string UserId)> CreateUserAsync(string userName, string email, string password)
+    public async Task<(Result Result, string UserId)> CreateUserAsync(string phoneNumber, string email, string password)
     {
         var user = new AppUser
         {
-            UserName = userName,
+            UserName = phoneNumber,
             Email = email,
+            PhoneNumber = phoneNumber,
             LockoutEnabled = true
         };
 
-        //var result = await _userManager.CreateAsync(user, password);
         _appDbContext.Add(user);
         await _appDbContext.SaveChangesAsync();
 
@@ -166,17 +171,28 @@ public class IdentityService : IIdentityService
         await _appDbContext.SaveChangesAsync();
         return (Result.Success(), user.Id);
     }
-    public async Task<Result> UpdateUserProfile(string userId, string userName, string email)
+    public async Task<Result> UpdateUserProfile(string userId, string phoneNumber, string email)
     {
-        var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
-        if (user == null)
-            throw new NotFoundException("User not found");
+        try
+        {
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (user == null)
+            {
+                throw new NotFoundException("User not found");
+            }
 
-        user.UserName = userName;
-        user.Email = email;
+            user.UserName = phoneNumber;
+            user.PhoneNumber = phoneNumber;
+            user.Email = email;
 
-        var result = await _userManager.UpdateAsync(user);
+            await _appDbContext.SaveChangesAsync();
 
-        return result.ToApplicationResult();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            // Здесь вы можете выполнить логирование исключения или любые другие необходимые действия
+            return Result.Failure(new[] { $"An error occurred while updating user profile. {ex.Message}" });
+        }
     }
 }

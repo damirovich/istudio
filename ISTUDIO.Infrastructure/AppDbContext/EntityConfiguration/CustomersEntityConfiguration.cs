@@ -22,6 +22,8 @@ public class CustomersEntityConfiguration : IEntityTypeConfiguration<CustomersEn
         builder.Property(e => e.Authority).HasMaxLength(250);
         builder.Property(e => e.Ethnicity).HasMaxLength(100);
         builder.Property(e => e.Address).HasMaxLength(500);
+        builder.Property(e => e.Identification).IsRequired(false);
+
 
         builder.HasMany(e => e.CustomerImages)
                .WithOne(c => c.Customers)

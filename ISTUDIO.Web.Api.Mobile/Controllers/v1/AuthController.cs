@@ -11,8 +11,13 @@ namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 [ApiVersion("1.0")]
 public class AuthController : BaseController
 {
-    [HttpGet]
-    public async Task<IActionResult> SendOTP(string phonesNumber)
+    /// <summary>
+    /// Отправка ОТП кода в номер телефона
+    /// </summary>
+    /// <param name="phonesNumber"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<IActionResult> SendOTP([FromForm] string phonesNumber)
     {
         try
         {

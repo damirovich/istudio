@@ -14,12 +14,6 @@ public class DiscountEntityConfiguration : IEntityTypeConfiguration<DiscountEnti
         builder.Property(e => e.StartTime).IsRequired();
         builder.Property(e => e.EndTime).IsRequired();
 
-
-        builder.HasOne(e => e.Products)
-                  .WithOne(p => p.Discount)
-                  .HasForeignKey<ProductsEntity>(p => p.Id)
-                  .IsRequired();
-
         builder.HasIndex(e => e.Id).IsUnique();
     }
 }

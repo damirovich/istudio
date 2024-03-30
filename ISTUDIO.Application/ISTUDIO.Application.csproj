@@ -13,8 +13,6 @@
   <ItemGroup>
     <Folder Include="Features\CustomerImages\DTOs\" />
     <Folder Include="Features\CustomerImages\Queries\" />
-    <Folder Include="Features\Products\Commands\" />
-    <Folder Include="Features\Products\Queries\" />
     <Folder Include="Features\SmsNikita\Queries\" />
     <Folder Include="Features\SubCategories\DTOs\" />
   </ItemGroup>
