@@ -22,4 +22,5 @@ public class CustomersEntity
     public bool? Identification { get; set; }
     public ICollection<CustomerImagesEntity> CustomerImages { get; set; } = new List<CustomerImagesEntity>();
     public ICollection<FamilyCustomersEntity> FamilyCustomers { get; set; } = new List<FamilyCustomersEntity>();
+    public ICollection<OrderEntity> Orders { get; set; } = new List<OrderEntity>();
 }

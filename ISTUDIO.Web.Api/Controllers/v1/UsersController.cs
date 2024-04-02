@@ -9,8 +9,6 @@ using ISTUDIO.Application.Features.UserManagement.Commands.UpdatePassword;
 using ISTUDIO.Application.Features.UserManagement.Queries;
 using ISTUDIO.Contracts.Features.UserManagement;
 using ISTUDIO.Web.Api.Data;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;

@@ -12,8 +12,13 @@ public class OrderEntity
     // Общая цена заказа
     public decimal TotalPrice { get; set; }
 
+    //Общая количество продуктов в заказе
+    public int TotalQuantyProduct {  get; set; }
+
     // Статус доставки заказа
     public string Status { get; set; }
+
+    public DateTime CreateDate { get; set; }
 
     // Идентификатор пользователя, сделавшего этот заказ
     public string UserId { get; set; }
@@ -25,4 +30,5 @@ public class OrderEntity
 
     // Детали заказа
     public ICollection<OrderDetailEntity> Details { get; set; } = new HashSet<OrderDetailEntity>();
+    public ICollection<CustomersEntity> Customers { get; set; } = new List<CustomersEntity>();
 }

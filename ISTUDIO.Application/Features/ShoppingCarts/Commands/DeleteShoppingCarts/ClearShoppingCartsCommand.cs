@@ -40,3 +40,14 @@ public class ClearShoppingCartsCommand : IRequest<ResModel>
         }
     }
 }
+public class ClearShoppingCartsCommandValidator : AbstractValidator<ClearShoppingCartsCommand>
+{
+    public ClearShoppingCartsCommandValidator()
+    {
+
+        RuleFor(v => v.UserId)
+               .NotEmpty().WithMessage("UserId не может быть пустым.")
+               .MaximumLength(255).WithMessage("UserId должно быть не длиннее 255 символов.");
+
+    }
+}

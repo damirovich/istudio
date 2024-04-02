@@ -7,11 +7,11 @@ public class EditCategoriesCommandValidator : AbstractValidator<EditCategoriesCo
         RuleFor(v => v.Id).NotEmpty().WithMessage("Id категории не должен быть пустым.")
            .GreaterThan(0).WithMessage("Id категории должен быть положительным числом.");
 
-        RuleFor(command => command.Name)
+        RuleFor(v => v.Name)
             .NotEmpty().WithMessage("Имя категории обязательно.")
             .MaximumLength(100).WithMessage("Имя категории не должно превышать 100 символов.");
 
-        RuleFor(command => command.Description)
+        RuleFor(v => v.Description)
             .NotEmpty().WithMessage("Описание категории обязательно.");
     }
 }

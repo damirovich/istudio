@@ -39,4 +39,5 @@ public class ProductsEntity
     public ICollection<ProductImagesEntity> Images { get; set; } = new List<ProductImagesEntity>();
     public ICollection<OrderEntity> Orders { get; set; } = new List<OrderEntity>();
     public ICollection<ShoppingCartEntity> ShoppingCarts { get; set;} = new List<ShoppingCartEntity>();
+    public ICollection<FavoriteProductsEntity> FavoriteProducts { get; set; } = new List<FavoriteProductsEntity>();
 }

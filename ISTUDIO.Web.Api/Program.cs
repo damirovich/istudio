@@ -18,7 +18,6 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddMediatR(x => x.AddCustomMediatR());
 builder.Services.AddCustomAutoMapper();
 
 

@@ -40,3 +40,13 @@ public class DeleteProductToCartCommand : IRequest<ResModel>
         }
     }
 }
+
+
+public class DeleteProductToCartCommandValidator : AbstractValidator<DeleteProductToCartCommand>
+{
+    public DeleteProductToCartCommandValidator()
+    {
+        RuleFor(v => v.CartId).NotEmpty().WithMessage("CartId не должен быть пустым.")
+            .GreaterThan(0).WithMessage("CartId должен быть положительным числом.");
+    }
+}

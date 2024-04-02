@@ -4,8 +4,8 @@ public class DeleteCategoriesCommandValidator : AbstractValidator<DeleteCategori
 {
     public DeleteCategoriesCommandValidator()
     {
-        RuleFor(v => v.CategoryId).NotEmpty().WithMessage("Id категории не должен быть пустым.")
-            .GreaterThan(0).WithMessage("Id категории должен быть положительным числом.");
+        RuleFor(v => v.CategoryId).NotEmpty().WithMessage("CategoryId категории не должен быть пустым.")
+            .GreaterThan(0).WithMessage("CategoryId категории должен быть положительным числом.");
         
     }
 }

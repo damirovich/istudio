@@ -4,11 +4,11 @@ public class CreateCategoriesCommandValidator : AbstractValidator<CreateCategori
 {
     public CreateCategoriesCommandValidator()
     {
-        RuleFor(command => command.Name)
+        RuleFor(v => v.Name)
             .NotEmpty().WithMessage("Имя категории обязательно.")
             .MaximumLength(100).WithMessage("Имя категории не должно превышать 100 символов.");
 
-        RuleFor(command => command.Description)
+        RuleFor(v => v.Description)
             .NotEmpty().WithMessage("Описание категории обязательно.");
 
         //RuleFor(command => command.ImageUrl)

@@ -11,6 +11,15 @@ public class OrderDetailEntity
     // Количество продуктов в данной детали заказа
     public int Quantity { get; set; }
 
+    // Скидка на товар
+    public decimal Discount { get; set; }
+
+    // Сумма за данный товар без учета скидки (вычисляемое свойство)
+    public decimal Subtotal => UnitPrice * Quantity;
+
+    // Сумма за данный товар с учетом скидки (вычисляемое свойство)
+    public decimal TotalPrice => Subtotal - Discount;
+
     // Идентификатор заказа, к которому относится данная деталь
     public int OrderId { get; set; }
 
@@ -22,4 +31,5 @@ public class OrderDetailEntity
 
     // Продукт, связанный с данной деталью заказа
     public ProductsEntity Product { get; set; }
+
 }

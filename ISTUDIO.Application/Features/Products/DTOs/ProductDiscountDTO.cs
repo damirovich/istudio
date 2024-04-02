@@ -10,6 +10,7 @@ public class ProductDiscountDTO  : IMapWith<DiscountEntity>
 
     public void Mapping(Profile profile)
     {
-        profile.CreateMap<DiscountEntity,ProductDiscountDTO>();
+        profile.CreateMap<DiscountEntity,ProductDiscountDTO>()
+            .ReverseMap();
     }
 }

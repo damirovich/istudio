@@ -30,6 +30,10 @@ public class CustomersEntityConfiguration : IEntityTypeConfiguration<CustomersEn
                .HasForeignKey(c => c.CustomerId)
                .IsRequired();
 
+        builder.HasMany(o => o.Orders)
+            .WithMany(p => p.Customers)
+            .UsingEntity(j => j.ToTable("CustomerOrders"));
+
         builder.HasIndex(e => e.Id).IsUnique();
         builder.HasIndex(e => e.PIN).IsUnique();
     }

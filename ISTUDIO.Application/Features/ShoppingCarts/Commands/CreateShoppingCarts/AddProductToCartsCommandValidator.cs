@@ -6,7 +6,7 @@ public class AddProductToCartsCommandValidator : AbstractValidator<AddProductToC
     public AddProductToCartsCommandValidator()
     {
 
-        RuleFor(x => x.UserId)
+        RuleFor(v => v.UserId)
           .NotEmpty().WithMessage("UserId не может быть пустой.")
           .MaximumLength(200).WithMessage("UserId должна быть не длиннее 200 символов.");
 

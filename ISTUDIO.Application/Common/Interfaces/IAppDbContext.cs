@@ -17,6 +17,9 @@ public interface IAppDbContext
     DbSet<DiscountEntity> Discounts { get; set; }
     DbSet<ProductImagesEntity> ProductImages { get; set; }
     DbSet<ShoppingCartEntity> ShoppingCarts { get; set; }
+    DbSet<OrderEntity> Orders { get; set; }
+    DbSet<OrderDetailEntity> OrderDetails { get; set; }
+    DbSet<FavoriteProductsEntity> FavoriteProducts { get; set; }
     DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
