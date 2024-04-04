@@ -10,7 +10,7 @@ public class PaginatedList<T>
     public PaginatedList(IReadOnlyCollection<T> items, int pageNumber, int totalPages, int totalCount)
     {
         PageNumber = pageNumber;
-        TotalPages = (int)Math.Ceiling(totalCount / (double)totalPages);
+        TotalPages = totalPages;
         TotalCount = totalCount;
         Items = items;
     }
@@ -22,7 +22,8 @@ public class PaginatedList<T>
     {
         var count = await source.CountAsync();
         var items = await source.Skip(pageNumber * pageSize).Take(pageSize).ToListAsync();
+        var totalPages = (int)Math.Ceiling(count / (double)pageSize);
 
-        return new PaginatedList<T>(items, count, pageNumber, pageSize);
+        return new PaginatedList<T>(items, pageNumber, totalPages, count);
     }
 }

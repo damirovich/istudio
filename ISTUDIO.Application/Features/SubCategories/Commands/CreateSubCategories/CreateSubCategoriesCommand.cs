@@ -1,5 +1,6 @@
 ﻿namespace ISTUDIO.Application.Features.SubCategories.Commands.CreateSubCategories;
 
+using ISTUDIO.Application.Common.Interfaces;
 using ISTUDIO.Domain.EntityModel;
 using ResModel = Result;
 public class CreateSubCategoriesCommand : IRequest<ResModel>
@@ -12,7 +13,9 @@ public class CreateSubCategoriesCommand : IRequest<ResModel>
     public class Handler : IRequestHandler<CreateSubCategoriesCommand, ResModel>
     {
         private readonly IAppDbContext _appDbContext;
-        public Handler(IAppDbContext appDbContext) => _appDbContext = appDbContext;
+        private readonly IRedisCacheService _redisCacheService;
+        public Handler(IAppDbContext appDbContext, IRedisCacheService redisCacheService) =>
+                (_appDbContext, _redisCacheService) = (appDbContext, redisCacheService);
 
         public async Task<ResModel> Handle(CreateSubCategoriesCommand command, CancellationToken cancellationToken)
         {
@@ -27,6 +30,10 @@ public class CreateSubCategoriesCommand : IRequest<ResModel>
                 };
                 await _appDbContext.Categories.AddAsync(subCategory);
                 await _appDbContext.SaveChangesAsync(cancellationToken);
+
+                // Сбрасываем кеш Redis после Добавление SubCategory
+                string cashKey = "CategoriesIstudio";
+                await _redisCacheService.RemoveAsync(cashKey);
 
                 return ResModel.Success();
             }

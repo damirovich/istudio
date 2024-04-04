@@ -22,7 +22,7 @@ public class GetOrderDetailsByIdQuery : IRequest<ResModel>
             var orderDetails = await _appDbContext.OrderDetails
                 .Include(s => s.Product)
                 .Where(s => s.OrderId == query.OrderId)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             if (orderDetails == null && orderDetails.Count == 0)
                 throw new NotFoundException("Заказ не найден");

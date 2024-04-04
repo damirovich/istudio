@@ -1,18 +1,9 @@
-﻿
-
-using Asp.Versioning;
-using AutoMapper;
-using ISTUDIO.Application.Common.Interfaces;
-using ISTUDIO.Application.Common.Models;
-using ISTUDIO.Application.Features.Products.Commands.CreateProducts;
+﻿using ISTUDIO.Application.Features.Products.Commands.CreateProducts;
 using ISTUDIO.Application.Features.Products.Commands.DeleteProducts;
 using ISTUDIO.Application.Features.Products.Commands.EditProducts;
 using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Application.Features.Products.Queries;
-using ISTUDIO.Contracts.Features;
 using ISTUDIO.Contracts.Features.Products;
-using ISTUDIO.Web.Api.Data;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 [ApiVersion("1.0")]

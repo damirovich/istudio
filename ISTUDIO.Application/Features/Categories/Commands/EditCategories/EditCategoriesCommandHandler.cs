@@ -4,13 +4,15 @@ public class EditCategoriesCommandHandler : IRequestHandler<EditCategoriesComman
 {
     private readonly IAppDbContext _appDbContext;
     private readonly IMapper _mapper;
-    public EditCategoriesCommandHandler(IAppDbContext appDbContext, IMapper mapper) =>
-        (_appDbContext, _mapper) = (appDbContext, mapper);
+    private readonly IRedisCacheService _redisCacheService;
+    public EditCategoriesCommandHandler(IAppDbContext appDbContext, IMapper mapper, IRedisCacheService redisCacheService) =>
+        (_appDbContext, _mapper, _redisCacheService) = (appDbContext, mapper, redisCacheService);
 
     public async Task<ResModel> Handle(EditCategoriesCommand command, CancellationToken cancellationToken)
     {
         try
         {
+            
             var existingCategory = await _appDbContext.Categories.FindAsync(command.Id);
             if (existingCategory == null)
                 return ResModel.Failure(new[] { "Категория не найдена" });
@@ -22,6 +24,10 @@ public class EditCategoriesCommandHandler : IRequestHandler<EditCategoriesComman
             _appDbContext.Categories.Update(existingCategory);
 
             await _appDbContext.SaveChangesAsync(cancellationToken);
+
+            // Сбрасываем кеш Redis после изменение данных категории
+            string cashKey = "CategoriesIstudio";
+            await _redisCacheService.RemoveAsync(cashKey);
 
             return ResModel.Success();
         }

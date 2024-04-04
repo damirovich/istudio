@@ -1,10 +1,6 @@
-﻿
-using AutoMapper;
-using ISTUDIO.Application.Common.Models;
-using ISTUDIO.Application.Features.FavoriteProducts.Commands;
+﻿using ISTUDIO.Application.Features.FavoriteProducts.Commands;
 using ISTUDIO.Application.Features.FavoriteProducts.Queries;
 using ISTUDIO.Contracts.Features.FavoriteProducts;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 

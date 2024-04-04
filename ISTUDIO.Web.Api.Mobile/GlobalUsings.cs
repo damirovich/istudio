@@ -1,0 +1,8 @@
+﻿global using Asp.Versioning;
+global using AutoMapper;
+global using ISTUDIO.Application.Common.Interfaces;
+global using ISTUDIO.Application.Common.Models;
+global using Microsoft.AspNetCore.Mvc;
+global using ISTUDIO.Contracts.Features;
+global using ISTUDIO.Application.Common.Exceptions;
+global using ISTUDIO.Application.Features.ModelsDTO;

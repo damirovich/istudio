@@ -1,14 +1,7 @@
-﻿
-using Asp.Versioning;
-using AutoMapper;
-using ISTUDIO.Application.Common.Interfaces;
-using ISTUDIO.Application.Common.Models;
-using ISTUDIO.Application.Features.SubCategories.Commands.CreateSubCategories;
+﻿using ISTUDIO.Application.Features.SubCategories.Commands.CreateSubCategories;
 using ISTUDIO.Application.Features.SubCategories.Commands.DeleteSubCategories;
 using ISTUDIO.Application.Features.SubCategories.Commands.EditSubCategories;
 using ISTUDIO.Contracts.Features.SubCategories;
-using ISTUDIO.Web.Api.Data;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 

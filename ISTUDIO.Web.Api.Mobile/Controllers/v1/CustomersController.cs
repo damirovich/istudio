@@ -1,13 +1,5 @@
-﻿
-
-using Asp.Versioning;
-using AutoMapper;
-using ISTUDIO.Application.Common.Exceptions;
-using ISTUDIO.Application.Common.Interfaces;
-using ISTUDIO.Application.Features.CustomerImages.Commands;
+﻿using ISTUDIO.Application.Features.CustomerImages.Commands;
 using ISTUDIO.Application.Features.Customers.Queries;
-using ISTUDIO.Application.Features.ModelsDTO;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 

@@ -25,4 +25,8 @@
     <ProjectReference Include="..\ISTUDIO.Infrastructure\ISTUDIO.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

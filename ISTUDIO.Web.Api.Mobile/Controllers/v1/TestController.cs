@@ -1,7 +1,4 @@
-﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc;
-
-namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
+﻿namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 
 [ApiVersion("1.0")]
 public class TestController : BaseController

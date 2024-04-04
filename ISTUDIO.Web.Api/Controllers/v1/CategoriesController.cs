@@ -1,15 +1,8 @@
-﻿
-using Asp.Versioning;
-using AutoMapper;
-using ISTUDIO.Application.Common.Interfaces;
-using ISTUDIO.Application.Common.Models;
-using ISTUDIO.Application.Features.Categories.Commands.CreateCategories;
+﻿using ISTUDIO.Application.Features.Categories.Commands.CreateCategories;
 using ISTUDIO.Application.Features.Categories.Commands.DeleteCategories;
 using ISTUDIO.Application.Features.Categories.Commands.EditCategories;
 using ISTUDIO.Application.Features.Categories.Queries;
 using ISTUDIO.Contracts.Features.Categories;
-using ISTUDIO.Web.Api.Data;
-using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;

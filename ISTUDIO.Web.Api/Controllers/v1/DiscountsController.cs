@@ -1,14 +1,8 @@
-﻿using Asp.Versioning;
-using AutoMapper;
-using ISTUDIO.Application.Common.Models;
-using ISTUDIO.Application.Features.Discounts.Commands.CreateDiscounts;
+﻿using ISTUDIO.Application.Features.Discounts.Commands.CreateDiscounts;
 using ISTUDIO.Application.Features.Discounts.Commands.DeleteDiscounts;
 using ISTUDIO.Application.Features.Discounts.Commands.EditDiscounts;
 using ISTUDIO.Application.Features.Discounts.Queries;
-using ISTUDIO.Contracts.Features;
 using ISTUDIO.Contracts.Features.Discounts;
-using ISTUDIO.Web.Api.Data;
-using Microsoft.AspNetCore.Mvc;
 
 
 namespace ISTUDIO.Web.Api.Controllers.v1;

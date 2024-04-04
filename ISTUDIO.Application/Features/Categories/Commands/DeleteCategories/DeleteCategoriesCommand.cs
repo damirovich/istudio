@@ -7,8 +7,9 @@ public class DeleteCategoriesCommand : IRequest<ResModel>
     {
         private readonly IAppDbContext _appDbContext;
         private readonly IFileStoreService _fileStoreService;
-        public Handler(IAppDbContext appDbContext, IFileStoreService fileStoreService) =>
-            (_appDbContext, _fileStoreService) = (appDbContext, fileStoreService);
+        private readonly IRedisCacheService _redisCacheService;
+        public Handler(IAppDbContext appDbContext, IFileStoreService fileStoreService, IRedisCacheService redisCacheService) =>
+            (_appDbContext, _fileStoreService, _redisCacheService) = (appDbContext, fileStoreService, redisCacheService);
 
         public async Task<ResModel> Handle(DeleteCategoriesCommand command, CancellationToken cancellationToken)
         {
@@ -22,7 +23,11 @@ public class DeleteCategoriesCommand : IRequest<ResModel>
                 await _appDbContext.SaveChangesAsync(cancellationToken);
 
                 _fileStoreService.DeleteImage(existingCategory.ImageUrl);
-                 
+
+                // Сбрасываем кеш Redis после Удалении категории
+                string cashKey = "CategoriesIstudio";
+                await _redisCacheService.RemoveAsync(cashKey);
+
                 return ResModel.Success();
             }
             catch (Exception ex)

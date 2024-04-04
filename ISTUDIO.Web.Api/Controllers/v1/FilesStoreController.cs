@@ -1,8 +1,4 @@
-﻿using Asp.Versioning;
-using ISTUDIO.Application.Common.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-
-namespace ISTUDIO.Web.Api.Controllers.v1;
+﻿namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
 public class FilesStoreController : BaseController

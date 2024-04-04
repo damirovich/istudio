@@ -1,10 +1,6 @@
-﻿
-
-using Asp.Versioning;
-using ISTUDIO.Application.Features.SmsNikita.Commands.SendSms;
+﻿using ISTUDIO.Application.Features.SmsNikita.Commands.SendSms;
 using ISTUDIO.Application.Features.UserManagement.Commands.RegistrUserMobile;
 using ISTUDIO.Contracts.Features.UserManagement;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 

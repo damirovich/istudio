@@ -9,22 +9,28 @@ public class GetCategoriesListQuery : IRequest<ResModel>
     {
         private readonly IAppDbContext _appDbContext;
         private readonly IMapper _mapper;
-
-        public Handler(IAppDbContext appDbContext, IMapper mapper)
+        private readonly IRedisCacheService _redisCacheService;
+        public Handler(IAppDbContext appDbContext, IMapper mapper, IRedisCacheService redisCacheService)
         {
             _appDbContext = appDbContext;
             _mapper = mapper;
+            _redisCacheService = redisCacheService;
         }
 
         public async Task<ResModel> Handle(GetCategoriesListQuery query, CancellationToken cancellationToken)
         {
-            var categories = await _appDbContext.Categories.ToListAsync(cancellationToken);
+            string cashKey = "CategoriesIstudio";
+            var cashedResult = await _redisCacheService.GetAsync<List<CategoryDTO>>(cashKey);
 
-            // Преобразование категорий в CategoriesListResponseDTO
+            if (cashedResult != null)
+            {
+                return new ResModel { Categories = cashedResult };
+            }
+            var categories = await _appDbContext.Categories.ProjectToListAsync<CategoryDTO>(_mapper.ConfigurationProvider);
 
-            var categoriesDto = _mapper.Map<List<CategoryDTO>>(categories);
+            await _redisCacheService.SetAsync(cashKey, categories, TimeSpan.FromDays(10));
             // Возврат результатов в виде PaginatedList
-            return new ResModel { Categories = categoriesDto };
+            return new ResModel { Categories = categories };
         }
     }
 }

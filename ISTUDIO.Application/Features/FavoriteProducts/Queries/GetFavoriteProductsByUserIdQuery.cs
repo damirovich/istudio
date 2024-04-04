@@ -17,20 +17,17 @@ public class GetFavoriteProductsByUserIdQuery : IRequest<ResModel>
         public async Task<ResModel> Handle (GetFavoriteProductsByUserIdQuery query, CancellationToken cancellationToken)
         {
             var favoriteProducts = await _appDbContext.FavoriteProducts
-                .Include(fp => fp.Products).ThenInclude(p => p.Images) // Включаем информацию о фотографиях продуктов
-                .Include(fp => fp.Products).ThenInclude(p => p.Discount) // Включаем информацию о скидках продуктов
+                .Include(fp => fp.Products).ThenInclude(p => p.Images)
+                .Include(fp => fp.Products).ThenInclude(p => p.Discount)
                 .AsNoTracking()
                 .Where(fp => fp.UserId == query.UserId)
                 .OrderByDescending(fp => fp.Id)
-                .ToListAsync();
-
-            // Маппинг каждого элемента списка на FavoriteProductsResponseDTO
-            var responseDto = favoriteProducts.Select(fp => _mapper.Map<ResModel>(fp)).ToList();
+                .ProjectToListAsync<ResModel>(_mapper.ConfigurationProvider);
 
             return new ResModel
             {
                 UserId = query.UserId,
-                Products = responseDto.SelectMany(fp => fp.Products).ToList()
+                Products = favoriteProducts.SelectMany(fp => fp.Products).ToList()
             };
         }
     }

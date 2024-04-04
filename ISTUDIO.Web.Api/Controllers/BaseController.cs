@@ -1,7 +1,4 @@
-﻿
-
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
 
 namespace ISTUDIO.Web.Api.Controllers;
 

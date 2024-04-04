@@ -1,15 +1,9 @@
-﻿
-
-using Asp.Versioning;
-using AutoMapper;
-using ISTUDIO.Application.Common.Models;
-using ISTUDIO.Application.Features.UserManagement.Commands.CreateUsers;
+﻿using ISTUDIO.Application.Features.UserManagement.Commands.CreateUsers;
 using ISTUDIO.Application.Features.UserManagement.Commands.EditUserProfile;
 using ISTUDIO.Application.Features.UserManagement.Commands.UpdatePassword;
 using ISTUDIO.Application.Features.UserManagement.Queries;
 using ISTUDIO.Contracts.Features.UserManagement;
-using ISTUDIO.Web.Api.Data;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 //[Authorize]

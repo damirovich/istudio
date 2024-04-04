@@ -1,18 +1,9 @@
-﻿using Asp.Versioning;
-using AutoMapper;
-using ISTUDIO.Application.Common.Exceptions;
-using ISTUDIO.Application.Common.Interfaces;
-using ISTUDIO.Application.Common.Models;
-using ISTUDIO.Application.Features.CustomerImages.Commands;
+﻿using ISTUDIO.Application.Features.CustomerImages.Commands;
 using ISTUDIO.Application.Features.Customers.Commands.CreateCustomers;
 using ISTUDIO.Application.Features.Customers.Commands.DeleteCustomers;
 using ISTUDIO.Application.Features.Customers.Commands.EditCustomers;
 using ISTUDIO.Application.Features.Customers.Queries;
-using ISTUDIO.Application.Features.ModelsDTO;
-using ISTUDIO.Contracts.Features;
 using ISTUDIO.Contracts.Features.Customers;
-using ISTUDIO.Web.Api.Data;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 

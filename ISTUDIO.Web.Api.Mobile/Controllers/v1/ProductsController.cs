@@ -1,8 +1,4 @@
-﻿using Asp.Versioning;
-using ISTUDIO.Application.Common.Models;
-using ISTUDIO.Application.Features.Products.Queries;
-using ISTUDIO.Contracts.Features;
-using Microsoft.AspNetCore.Mvc;
+﻿using ISTUDIO.Application.Features.Products.Queries;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 

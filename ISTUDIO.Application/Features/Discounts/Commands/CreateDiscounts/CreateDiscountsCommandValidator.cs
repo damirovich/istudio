@@ -9,7 +9,7 @@ public class CreateDiscountsCommandValidator : AbstractValidator<CreateDiscounts
           .GreaterThan(0).WithMessage("Percentage must be greater than 0.")
           .LessThanOrEqualTo(100).WithMessage("Percentage must be less than or equal to 100.");
 
-        RuleFor(v => v.StartTimev)
+        RuleFor(v => v.StartTime)
             .NotEmpty().WithMessage("Start time is required.")
             .Must(BeAValidDateTime).WithMessage("Invalid start time.");
 

@@ -12,15 +12,15 @@ public class CreateCategoriesCommand : IRequest<ResModel>
     public class Handler : IRequestHandler<CreateCategoriesCommand, ResModel>
     {
         private readonly IAppDbContext _appDbContext;
-        private readonly IFileStoreService _fileStoreService;
-        public Handler(IAppDbContext appDbContext, IFileStoreService fileStoreService) =>
-                    (_appDbContext, _fileStoreService) = (appDbContext, fileStoreService);
+        private readonly IRedisCacheService _redisCacheService;
+        public Handler(IAppDbContext appDbContext, IRedisCacheService redisCacheService) =>
+                    (_appDbContext, _redisCacheService) = (appDbContext, redisCacheService);
 
         public async Task<ResModel> Handle(CreateCategoriesCommand command, CancellationToken cancellationToken)
         {
             try 
             {
-               
+                // Добавление новой категории
                 var category = new CategoryEntity
                 {
                     Name = command.Name,
@@ -29,6 +29,10 @@ public class CreateCategoriesCommand : IRequest<ResModel>
                 };
                 await _appDbContext.Categories.AddAsync(category);
                 await _appDbContext.SaveChangesAsync(cancellationToken);
+
+                // Сбрасываем кеш Redis после добавления новой категории
+                string cashKey = "CategoriesIstudio";
+                await _redisCacheService.RemoveAsync(cashKey);
 
                 return ResModel.Success();
             }

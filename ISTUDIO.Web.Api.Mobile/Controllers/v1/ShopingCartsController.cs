@@ -1,11 +1,9 @@
-﻿using Asp.Versioning;
-using AutoMapper;
-using ISTUDIO.Application.Features.ShoppingCarts.Commands.CreateShoppingCarts;
+﻿using ISTUDIO.Application.Features.ShoppingCarts.Commands.CreateShoppingCarts;
 using ISTUDIO.Application.Features.ShoppingCarts.Commands.DeleteShoppingCarts;
 using ISTUDIO.Application.Features.ShoppingCarts.Commands.EditShoppinCarts;
 using ISTUDIO.Application.Features.ShoppingCarts.Queries;
 using ISTUDIO.Contracts.Features.ShoppingsCarts;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 

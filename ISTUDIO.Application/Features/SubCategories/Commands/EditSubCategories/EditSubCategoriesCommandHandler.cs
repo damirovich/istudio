@@ -6,8 +6,9 @@ public class EditSubCategoriesCommandHandler : IRequestHandler<EditSubCategories
 
     private readonly IAppDbContext _appDbContext;
     private readonly IMapper _mapper;
-    public EditSubCategoriesCommandHandler(IAppDbContext appDbContext, IMapper mapper) =>
-        (_appDbContext, _mapper) = (appDbContext, mapper);
+    private readonly IRedisCacheService _redisCacheService;
+    public EditSubCategoriesCommandHandler(IAppDbContext appDbContext, IMapper mapper, IRedisCacheService redisCacheService) =>
+        (_appDbContext, _mapper, _redisCacheService) = (appDbContext, mapper, redisCacheService);
 
     public async Task<ResModel> Handle(EditSubCategoriesCommand command, CancellationToken cancellationToken)
     {
@@ -22,6 +23,10 @@ public class EditSubCategoriesCommandHandler : IRequestHandler<EditSubCategories
             _appDbContext.Categories.Update(existingSubCategory);
 
             await _appDbContext.SaveChangesAsync(cancellationToken);
+
+            // Сбрасываем кеш Redis после изменение SubCategory
+            string cashKey = "CategoriesIstudio";
+            await _redisCacheService.RemoveAsync(cashKey);
 
             return ResModel.Success();
         }

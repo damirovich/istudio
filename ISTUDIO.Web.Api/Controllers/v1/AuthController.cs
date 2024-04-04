@@ -1,15 +1,10 @@
-﻿using Asp.Versioning;
-using AutoMapper;
-using ISTUDIO.Application.Common.Interfaces;
-using ISTUDIO.Application.Features.Authentication.Commands.AuthUsers;
+﻿using ISTUDIO.Application.Features.Authentication.Commands.AuthUsers;
 using ISTUDIO.Application.Features.Authentication.Commands.RefreshJWT;
 using ISTUDIO.Application.Features.SmsNikita.Commands.SendSms;
 using ISTUDIO.Application.Features.UserManagement.Commands.RegistrUserMobile;
 using ISTUDIO.Contracts.Features.Authentication.Authorizations;
 using ISTUDIO.Contracts.Features.Authentication.JWTTokens;
 using ISTUDIO.Contracts.Features.UserManagement;
-using ISTUDIO.Web.Api.Data;
-using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;

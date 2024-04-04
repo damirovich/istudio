@@ -1,11 +1,6 @@
-﻿
-using AutoMapper;
-using ISTUDIO.Application.Common.Exceptions;
-using ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
+﻿using ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
 using ISTUDIO.Application.Features.Orders.Queries;
 using ISTUDIO.Contracts.Features.Orders;
-
-using Microsoft.AspNetCore.Mvc;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 
