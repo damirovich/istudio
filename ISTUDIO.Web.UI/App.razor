@@ -1,12 +1,41 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿@using System.Reflection
+@using ISTUDIO.Web.UI.Features.Auth;
+@using System.Security.Claims
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="CustomAssemblies()">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <p>Determining session state, please wait...</p>
+                </Authorizing>
+                <NotAuthorized>
+                    @if (context.User.Claims.Where(c => c.Type.Equals(ClaimTypes.Surname)).Select(c => c.Value).FirstOrDefault() is not null)
+                    {
+                        <MudText Align="Align.Center">
+                            @context.User.Claims.Where(c => c.Type.Equals(ClaimTypes.Surname)).Select(c => c.Value).FirstOrDefault() вам доступ запрещен!!!
+                        </MudText>
+                    }
+                    else
+                    {
+                        <Login CurrentUrl="@(_navManager.Uri)" />
+                    }
+
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    private IEnumerable<Assembly> CustomAssemblies() => new[]
+    {
+        Assembly.Load("ISTUDIO.Web.UI")
+    };
+}

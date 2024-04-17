@@ -1,6 +1,4 @@
-﻿
-using ISTUDIO.Application.Features.ModelsDTO;
-using ISTUDIO.Domain.EntityModel;
+﻿using ISTUDIO.Domain.EntityModel;
 
 namespace ISTUDIO.Application.Features.Categories.DTOs;
 

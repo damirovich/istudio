@@ -57,6 +57,7 @@ if (app.Environment.IsDevelopment())
             var url = $"/swagger/{description.GroupName}/swagger.json";
             var name = description.GroupName;
             options.SwaggerEndpoint(url, name);
+            options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
         }
     });
 }

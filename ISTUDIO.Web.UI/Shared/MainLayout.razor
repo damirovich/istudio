@@ -1,19 +1,47 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.IdentityModel.Claims
+@inherits LayoutComponentBase
 
-<PageTitle>ISTUDIO.Web.UI</PageTitle>
+<PageTitle>ISTUDIO.WEB.UI</PageTitle>
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-<div class="page">
-    <div class="sidebar">
+<MudLayout>
+    <MudAppBar Elevation="1" Style="background-image: linear-gradient(109.6deg, rgba(110,51,153,1) 0%, rgba(57,131,154) 100% );">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+        <AuthorizeView>
+            <Authorized>
+                <MudIconButton Icon="@Icons.TwoTone.AccountCircle" Color="Color.Inherit" />
+                <MudText Typo="Typo.subtitle1" Color="Color.Default">@context.User.Claims.Where(c => c.Type.Equals(ClaimTypes.Name)).Select(c => c.Value).FirstOrDefault() </MudText>
+            </Authorized>
+            <NotAuthorized>
+                <MudIconButton Href="/login" Icon="@Icons.TwoTone.Login" Color="Color.Inherit" />
+            </NotAuthorized>
+        </AuthorizeView>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="25" Color="Color.Warning"
+               Style="background-image: linear-gradient(180deg, rgba(110,51,153,1) 0%, rgba(57,131,154) 100%);">
+        <MudDrawerHeader>
+            <MudImage Class="ml-1" ObjectFit="ObjectFit.ScaleDown" Src="photos/Ресурс 25.png" Height="70" Width="190" Alt="Logo" />
+        </MudDrawerHeader>
+        <br />
         <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
+    </MudDrawer>
+    <MudMainContent>
+        <MudPaper Class="ma-10 pa-3" Elevation="0">
             @Body
-        </article>
-    </main>
-</div>
+        </MudPaper>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    public string UserName { get; set; } = string.Empty;
+}

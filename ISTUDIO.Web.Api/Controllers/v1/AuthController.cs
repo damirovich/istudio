@@ -25,12 +25,12 @@ public class AuthController : BaseController
 
    
     /// <summary>
-    /// Метод для аудентификации
+    /// Метод для аудентификации и авторизации
     /// </summary>
     /// <param name="login">UserName and Password</param>
     /// <returns>User data, Access token and Refresh token</returns>
     [HttpPost("Login")]
-    public async Task<ICsmActionResult> Login([FromBody] AuthUserVM login)
+    public async Task<ICsmActionResult> Login([FromBody] LoginVM login)
     {
         try
         {
@@ -44,6 +44,8 @@ public class AuthController : BaseController
         }
 
     }
+
+
     /// <summary>
     /// Метод для обновление Token
     /// </summary>
@@ -112,7 +114,7 @@ public class AuthController : BaseController
     /// <param name="user"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ICsmActionResult> RegistrUser([FromBody] CreateUserMobleVM user)
+    public async Task<ICsmActionResult> RegistrMobileUser([FromBody] CreateUserMobleVM user)
     {
         try
         {

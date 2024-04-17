@@ -1,0 +1,68 @@
+﻿@page "/login"
+
+
+<PageTitle>Авторизация</PageTitle>
+
+
+<EditForm Model="@_loginModel" OnValidSubmit="async () => await Authenticate()">
+    <DataAnnotationsValidator />
+    <div class="d-flex justify-center">
+        <MudPaper Elevation="25" Class="py-8 px-10" MinWidth="330px">
+            <div class="">
+                <h3>Авторизация</h3>
+            </div>
+            <div class="">
+                <MudTextField @bind-Value="_loginModel.UserName" Label="Почта" Variant="Variant.Text" Adornment="Adornment.Start"
+                              For="@(() => _loginModel.UserName)" />
+            </div>
+            <div class="">
+                <MudTextField @bind-Value="_loginModel.Password" Label="Пароль" InputType="InputType.Password" Variant="Variant.Text" Adornment="Adornment.Start"
+                              For="@(() => _loginModel.Password)" />
+            </div>
+            <div class="mt-4">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Войти</MudButton>
+            </div>
+
+            <MudProgressLinear Color="Color.Primary" Indeterminate="_progress" Class="my-7" />
+        </MudPaper>
+    </div>
+</EditForm>
+
+@using ISTUDIO.Contracts.Features.Authentication.Authorizations
+
+@using ISTUDIO.Web.UI.Features.Auth.Queries
+@using Microsoft.AspNetCore.Identity
+
+@inject AuthenticationStateProvider authStateProvider
+@code {
+    [Parameter]
+    public string CurrentUrl { get; set; } = string.Empty;
+
+    private LoginVM _loginModel { get; set; } = new();
+    private bool _progress = false;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(null);
+        }
+    }
+    private async Task Authenticate()
+    {
+        _progress = true;
+        var user = await _mediatr.Send(new UIGetLoginQuery { Login = _loginModel });
+        if (user.Status)
+        {
+
+            _navManager.NavigateTo((string.IsNullOrWhiteSpace(CurrentUrl) ? "/" : CurrentUrl));
+            _snackbar.Add(user.StatusMessage, Severity.Success);
+        }
+        else
+        {
+            _snackbar.Add(user.StatusMessage, Severity.Warning);
+        }
+        _progress = false;
+    }
+
+}

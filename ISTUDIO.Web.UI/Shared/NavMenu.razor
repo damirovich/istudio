@@ -1,29 +1,35 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">ISTUDIO.Web.UI</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿@using System.Security.Claims
+<MudNavMenu Rounded="true" Margin="Margin.Dense" Color="Color.Inherit" Class="pa-2">
+    <MudNavLink Href="" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.TwoTone.Home">Home</MudNavLink>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="/categories" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.AccountTree">Категории</MudNavLink>
+            <MudNavLink Href="/categoryGrid" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.ProductionQuantityLimits">Управление продуктами</MudNavLink>
+            <MudNavLink Href="/categoriesList" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.QueryStats">Заказы</MudNavLink>
+            <MudNavLink Href="/accounts" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.ShoppingCart">Актуальные корзины</MudNavLink>
+            <MudNavLink Href="/bankcards" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.TwoTone.Groups">Клинеты</MudNavLink>
+            <MudNavLink Href="/debt" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.Discount">Скидки</MudNavLink>
+            <MudNavLink Href="/promise" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.Shop">Магазины</MudNavLink>
+            <MudNavLink Href="/verifiedClient" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.Payments">Способы оплаты</MudNavLink>
+            <MudNavLink Href="/idenClient" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.FavoriteBorder">Акутальные списки желаний</MudNavLink>
+            
+            <MudNavGroup Title="@context.User.Claims.Where(c => c.Type.Equals(ClaimTypes.Name)).Select(c => c.Value).FirstOrDefault()" IconColor="@IconColor" Icon="@Icons.TwoTone.ManageAccounts">
+                <MudNavLink Href="/changepassword" IconColor="@IconColor" Icon="@Icons.TwoTone.Refresh">Смена пароля</MudNavLink>
+                <MudNavLink OnClick="Logout" IconColor="@IconColor" Icon="@Icons.TwoTone.Logout">Выйти</MudNavLink>
+            </MudNavGroup>
+        </Authorized>
+        <NotAuthorized>
+            <MudNavLink Href="/login" Icon="@Icons.TwoTone.Login" IconColor="@IconColor">Войти</MudNavLink>
+        </NotAuthorized>
+    </AuthorizeView>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-    </nav>
-</div>
+</MudNavMenu>
+
 
 @code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
+    private Color IconColor { get; set; } = Color.Inherit;
+    private async Task Logout()
     {
-        collapseNavMenu = !collapseNavMenu;
+        _navManager.NavigateTo("/login");
     }
 }

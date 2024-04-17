@@ -68,7 +68,7 @@ public class IdentityService : IIdentityService
     //Пытается аутентифицировать пользователя на основе предоставленного имени пользователя и пароля.
     public async Task<bool> AuthenticateAsync(string userName, string password)
     {
-        var user = await _appDbContext.AppUsers.FirstOrDefaultAsync(u => u.PhoneNumber == userName);
+        var user = await _appDbContext.AppUsers.FirstOrDefaultAsync(u => u.UserName == userName);
 
         // Если пользователь не найден, возвращаем false
         if (user == null)
@@ -82,20 +82,19 @@ public class IdentityService : IIdentityService
     }
 
     //Создание нового пользователя
-    public async Task<(Result Result, string UserId)> CreateUserAsync(string phoneNumber, string email, string password)
+    public async Task<(Result Result, string UserId)> CreateUserAsync(string userName, string phoneNumber, string email, string password)
     {
         var user = new AppUser
         {
-            UserName = phoneNumber,
+            UserName = userName,
             Email = email,
             PhoneNumber = phoneNumber,
             LockoutEnabled = true
         };
 
-        _appDbContext.Add(user);
-        await _appDbContext.SaveChangesAsync();
+        var result = await _userManager.CreateAsync(user, password);
 
-        return (Result.Success(), user.Id);
+        return (result.ToApplicationResult(), user.Id);
     }
     //Регистрация пользователя
     public async Task<(Result Result, string UserId)> CreateUserMoblieAsync(string userName, string phoneNumber, int codeOTP)

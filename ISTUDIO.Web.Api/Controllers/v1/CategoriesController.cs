@@ -3,6 +3,7 @@ using ISTUDIO.Application.Features.Categories.Commands.DeleteCategories;
 using ISTUDIO.Application.Features.Categories.Commands.EditCategories;
 using ISTUDIO.Application.Features.Categories.Queries;
 using ISTUDIO.Contracts.Features.Categories;
+using Microsoft.AspNetCore.Authorization;
 using System.Net;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
@@ -31,6 +32,30 @@ public class CategoriesController : BaseController
         try
         {
             return new CsmActionResult(await Mediator.Send(new GetCategoriesListQuery()));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Получение данные категории по Id
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ICsmActionResult> GetCategoriesById([FromQuery] int categoryId)
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetCategoriesByIdQuery { Id = categoryId }));
+        }
+        catch (NotFoundException ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
         catch (Exception ex)
         {

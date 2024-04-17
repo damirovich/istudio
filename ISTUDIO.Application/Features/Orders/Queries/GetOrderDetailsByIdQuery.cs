@@ -21,6 +21,7 @@ public class GetOrderDetailsByIdQuery : IRequest<ResModel>
         {
             var orderDetails = await _appDbContext.OrderDetails
                 .Include(s => s.Product)
+                .ThenInclude(s => s.Images)
                 .Where(s => s.OrderId == query.OrderId)
                 .ToListAsync(cancellationToken);
 

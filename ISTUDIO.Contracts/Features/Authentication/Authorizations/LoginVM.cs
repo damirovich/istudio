@@ -2,13 +2,13 @@
 
 namespace ISTUDIO.Contracts.Features.Authentication.Authorizations;
 
-public class AuthUserVM : IMapWith<AuthUserCommand>
+public class LoginVM : IMapWith<AuthUserCommand>
 {
     [Required] public string UserName { get; set; }
     [Required] public string Password { get; set; }
     public void Mapping(Profile profile)
     {
-        profile.CreateMap<AuthUserVM, AuthUserCommand>()
+        profile.CreateMap<LoginVM, AuthUserCommand>()
              .ForMember(u => u.UserName,
                 x => x.MapFrom(c => c.UserName))
             .ForMember(u => u.Password,

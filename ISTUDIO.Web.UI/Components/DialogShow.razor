@@ -1,0 +1,16 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudText>@ContentText <span style="color: forestgreen">@ItemName</span></MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Sumbit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public string ContentText { get; set; }
+    [Parameter] public string ItemName { get; set; }
+    //[Parameter] public
+
+    void Sumbit() => MudDialog.Close(DialogResult.Ok(true));
+}

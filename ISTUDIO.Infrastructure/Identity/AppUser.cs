@@ -8,7 +8,7 @@ public class AppUser : IdentityUser
     public string? RefreshToken { get; set; }
     public DateTime RefreshTokenExpiryTime { get; set; }
     public int? CodeOTP { get; set; }
-    public string? Email { get; set; }
+    //public string? Email { get; set; }
     public string? NormalizedEmail { get; set; }
     public DateTime CreatedDate { get; set; }
 }

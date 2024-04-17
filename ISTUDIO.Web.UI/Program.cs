@@ -1,10 +1,17 @@
 
+using ISTUDIO.Application;
+using ISTUDIO.Web.UI.AppStart;
+using MudBlazor.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-
+builder.Services.AddMediatR(cfg => cfg.AddCustomMediatR());
+builder.Services.AddMudServices(x => x.AddCustomMud());
+builder.Services.AddCustomAutoMapper();
+builder.Services.AddCustomDI(builder.Configuration);
 
 var app = builder.Build();
 

@@ -20,11 +20,11 @@ public class SendSmsCommandValidator : AbstractValidator<SendSmsCommand>
             return false;
 
         // Если номер начинается с '+', то длина должна быть не менее 13 символов
-        if (phoneNumber[0] == '+' && phoneNumber.Length < 13)
+        if (phoneNumber[0] == '+' && phoneNumber.Length != 13)
             return false;
 
         // Если номер начинается с цифры, то длина должна быть не менее 11 символов
-        if (char.IsDigit(phoneNumber[0]) && phoneNumber.Length < 12)
+        if (char.IsDigit(phoneNumber[0]) && phoneNumber.Length != 12)
             return false;
 
         // Проверяем, что остальные символы - только цифры

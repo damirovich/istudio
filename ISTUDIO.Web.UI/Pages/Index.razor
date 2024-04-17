@@ -2,8 +2,23 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<style>
+    .container {
+        display: flex;
+        justify-content: center; /* Центрирует содержимое по горизонтали */
+        align-items: center; /* Центрирует содержимое по вертикали */
+        height: 70vh; /* Занимает 100% высоты экрана */
+    }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    .centered-image {
+        max-width: calc(100% / 3); /* Устанавливает максимальную ширину в треть ширины экрана */
+        height: auto; /* Автоматически подстраивает высоту */
+    }
+</style>
+
+
+<div class="container">
+    <MudImage Class="centered-image ml-1" ObjectFit="ObjectFit.ScaleDown" Src="photos/Ресурс 24.png" Alt="Logo" />
+</div>
+

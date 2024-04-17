@@ -20,8 +20,11 @@ public class FilesStoreController : BaseController
                 return NotFound(); // Файл не найден или пустой
             }
 
-            // Возвращаем файл в ответе
-            return File(fileContent, "application/octet-stream", Path.GetFileName(photoFilePath));
+            // Конвертируем содержимое файла в строку base64
+            var base64String = Convert.ToBase64String(fileContent);
+
+            // Возвращаем строку base64 в ответе
+            return Ok(new { File = base64String });
         }
         catch (ArgumentException ex)
         {

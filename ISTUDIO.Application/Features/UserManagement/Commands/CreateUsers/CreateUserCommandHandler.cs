@@ -4,15 +4,14 @@ using ResModel = Result;
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ResModel>
 {
     private readonly IIdentityService _identityService;
-    private readonly IAppDbContext _appDbContext;
-    public CreateUserCommandHandler(IIdentityService identityService, IAppDbContext appDbContext) =>
-                            (_identityService, _appDbContext) = (identityService, appDbContext);
+    public CreateUserCommandHandler(IIdentityService identityService) =>
+                            (_identityService) = (identityService);
 
     public async Task<ResModel> Handle(CreateUserCommand command, CancellationToken cancellationToken)
     {
         try
         {
-            var result = await _identityService.CreateUserAsync(command.PhoneNumber!, command.Email!, command.Password!);
+            var result = await _identityService.CreateUserAsync(command.UserName!, command.PhoneNumber!, command.Email!, command.Password!);
 
             if (!result.Result.Succeeded)
             {

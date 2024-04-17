@@ -1,0 +1,43 @@
+﻿@page "/categories/create"
+
+
+<CategoriesForm Customer="@category" IsEditMode="false" ButtonName="Добавить" OnSave="CreateCategories" />
+
+@using ISTUDIO.Application.Features.Categories.DTOs;
+@using ISTUDIO.Contracts.Features.Categories
+@using ISTUDIO.Web.UI.Components
+@using ISTUDIO.Web.UI.Features.Categories.Commands
+@using ISTUDIO.Web.UI.Features.Categories.Components
+
+@code {
+    private CategoryResponseDTO category { get; set; } = new();
+
+    private async Task CreateCategories(CategoryResponseDTO newCategory)
+    {
+        var command = _mapper.Map<CreateCategoriesVM>(category);
+        var res = await _mediatr.Send(new UICreateCategoriesCommand { Categories = command });
+
+        if (res.Status)
+        {
+            _snackbar.Add($"Успешно!!! Данные новой категории успешно добавлено {res.Data.Succeeded}", Severity.Success);
+            _navManager.NavigateTo("/customers");
+        }
+        else
+        {
+            var parameters = new DialogParameters()
+            {
+               { "ContentText", $"Ошибка при добавлении нового клиента! {res.Data?.Errors} {res.StatusMessage} "},
+               { "ItemName", $"{category.Name}"},
+            };
+
+            var dialogOptions = new DialogOptions()
+                {
+                    Position = DialogPosition.TopCenter,
+                    CloseButton = true,
+                    DisableBackdropClick = true
+                };
+
+            _dialogService.Show<DialogShow>("Ошибка", parameters, dialogOptions);
+        }
+    }
+}

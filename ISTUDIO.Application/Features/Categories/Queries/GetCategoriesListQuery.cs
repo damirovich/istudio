@@ -1,5 +1,4 @@
 ﻿using ISTUDIO.Application.Features.Categories.DTOs;
-using ISTUDIO.Application.Features.ModelsDTO;
 
 namespace ISTUDIO.Application.Features.Categories.Queries;
 using ResModel = CategoriesListResponseDTO;

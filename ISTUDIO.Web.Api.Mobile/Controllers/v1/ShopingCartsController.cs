@@ -83,7 +83,6 @@ public class ShopingCartsController : BaseController
 
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> DeletePoductCart([FromQuery] int cartId)
     {
         try
@@ -96,5 +95,21 @@ public class ShopingCartsController : BaseController
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
+
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ClearProductCart([FromQuery] string userId)
+    {
+        try
+        {
+            var result = await Mediator.Send(new ClearShoppingCartsCommand { UserId = userId });
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
 }
 

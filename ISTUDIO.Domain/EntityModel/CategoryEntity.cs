@@ -13,7 +13,6 @@ public class CategoryEntity
 
     // URL изображения, связанного с категорией
     public string ImageUrl { get; set; }
-
     public int? ParentCategoryId { get; set; }
     public CategoryEntity ParentCategory { get; set; }
 

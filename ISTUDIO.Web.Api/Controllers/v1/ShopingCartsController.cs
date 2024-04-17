@@ -94,5 +94,21 @@ public class ShopingCartsController : BaseController
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
+
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> ClearProductCart([FromQuery] string userId)
+    {
+        try
+        {
+            var result = await Mediator.Send(new ClearShoppingCartsCommand { UserId = userId });
+            return new CsmActionResult<Result>(result);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
 }
 

@@ -1,10 +1,25 @@
 ﻿@using System.Net.Http
+@using MediatR
+@using AutoMapper;
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
 @using ISTUDIO.Web.UI
 @using ISTUDIO.Web.UI.Shared
+
+
+
+@using MudBlazor
+
+@inject NavigationManager _navManager
+@inject ISender _mediatr
+@inject IJSRuntime _js
+@inject ISnackbar _snackbar
+@inject ProtectedSessionStorage _sessionStorage
+@inject IMapper _mapper;
+@inject IDialogService _dialogService

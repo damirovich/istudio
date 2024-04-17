@@ -1,0 +1,64 @@
+﻿
+<MudTreeView T="CategoryDTO" Items="@Categories.ToHashSet()" Hover="true" Width="100%">
+    <ItemTemplate Context="item">
+        <MudTreeViewItem Items="@item.SubCategories?.ToHashSet()">
+            <BodyContent>
+               
+                <img src="@GetImageBase64(item.PhotoURL)" alt="Category Icon" style="width: 18px; height: 18px; margin-bottom: 3px; margin-right: 5px;" />
+                <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
+                    <MudText Style="justify-self: start;">@item.Name</MudText>
+                    <div style="justify-self: end;">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" />
+                    </div>
+                </div>
+            </BodyContent>
+        </MudTreeViewItem>
+    </ItemTemplate>
+</MudTreeView>
+@foreach (var item in ass)
+{
+    <h2>@item</h2>
+}
+@using ISTUDIO.Application.Features.Categories.DTOs;
+@using ISTUDIO.Web.UI.Features.Categories.Queries
+@code {
+    private List<CategoryDTO> Categories { get; set; } = new List<CategoryDTO>();
+    private List<string> ass = new List<string>();
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCategories();
+    }
+    public string GetImageBase64(string imageUrl)
+    {
+        var resHttpReq = Task.Run(async ()=>await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
+        
+        return $"data:image/png;base64,{baseFile64.FileBase64}";
+
+    }
+
+
+    private async Task GetCategories()
+    {
+        try
+        {
+            var resCategories = await _mediatr.Send(new UIGetCategoriesQuery());
+
+            if (resCategories.Status)
+            {
+                Categories = resCategories.Data.Categories;
+                _snackbar.Add($"Успешно!!! Количество найденных объектов: {Categories.Count}", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resCategories.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+}
