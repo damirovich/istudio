@@ -1,7 +1,4 @@
 ﻿using ISTUDIO.Application.Common.Exceptions;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-
 namespace ISTUDIO.Infrastructure.Services;
 
 public class FileStoreService : IFileStoreService
@@ -13,14 +10,14 @@ public class FileStoreService : IFileStoreService
         _storagePath = storagePath;
     }
 
-    public async Task<string> SaveImage(IFormFile photoFile)
+    public async Task<string> SaveImage(byte[] photoBytes)
     {
-        // Проверяем наличие файла и его размер
-        if (photoFile == null || photoFile.Length == 0)
-            throw new BadRequestException("No file uploaded.");
+        // Проверяем наличие данных и их размер
+        if (photoBytes == null || photoBytes.Length == 0)
+            throw new BadRequestException("No file data provided.");
 
-        // Уникальное называние файла
-        string photoFileName = Guid.NewGuid().ToString() + Path.GetExtension(photoFile.FileName);
+        // Уникальное название файла
+        string photoFileName = Guid.NewGuid().ToString() + ".png";
 
         // Полный путь к директории, где будут храниться фотографии
         string directoryPath = Path.Combine(_storagePath, "photos");
@@ -35,15 +32,11 @@ public class FileStoreService : IFileStoreService
         }
 
         // Сохраняем фотографию на сервере
-        using (var fileStream = new FileStream(fullPath, FileMode.Create))
-        {
-            await photoFile.CopyToAsync(fileStream);
-        }
+        await File.WriteAllBytesAsync(fullPath, photoBytes);
 
         // Возвращаем путь к сохраненной фотографии
         return Path.Combine("photos", photoFileName);
     }
-
     public async Task<byte[]> GetImage(string photoFilePath)
     {
         if (string.IsNullOrEmpty(photoFilePath))

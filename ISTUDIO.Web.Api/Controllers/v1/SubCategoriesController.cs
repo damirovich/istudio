@@ -10,11 +10,9 @@ namespace ISTUDIO.Web.Api.Controllers.v1;
 public class SubCategoriesController : BaseController
 {
     private readonly IMapper _mapper;
-    private readonly IFileStoreService _fileStoreService;
-    public SubCategoriesController(IMapper mapper, IFileStoreService fileStoreService)
+    public SubCategoriesController(IMapper mapper)
     {
         _mapper = mapper;
-        _fileStoreService = fileStoreService;
     }
 
     /// <summary>
@@ -25,21 +23,11 @@ public class SubCategoriesController : BaseController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> CreateSubCategories([FromForm] CreateSubCategoriesVM subCategory, IFormFile? photoSubCategory)
+    public async Task<ICsmActionResult> CreateSubCategories([FromBody] CreateSubCategoriesVM subCategory)
     {
         try
-        {
-            string photoFilePath = string.Empty;
-
-            if (photoSubCategory != null)
-            {
-                photoFilePath = await _fileStoreService.SaveImage(photoSubCategory);
-            }
-
+        {           
             var command = _mapper.Map<CreateSubCategoriesCommand>(subCategory);
-
-            // Передаем путь к фотографии в команду
-            command.PhotoFilePath = photoFilePath;
 
             var result = await Mediator.Send(command);
 
@@ -60,22 +48,11 @@ public class SubCategoriesController : BaseController
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> EditSubCategories([FromForm] EditSubCategoriesVM subCategory, IFormFile? photoSubCategory)
+    public async Task<ICsmActionResult> EditSubCategories([FromBody] EditSubCategoriesVM subCategory)
     {
         try
         {
-            string photoFilePath = string.Empty;
-
-            if (photoSubCategory != null)
-            {
-                photoFilePath = await _fileStoreService.SaveImage(photoSubCategory);
-            }
-
             var command = _mapper.Map<EditSubCategoriesCommand>(subCategory);
-
-            // Передаем путь к фотографии в команду
-            command.PhotoFilePath = photoFilePath;
-
 
             var result = await Mediator.Send(command);
 

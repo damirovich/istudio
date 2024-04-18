@@ -76,27 +76,25 @@ public class ProductsController : BaseController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> CreateProducts([FromForm] CreateProductsVM product, IList<IFormFile>? productPhotos)
+    public async Task<ICsmActionResult> CreateProducts([FromBody] CreateProductsVM product)
     {
         try
         {
             var productImages = new List<ProductImagesDTO>();
 
-            foreach (var photo in productPhotos)
+            foreach (var photo in product.ProductPhotos)
             {
                 if (photo != null)
                 {
-                    var photoUrl = await _fileStoreService.SaveImage(photo);
+                    var fileByte = Convert.FromBase64String(photo);
 
-                    // Другие свойства из объекта IFormFile
-                    var typeImg = photo.ContentType; // Пример типа изображения
-                    var name = photo.FileName; // Пример имени файла
+                    var photoUrl = await _fileStoreService.SaveImage(fileByte);
 
                     productImages.Add(new ProductImagesDTO
                     {
                         Url = photoUrl,
-                        Name = name,
-                        ContentType = typeImg,
+                        Name = $"image_{DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss")}.png",
+                        ContentType = "image/png",
                     });
                 }
             }
@@ -124,27 +122,25 @@ public class ProductsController : BaseController
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> EditProducts([FromForm] EditProductsVM product, List<IFormFile> photoProducts)
+    public async Task<ICsmActionResult> EditProducts([FromForm] EditProductsVM product)
     {
         try
         {
             var productImages = new List<ProductImagesDTO>();
 
-            foreach (var photo in photoProducts)
+            foreach (var photo in product.ProductPhotos)
             {
                 if (photo != null)
                 {
-                    var photoUrl = await _fileStoreService.SaveImage(photo);
+                    var fileByte = Convert.FromBase64String(photo);
 
-                    // Другие свойства из объекта IFormFile
-                    var typeImg = photo.ContentType; // Пример типа изображения
-                    var name = photo.FileName; // Пример имени файла
+                    var photoUrl = await _fileStoreService.SaveImage(fileByte);
 
                     productImages.Add(new ProductImagesDTO
                     {
                         Url = photoUrl,
-                        Name = name,
-                        ContentType = typeImg,
+                        Name = $"image_{DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss")}.png",
+                        ContentType = "image/png",
                     });
                 }
             }

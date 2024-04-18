@@ -1,4 +1,5 @@
 ﻿using ISTUDIO.Application.Features.Products.Commands.CreateProducts;
+using System.Text;
 
 
 namespace ISTUDIO.Contracts.Features.Products;
@@ -13,6 +14,7 @@ public class CreateProductsVM : IMapWith<CreateProductsCommand>
     public string Description { get; set; }
     public int CategoryId { get; set; }
     public int? DiscountId { get; set; }
+    public List<string> ProductPhotos { get; set; } 
    
     public void Mapping(Profile profile)
     {

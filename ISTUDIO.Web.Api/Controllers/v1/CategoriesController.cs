@@ -3,8 +3,6 @@ using ISTUDIO.Application.Features.Categories.Commands.DeleteCategories;
 using ISTUDIO.Application.Features.Categories.Commands.EditCategories;
 using ISTUDIO.Application.Features.Categories.Queries;
 using ISTUDIO.Contracts.Features.Categories;
-using Microsoft.AspNetCore.Authorization;
-using System.Net;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
@@ -13,11 +11,9 @@ namespace ISTUDIO.Web.Api.Controllers.v1;
 public class CategoriesController : BaseController
 {
     private readonly IMapper _mapper;
-    private readonly IFileStoreService _fileStoreService;
-    public CategoriesController(IMapper mapper, IFileStoreService fileStoreService)
+    public CategoriesController(IMapper mapper)
     {
         _mapper = mapper;
-        _fileStoreService = fileStoreService;
     }
 
     /// <summary>
@@ -71,21 +67,12 @@ public class CategoriesController : BaseController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> CreateCategories([FromForm] CreateCategoriesVM category, IFormFile? photoCategory)
+    public async Task<ICsmActionResult> CreateCategories([FromBody] CreateCategoriesVM category)
     {
         try
         {
-            string photoFilePath = string.Empty;
-
-            if (photoCategory != null)
-            {
-                photoFilePath = await _fileStoreService.SaveImage(photoCategory);
-            }
 
             var command = _mapper.Map<CreateCategoriesCommand>(category);
-
-            // Передаем путь к фотографии в команду
-            command.PhotoFilePath = photoFilePath;
 
             var result = await Mediator.Send(command);
             if(result.Succeeded)
@@ -108,22 +95,12 @@ public class CategoriesController : BaseController
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> EditCategories([FromForm] EditCategoriesVM category, IFormFile? photoCategory)
+    public async Task<ICsmActionResult> EditCategories([FromBody] EditCategoriesVM category)
     {
         try
         {
-            string photoFilePath = string.Empty;
-
-            if (photoCategory != null)
-            {
-                photoFilePath = await _fileStoreService.SaveImage(photoCategory);
-            }
-
+          
             var command = _mapper.Map<EditCategoriesCommand>(category);
-
-            // Передаем путь к фотографии в команду
-            command.PhotoFilePath = photoFilePath;
-
 
             var result = await Mediator.Send(command);
 
@@ -155,12 +132,5 @@ public class CategoriesController : BaseController
         }
     }
 
-    private ICsmActionResult BadRequest(string message)
-    {
-        return new CsmActionResult(new CsmReturnStatus
-        {
-            Status = (int)HttpStatusCode.BadRequest,
-            Message = message
-        });
-    }
+    
 }

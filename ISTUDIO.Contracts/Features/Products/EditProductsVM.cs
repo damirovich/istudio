@@ -14,7 +14,7 @@ public class EditProductsVM : IMapWith<EditProductsCommand>
     public string Description { get; set; }
     public int? CategoryId { get; set; }
     public int? DiscountId { get; set; }
-
+    public List<string> ProductPhotos { get; set; }
     public void Mapping(Profile profile)
     {
         profile.CreateMap<EditProductsVM, EditProductsCommand>();

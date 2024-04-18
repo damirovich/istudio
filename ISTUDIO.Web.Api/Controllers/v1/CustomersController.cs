@@ -3,6 +3,7 @@ using ISTUDIO.Application.Features.Customers.Commands.CreateCustomers;
 using ISTUDIO.Application.Features.Customers.Commands.DeleteCustomers;
 using ISTUDIO.Application.Features.Customers.Commands.EditCustomers;
 using ISTUDIO.Application.Features.Customers.Queries;
+using ISTUDIO.Application.Helpers;
 using ISTUDIO.Contracts.Features.Customers;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
@@ -39,7 +40,8 @@ public class CustomersController : BaseController
             {
                 if (photo != null)
                 {
-                    var photoUrl = await _fileStoreService.SaveImage(photo);
+                    var fileByte = await HelperServices.ConvertToByteArrayAsync(photo);
+                    var photoUrl = await _fileStoreService.SaveImage(fileByte);
 
                     // Другие свойства из объекта IFormFile
                     var typeImg = photo.ContentType; // Пример типа изображения
@@ -49,7 +51,7 @@ public class CustomersController : BaseController
                     {
                         Url = photoUrl,
                         TypeImg = typeImg,
-                        Name = name, 
+                        Name = name,
                         UserId = userId
                     });
                 }
@@ -140,7 +142,9 @@ public class CustomersController : BaseController
             {
                 if (photo != null)
                 {
-                    var photoUrl = await _fileStoreService.SaveImage(photo);
+                    var fileByte = await HelperServices.ConvertToByteArrayAsync(photo);
+
+                    var photoUrl = await _fileStoreService.SaveImage(fileByte);
 
                     // Другие свойства из объекта IFormFile
                     var typeImg = photo.ContentType; // Пример типа изображения
@@ -188,7 +192,9 @@ public class CustomersController : BaseController
             {
                 if (photo != null)
                 {
-                    var photoUrl = await _fileStoreService.SaveImage(photo);
+                    var fileByte = await HelperServices.ConvertToByteArrayAsync(photo);
+
+                    var photoUrl = await _fileStoreService.SaveImage(fileByte);
 
                     // Другие свойства из объекта IFormFile
                     var typeImg = photo.ContentType; // Пример типа изображения

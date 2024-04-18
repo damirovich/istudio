@@ -1,5 +1,6 @@
 ﻿using ISTUDIO.Application.Features.CustomerImages.Commands;
 using ISTUDIO.Application.Features.Customers.Queries;
+using ISTUDIO.Application.Helpers;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 
@@ -34,7 +35,8 @@ public class CustomersController : BaseController
             {
                 if (photo != null)
                 {
-                    var photoUrl = await _fileStoreService.SaveImage(photo);
+                    var fileByte = await HelperServices.ConvertToByteArrayAsync(photo);
+                    var photoUrl = await _fileStoreService.SaveImage(fileByte);
 
                     // Другие свойства из объекта IFormFile
                     var typeImg = photo.ContentType; // Пример типа изображения

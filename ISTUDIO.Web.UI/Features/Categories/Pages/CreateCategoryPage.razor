@@ -1,7 +1,7 @@
 ﻿@page "/categories/create"
 
 
-<CategoriesForm Customer="@category" IsEditMode="false" ButtonName="Добавить" OnSave="CreateCategories" />
+<CreateCategoriesForm OnSave="CreateCategories" />
 
 @using ISTUDIO.Application.Features.Categories.DTOs;
 @using ISTUDIO.Contracts.Features.Categories
@@ -10,12 +10,11 @@
 @using ISTUDIO.Web.UI.Features.Categories.Components
 
 @code {
-    private CategoryResponseDTO category { get; set; } = new();
 
-    private async Task CreateCategories(CategoryResponseDTO newCategory)
+    private async Task CreateCategories(CreateCategoriesVM newCategory)
     {
-        var command = _mapper.Map<CreateCategoriesVM>(category);
-        var res = await _mediatr.Send(new UICreateCategoriesCommand { Categories = command });
+      
+        var res = await _mediatr.Send(new UICreateCategoriesCommand { Categories = newCategory });
 
         if (res.Status)
         {
@@ -27,7 +26,7 @@
             var parameters = new DialogParameters()
             {
                { "ContentText", $"Ошибка при добавлении нового клиента! {res.Data?.Errors} {res.StatusMessage} "},
-               { "ItemName", $"{category.Name}"},
+               { "ItemName", $"{newCategory.Name}"},
             };
 
             var dialogOptions = new DialogOptions()
