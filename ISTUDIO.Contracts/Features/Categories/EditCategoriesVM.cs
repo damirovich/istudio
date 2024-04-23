@@ -1,6 +1,7 @@
 ﻿
 
 using ISTUDIO.Application.Features.Categories.Commands.EditCategories;
+using ISTUDIO.Application.Features.Categories.DTOs;
 
 namespace ISTUDIO.Contracts.Features.Categories;
 
@@ -20,5 +21,11 @@ public class EditCategoriesVM : IMapWith<EditCategoriesCommand>
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
             .ForMember(dest => dest.PhotoCategory, opt => opt.MapFrom(src => Convert.FromBase64String(src.PhotoCategoryBase64)));
+
+        profile.CreateMap<CategoryResponseDTO, EditCategoriesVM>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+            .ForMember(dest => dest.PhotoCategoryBase64, opt => opt.MapFrom(src => src.ImageUrl));
     }
 }

@@ -3,13 +3,12 @@
     <ItemTemplate Context="item">
         <MudTreeViewItem Items="@item.SubCategories?.ToHashSet()">
             <BodyContent>
-               
                 <img src="@GetImageBase64(item.PhotoURL)" alt="Category Icon" style="width: 18px; height: 18px; margin-bottom: 3px; margin-right: 5px;" />
                 <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
                     <MudText Style="justify-self: start;">@item.Name</MudText>
                     <div style="justify-self: end;">
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" />
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" />
+                        <MudIconButton Href="@($"categories/edit/{item.Id}")" Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" />
+                        <MudIconButton OnClick="async() => await DeleteCategories(item.Id, item.Name)" Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" />
                     </div>
                 </div>
             </BodyContent>
@@ -21,6 +20,7 @@
     <h2>@item</h2>
 }
 @using ISTUDIO.Application.Features.Categories.DTOs;
+@using ISTUDIO.Web.UI.Features.Categories.Commands
 @using ISTUDIO.Web.UI.Features.Categories.Queries
 @code {
     private List<CategoryDTO> Categories { get; set; } = new List<CategoryDTO>();
@@ -29,11 +29,12 @@
     {
         await GetCategories();
     }
+
     public string GetImageBase64(string imageUrl)
     {
-        var resHttpReq = Task.Run(async ()=>await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
         var baseFile64 = resHttpReq.Result;
-        
+
         return $"data:image/png;base64,{baseFile64.FileBase64}";
 
     }
@@ -60,5 +61,41 @@
         {
             _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
         }
+    }
+
+    private async Task DeleteCategories(int categoryId, string Name)
+    {
+        var dialogParameters = new DialogParameters
+            {
+                { "ContentText", $"Вы действительно хотите удалить эти данные? Этот процесс нельзя отменить. Категория {Name}" },
+                { "ButtonText", "Удалить" },
+                { "ItemName", Name },
+                { "Color", Color.Error }
+            };
+
+        var dialogOptions = new DialogOptions()
+            {
+                Position = DialogPosition.TopCenter,
+                CloseButton = true,
+                DisableBackdropClick = true
+            };
+
+        var dialog = _dialogService.Show<DeleteDialog>("Удалить", dialogParameters, dialogOptions);
+        var resDialog = await dialog.Result;
+
+        if (!resDialog.Canceled)
+        {
+            var resDelCategories = await _mediatr.Send(new UIDeleteCategoriesCommand { CategoryId = categoryId });
+
+            if (resDelCategories.Status)
+            {
+                _snackbar.Add($"Успешно!!! {resDelCategories.Data.Succeeded}", Severity.Success);
+                await GetCategories();
+            }
+            else
+                _snackbar.Add($"Инфо: Что-то пошло не так {resDelCategories.StatusMessage}", Severity.Warning);
+
+        }
+
     }
 }

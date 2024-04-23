@@ -19,7 +19,7 @@
         if (res.Status)
         {
             _snackbar.Add($"Успешно!!! Данные новой категории успешно добавлено {res.Data.Succeeded}", Severity.Success);
-            _navManager.NavigateTo("/customers");
+            _navManager.NavigateTo("/categories");
         }
         else
         {

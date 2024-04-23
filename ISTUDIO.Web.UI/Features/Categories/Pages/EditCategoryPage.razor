@@ -1,0 +1,75 @@
+﻿@page "/categories/edit/{Id:int}"
+
+<EditCategoriesForm Category="Categories" OnSave="SaveCategories"></EditCategoriesForm>
+
+@using ISTUDIO.Contracts.Features.Categories
+@using ISTUDIO.Web.UI.Features.Categories.Commands
+@using ISTUDIO.Web.UI.Features.Categories.Components
+@using ISTUDIO.Web.UI.Features.Categories.Queries
+@code {
+    [Parameter] public int Id { get; set; }
+    private EditCategoriesVM Categories { get; set; } = new ();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCategoriesEdit(Id);
+    }
+
+    private async Task GetCategoriesEdit(int Id)
+    {
+        try
+        {
+            var resCategory = await _mediatr.Send(new UIGetCategoriesByIdQuery { CategoryId = Id });
+            if (resCategory.Status)
+            {
+                Categories = _mapper.Map<EditCategoriesVM>(resCategory.Data);
+                Categories.PhotoCategoryBase64 = GetImageBase64(Categories.PhotoCategoryBase64);
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resCategory.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+    public string GetImageBase64(string imageUrl)
+    {
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
+
+        return baseFile64.FileBase64;
+
+    }
+    private async Task SaveCategories(EditCategoriesVM editCategory)
+    {
+
+        var res = await _mediatr.Send(new UIEditCategoriesCommand { Categories = editCategory });
+
+        if (res.Status)
+        {
+            _snackbar.Add($"Успешно!!! Данные категории успешно измененно {res.Data.Succeeded}", Severity.Success);
+            _navManager.NavigateTo("/categories");
+        }
+        else
+        {
+            var parameters = new DialogParameters()
+            {
+               { "ContentText", $"Ошибка при сохранении данные категории! {res.Data?.Errors} {res.StatusMessage} "},
+               { "ItemName", $"{editCategory.Name}"},
+            };
+
+            var dialogOptions = new DialogOptions()
+                {
+                    Position = DialogPosition.TopCenter,
+                    CloseButton = true,
+                    DisableBackdropClick = true
+                };
+
+            _dialogService.Show<DialogShow>("Ошибка", parameters, dialogOptions);
+        }
+    }
+}
