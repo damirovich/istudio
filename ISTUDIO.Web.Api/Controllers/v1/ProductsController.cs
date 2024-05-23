@@ -41,6 +41,56 @@ public class ProductsController : BaseController
         }
     }
     /// <summary>
+    /// Метод поиска по продуктам
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="searchTerm"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetSearchProducts([FromQuery] PaginatedListVM page, string searchTerm)
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetSearchProductsQuery
+            {
+                Parameters = new PaginationWithSearchParameters
+                {
+                    PageNumber = page.PageNumber,
+                    PageSize = page.PageSize,
+                    SearchTerm = searchTerm
+                }
+            }));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Новинки продуктов за последнюю неделю
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="searchTerm"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetWeeklyNewProducts()
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetWeeklyNewProductsQuery()));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
     /// Получение списка продуктов по категории
     /// </summary>
     /// <param name="page"></param>
@@ -60,6 +110,30 @@ public class ProductsController : BaseController
                     PageSize = page.PageSize
                 },
                 CategoryId = categoryId 
+            }));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+
+    /// <summary>
+    /// Получение данные продукта по ProductId
+    /// </summary>
+    /// <param name="page"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetProductsById([FromQuery] int productId)
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetProductsByIdQuery
+            {
+                ProductId = productId
             }));
         }
         catch (Exception ex)

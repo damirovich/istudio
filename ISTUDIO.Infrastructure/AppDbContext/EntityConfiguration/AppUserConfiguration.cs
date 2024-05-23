@@ -19,6 +19,8 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
            .HasDefaultValue(DateTime.UtcNow)
            .ValueGeneratedOnAdd();
 
+        builder.Property(e => e.PhotoUsersUrl).HasMaxLength(500).IsRequired(false);
+
         builder.HasIndex(e => e.Id).IsUnique();
         
     }

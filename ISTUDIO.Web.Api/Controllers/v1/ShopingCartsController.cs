@@ -12,8 +12,10 @@ public class ShopingCartsController : BaseController
     private readonly IMapper _mapper;
     public ShopingCartsController(IMapper mapper)
         => _mapper = mapper;
+  
+
     /// <summary>
-    /// Получени список продуктов в корзине по UserId
+    /// Получение список продуктов в корзине по UserId
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
@@ -34,6 +36,7 @@ public class ShopingCartsController : BaseController
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

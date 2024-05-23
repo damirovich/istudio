@@ -11,4 +11,5 @@ public class AppUser : IdentityUser
     //public string? Email { get; set; }
     public string? NormalizedEmail { get; set; }
     public DateTime CreatedDate { get; set; }
+    public string? PhotoUsersUrl { get; set; }
 }

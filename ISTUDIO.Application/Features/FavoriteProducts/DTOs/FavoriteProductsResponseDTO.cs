@@ -7,7 +7,7 @@ public class FavoriteProductsResponseDTO : IMapWith<FavoriteProductsEntity>
 {
     public string UserId { get; set; }
 
-    public IList<ProductsResponseDTO> Products { get; set; }
+    public IList<ProductsFavoriteDTO> Products { get; set; }
 
     public void Mapping(Profile profile)
     {

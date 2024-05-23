@@ -14,7 +14,7 @@ public class CreateProductsVM : IMapWith<CreateProductsCommand>
     public string Description { get; set; }
     public int CategoryId { get; set; }
     public int? DiscountId { get; set; }
-    public List<string> ProductPhotos { get; set; } 
+    public List<string> ProductPhotos { get; set; } = new List<string>();
    
     public void Mapping(Profile profile)
     {

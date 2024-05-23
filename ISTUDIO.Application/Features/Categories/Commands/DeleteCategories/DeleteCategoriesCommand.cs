@@ -23,6 +23,7 @@ public class DeleteCategoriesCommand : IRequest<ResModel>
                 await _appDbContext.SaveChangesAsync(cancellationToken);
 
                 _fileStoreService.DeleteImage(existingCategory.ImageUrl);
+                _fileStoreService.DeleteImage(existingCategory.IconImageUrl);
 
                 // Сбрасываем кеш Redis после Удалении категории
                 string cashKey = "CategoriesIstudio";

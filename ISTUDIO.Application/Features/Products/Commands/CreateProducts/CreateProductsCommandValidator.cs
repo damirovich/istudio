@@ -25,7 +25,7 @@ public class CreateProductsCommandValidator : AbstractValidator<CreateProductsCo
             .GreaterThanOrEqualTo(0).WithMessage("Количество продукта на складе не может быть отрицательным.");
 
         RuleFor(v => v.Description)
-            .MaximumLength(500).WithMessage("Описание продукта должно быть не длиннее 500 символов.");
+            .MaximumLength(5000).WithMessage("Описание продукта должно быть не длиннее 5000 символов.");
 
         //RuleFor(x => x.CategoryId)
         //    .NotNull().WithMessage("Идентификатор категории не может быть пустым.")

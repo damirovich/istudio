@@ -2,7 +2,7 @@
 using ISTUDIO.Application.Features.Orders.DTOs;
 
 namespace ISTUDIO.Application.Features.Orders.Queries;
-using ResModel = OrderResponseDTO;
+using ResModel = List<OrderResponseDTO>;
 public class GetOrdersByUserIdQuery : IRequest<ResModel>
 {
     public string UserId { get; set; }
@@ -21,7 +21,7 @@ public class GetOrdersByUserIdQuery : IRequest<ResModel>
         {
             var order = await _appDbContext.Orders
                 .Include(o=>o.Customers)
-                .FirstOrDefaultAsync(o => o.UserId == query.UserId);
+                .Where(o => o.UserId == query.UserId).ToListAsync();
 
             var responseDto = _mapper.Map<ResModel>(order);
            

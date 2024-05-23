@@ -31,4 +31,5 @@ public class OrderEntity
     // Детали заказа
     public ICollection<OrderDetailEntity> Details { get; set; } = new HashSet<OrderDetailEntity>();
     public ICollection<CustomersEntity> Customers { get; set; } = new List<CustomersEntity>();
+    public ICollection<OrderAddressEntity> OrderAddresses { get; set; } = new List<OrderAddressEntity>();
 }

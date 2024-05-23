@@ -1,9 +1,7 @@
 ﻿namespace ISTUDIO.Web.UI.Features;
-using ISTUDIO.Domain.Models;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Xml.Serialization;
 using ResModel = File;
 public class GetFilesQuery : IRequest<ResModel>
 {

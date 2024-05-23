@@ -1,0 +1,202 @@
+﻿
+<EditForm Model="@SubCategory" OnValidSubmit="SaveAsync">
+    <MudGrid>
+        <MudItem xs="12" md="12">
+            <MudPaper Class="pa-3 ma-1">
+
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Success">Добавить</MudButton>
+
+                <MudButton Href="categories" Variant="Variant.Text">Отмена</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="12" md="12">
+            <MudPaper Class="pa-16 ma-1">
+
+                <MudGrid>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect T="int" Label="Родительский элемент" @bind-Value="SubCategory.CategoryId">
+                            @foreach (var item in ParentCategory)
+                            {
+                                <MudSelectItem T="int" Value="@item.Id">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="string" Label="Называние категории"
+                                      Variant="@variant" @bind-Text="@SubCategory.Name"
+                                      For="@(() => SubCategory.Name)" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="string" Label="Описание"
+                                      Variant="variant" @bind-Text="@SubCategory.Description"
+                                      For="@(() => SubCategory.Description)" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="UploadPhotoIcon">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                                           for="@fileInput">
+                                    Загрузить фото иконки
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="UploadPhoto">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                                           for="@fileInput">
+                                    Загрузить фото
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        @if (IconFiles != null)
+                        {
+                            <h3>@IconFiles.Name</h3>
+                            <img src="data:image/png;base64, @SubCategory.IcontPhotoCategoryBase64" alt="Category Icon" style="width: 100px; height: 100px; margin-bottom: 3px; margin-right: 5px;" />
+                        }
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        @if (PhotoFiles != null)
+                        {
+                            <h3>@PhotoFiles.Name</h3>
+                            <img src="data:image/png;base64, @SubCategory.PhotoCategoryBase64" alt="Category Icon" style="width: 100px; height: 100px; margin-bottom: 3px; margin-right: 5px;" />
+                        }
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using ISTUDIO.Application.Features.ModelsDTO
+@using ISTUDIO.Contracts.Features.SubCategories;
+@using ISTUDIO.Application.Features.Categories.DTOs;
+@using ISTUDIO.Web.UI.Features.Categories.Queries
+
+
+@code {
+    public CreateSubCategoriesVM SubCategory { get; set; } = new();
+    [Parameter] public EventCallback<CreateSubCategoriesVM> OnSave { get; set; }
+    private Variant variant = Variant.Text;
+    private IBrowserFile IconFiles { get; set; }
+    private IBrowserFile PhotoFiles { get; set; }
+
+    private IEnumerable<CategoryDTO> ParentCategory { get; set; } = new List<CategoryDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCategories();
+    }
+
+    private async Task UploadPhotoIcon(IBrowserFile file)
+    {
+        IconFiles = file;
+        SubCategory.IcontPhotoCategoryBase64 = await ConvertFileToBase64(IconFiles);
+        StateHasChanged();
+    }
+    private async Task UploadPhoto(IBrowserFile file)
+    {
+        PhotoFiles = file;
+        SubCategory.PhotoCategoryBase64 = await ConvertFileToBase64(PhotoFiles);
+        StateHasChanged();
+    }
+    private async Task SaveAsync()
+    {
+        await OnSave.InvokeAsync(SubCategory);
+    }
+
+    private async Task<string> ConvertFileToBase64(IBrowserFile file)
+    {
+        using (var stream = file.OpenReadStream(maxAllowedSize: 512 * 5120))
+        using (var memoryStream = new MemoryStream())
+        {
+            await stream.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
+            return Convert.ToBase64String(bytes);
+        }
+    }
+
+    private async Task GetCategories()
+    {
+        try
+        {
+            var resCategories = await _mediatr.Send(new UIGetCategoriesQuery());
+
+            if (resCategories.Status)
+            {
+
+                var categories = resCategories.Data.Categories.ToList(); // Конвертируем IEnumerable в список для возможности изменения
+
+                // Создаем список для хранения всех категорий и их подкатегорий
+                var allCategories = new List<CategoryDTO>();
+
+                // Рекурсивная функция для получения всех подкатегорий
+                async Task GetSubCategoriesRecursively(List<CategoryDTO> subCategories)
+                {
+                    foreach (var subCategory in subCategories)
+                    {
+                        // Добавляем текущую подкатегорию в общий список
+                        allCategories.Add(subCategory);
+
+                        // Получаем подкатегории для текущей подкатегории
+                        var childSubCategories = await GetSubCategories(subCategory.SubCategories);
+
+                        // Рекурсивно вызываем эту же функцию для дочерних подкатегорий
+                        await GetSubCategoriesRecursively(childSubCategories);
+                    }
+                }
+
+                // Проходим по основным категориям
+                foreach (var category in categories)
+                {
+                    // Добавляем основную категорию в общий список
+                    allCategories.Add(category);
+
+                    // Получаем подкатегории для текущей категории
+                    var subCategories = await GetSubCategories(category.SubCategories);
+
+                    // Вызываем рекурсивную функцию для обработки всех уровней подкатегорий
+                    await GetSubCategoriesRecursively(subCategories);
+                }
+                // Присваиваем обновленный список категорий основной категории
+                ParentCategory = allCategories;
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resCategories.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+    private async Task<List<CategoryDTO>> GetSubCategories(List<CategoryDTO> subCategories)
+    {
+        var subCategoryList = new List<CategoryDTO>();
+        foreach (var subCategory in subCategories)
+        {
+            // subCategory.SubCategories = GetSubCategories(subCategory);
+            subCategoryList.Add(subCategory);
+        }
+        return subCategoryList;
+    }
+}

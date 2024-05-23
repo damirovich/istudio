@@ -1,5 +1,4 @@
 ﻿using ISTUDIO.Application.Features.SubCategories.Commands.CreateSubCategories;
-using ISTUDIO.Application.Features.SubCategories.Commands.DeleteSubCategories;
 using ISTUDIO.Application.Features.SubCategories.Commands.EditSubCategories;
 using ISTUDIO.Contracts.Features.SubCategories;
 
@@ -63,24 +62,5 @@ public class SubCategoriesController : BaseController
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
-    /// <summary>
-    /// Удаление данных Под категории
-    /// </summary>
-    /// <param name="Id"></param>
-    /// <returns></returns>
-    [HttpDelete]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> DeleteSubCategory([FromQuery] int Id)
-    {
-        try
-        {
-            var result = await Mediator.Send(new DeleteSubCategoriesCommand { SubCategoryId = Id });
-            return new CsmActionResult<Result>(result);
-        }
-        catch (Exception ex)
-        {
-            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
-        }
-    }
+   
 }

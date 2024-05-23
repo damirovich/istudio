@@ -16,4 +16,5 @@ public class DiscountEntity
 
     // Продукты данной скидки
     public ICollection<ProductsEntity> Products { get; set; } = new List<ProductsEntity>();
+    public ICollection<BannerEntity> Baners { get; set; } = new List<BannerEntity>();
 }

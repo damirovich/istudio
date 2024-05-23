@@ -1,0 +1,76 @@
+﻿@page "/products/edit/{Id:int}"
+
+
+<EditProductForm Product="Products" OnSave="SaveProducts" />
+
+
+@using ISTUDIO.Contracts.Features.Products
+@using ISTUDIO.Web.UI.Features.Products.Components
+@using ISTUDIO.Web.UI.Features.Products.Queries;
+@using ISTUDIO.Web.UI.Features.Products.Commands;
+@code {
+    [Parameter] public int Id { get; set; }
+    private EditProductsVM Products { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetProductsEdit(Id);
+    }
+
+    private async Task GetProductsEdit(int Id)
+    {
+        try
+        {
+            var resProduct = await _mediatr.Send(new UIGetProductByIdQuery { ProductId = Id });
+            if (resProduct.Status)
+            {
+                Products = _mapper.Map<EditProductsVM>(resProduct.Data);
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resProduct.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+    public string GetImageBase64(string imageUrl)
+    {
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
+
+        return baseFile64.FileBase64;
+
+    }
+    private async Task SaveProducts(EditProductsVM editProducts)
+    {
+
+        var res = await _mediatr.Send(new UIEditProductsCommand { Products = editProducts });
+
+        if (res.Status)
+        {
+            _snackbar.Add($"Успешно!!! Данные продукта успешно измененно {res.Data.Succeeded}", Severity.Success);
+            _navManager.NavigateTo("/products");
+        }
+        else
+        {
+            var parameters = new DialogParameters()
+            {
+               { "ContentText", $"Ошибка при сохранении данные продукта! {res.Data?.Errors} {res.StatusMessage} "},
+               { "ItemName", $"{editProducts.Name}"},
+            };
+
+            var dialogOptions = new DialogOptions()
+                {
+                    Position = DialogPosition.TopCenter,
+                    CloseButton = true,
+                    DisableBackdropClick = true
+                };
+
+            _dialogService.Show<DialogShow>("Ошибка", parameters, dialogOptions);
+        }
+    }
+}

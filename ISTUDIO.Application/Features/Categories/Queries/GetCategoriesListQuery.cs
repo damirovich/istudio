@@ -25,11 +25,12 @@ public class GetCategoriesListQuery : IRequest<ResModel>
             {
                 return new ResModel { Categories = cashedResult };
             }
-            var categories = await _appDbContext.Categories.ProjectToListAsync<CategoryDTO>(_mapper.ConfigurationProvider);
+            var categories = await _appDbContext.Categories.ToListAsync(cancellationToken);
+            var categoriesDto = _mapper.Map<List<CategoryDTO>>(categories);
 
-            await _redisCacheService.SetAsync(cashKey, categories, TimeSpan.FromDays(10));
+            await _redisCacheService.SetAsync(cashKey, categoriesDto, TimeSpan.FromDays(10));
             // Возврат результатов в виде PaginatedList
-            return new ResModel { Categories = categories };
+            return new ResModel { Categories = categoriesDto };
         }
     }
 }

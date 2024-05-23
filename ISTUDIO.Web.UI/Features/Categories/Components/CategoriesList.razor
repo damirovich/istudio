@@ -3,7 +3,8 @@
     <ItemTemplate Context="item">
         <MudTreeViewItem Items="@item.SubCategories?.ToHashSet()">
             <BodyContent>
-                <img src="@GetImageBase64(item.PhotoURL)" alt="Category Icon" style="width: 18px; height: 18px; margin-bottom: 3px; margin-right: 5px;" />
+                <img src="@GetImageBase64(item.PhotoURL)" alt="Category photo" style="width: 18px; height: 18px; margin-bottom: 3px; margin-right: 5px;" />
+                <img src="@GetImageBase64(item.IconPhotoURL)" alt="Category Icon" style="width: 18px; height: 18px; margin-bottom: 3px; margin-right: 5px;" />
                 <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
                     <MudText Style="justify-self: start;">@item.Name</MudText>
                     <div style="justify-self: end;">
@@ -25,6 +26,8 @@
 @code {
     private List<CategoryDTO> Categories { get; set; } = new List<CategoryDTO>();
     private List<string> ass = new List<string>();
+
+
     protected override async Task OnInitializedAsync()
     {
         await GetCategories();

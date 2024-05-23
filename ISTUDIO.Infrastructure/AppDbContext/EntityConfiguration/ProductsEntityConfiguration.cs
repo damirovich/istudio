@@ -17,6 +17,9 @@ public class ProductsEntityConfiguration : IEntityTypeConfiguration<ProductsEnti
         builder.Property(e => e.Price).HasColumnType("decimal(18, 2)").IsRequired();
         builder.Property(e => e.QuantityInStock).IsRequired();
         builder.Property(e => e.Description).IsRequired();
+        builder.Property(e => e.CreateDate)
+            .HasDefaultValue(DateTime.UtcNow)
+            .ValueGeneratedOnAdd();
 
         // Определение связи с категорией
         builder.HasOne(p => p.Category)

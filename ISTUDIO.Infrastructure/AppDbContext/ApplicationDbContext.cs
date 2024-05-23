@@ -26,7 +26,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<OrderEntity> Orders { get; set; }
     public DbSet<FavoriteProductsEntity> FavoriteProducts { get; set; }
     public DbSet<OrderDetailEntity> OrderDetails { get; set; }
-         
+    public DbSet<OrderAddressEntity> OrderAddresses { get; set; }
+    public DbSet<BannerEntity> Banners { get; set; }
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
     protected override void OnModelCreating(ModelBuilder builder)
@@ -60,6 +61,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new SmsNikitaStatusConfiguration());
         builder.ApplyConfiguration(new CustomersEntityConfiguration());
         builder.ApplyConfiguration(new FavoriteProductsEntityConfiguration());
+        builder.ApplyConfiguration(new OrderAddressConfiguration());
+        builder.ApplyConfiguration(new BannerEntityConfiguration());
     }
    
 }

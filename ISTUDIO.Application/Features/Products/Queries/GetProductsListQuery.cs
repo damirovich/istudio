@@ -19,13 +19,31 @@ public class GetProductsListQuery  : IRequest<ResModel>
 
         public async Task<ResModel> Handle(GetProductsListQuery query, CancellationToken cancellationToken)
         {
-            var products = _appDbContext.Products.Include(d => d.Discount)
-               .AsNoTracking()
-               .OrderByDescending(c => c.Id)
-               .ProjectTo<ProductsResponseDTO>(_mapper.ConfigurationProvider)
-               .PaginatedListAsync(query.Parameters.PageNumber, query.Parameters.PageSize);
+            var random = new Random();
+            var products = await _appDbContext.Products
+                .Include(d => d.Discount)
+                .AsNoTracking()
+                .OrderByDescending(c => c.Id)
+                .ProjectTo<ProductsResponseDTO>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
 
-            return await products;
+            // Выполняем случайное упорядочивание на стороне клиента
+            var randomizedProducts = products.OrderBy(p => random.Next()).ToList();
+
+            // Применяем пагинацию к уже случайно упорядоченному списку
+            var paginatedList = randomizedProducts
+                .Skip((query.Parameters.PageNumber - 1) * query.Parameters.PageSize)
+                .Take(query.Parameters.PageSize)
+                .ToList();
+
+            // Возвращаем новый PaginatedList
+            return new ResModel(
+                paginatedList,
+                query.Parameters.PageNumber,
+                (int)Math.Ceiling(products.Count / (double)query.Parameters.PageSize),
+                products.Count
+            );
         }
     }
 }
+

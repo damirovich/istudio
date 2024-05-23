@@ -7,11 +7,9 @@ namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 [ApiVersion("1.0")]
 public class CustomersController : BaseController
 {
-    private readonly IMapper _mapper;
     private readonly IFileStoreService _fileStoreService;
-    public CustomersController(IMapper mapper, IFileStoreService fileStoreService)
+    public CustomersController(IFileStoreService fileStoreService)
     {
-        _mapper = mapper;
         _fileStoreService = fileStoreService;
     }
     /// <summary>

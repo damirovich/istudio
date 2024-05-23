@@ -22,6 +22,8 @@ public class ProductsEntity
 
     // Описание продукта
     public string Description { get; set; }
+    //Дата добавление продукта
+    public DateTime CreateDate { get; set; }
 
     // Идентификатор категории, к которой относится продукт
     public int? CategoryId { get; set; }
@@ -40,4 +42,5 @@ public class ProductsEntity
     public ICollection<OrderEntity> Orders { get; set; } = new List<OrderEntity>();
     public ICollection<ShoppingCartEntity> ShoppingCarts { get; set;} = new List<ShoppingCartEntity>();
     public ICollection<FavoriteProductsEntity> FavoriteProducts { get; set; } = new List<FavoriteProductsEntity>();
+    public ICollection<BannerEntity> Baners { get; set; } = new List<BannerEntity>();
 }

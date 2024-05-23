@@ -14,6 +14,7 @@ public class CategoryEntityConfiguration : IEntityTypeConfiguration<CategoryEnti
         builder.Property(e => e.Name).HasMaxLength(250).IsRequired();
         builder.Property(e => e.Description).HasMaxLength(500);
         builder.Property(e => e.ImageUrl).HasMaxLength(500);
+        builder.Property(e => e.IconImageUrl).HasMaxLength(500);
 
         // Определение связи с самой собой (для иерархии подкатегорий)
         builder.HasMany(e => e.SubCategories)

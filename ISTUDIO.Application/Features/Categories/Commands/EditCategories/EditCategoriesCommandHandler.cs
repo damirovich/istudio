@@ -22,16 +22,22 @@ public class EditCategoriesCommandHandler : IRequestHandler<EditCategoriesComman
             var existingCategory = await _appDbContext.Categories.FindAsync(command.Id);
             if (existingCategory == null)
                 return ResModel.Failure(new[] { "Категория не найдена" });
-            string photoFilePath = string.Empty;
 
-            if (command.PhotoCategory != null)
+            string photoFilePath = string.Empty;
+            string iconPhotoFilePath = string.Empty;
+
+            if (command.PhotoCategory != null && command.PhotoCategory.Length > 0)
             {
                 photoFilePath = await _fileStoreService.SaveImage(command.PhotoCategory);
             }
-
+            if(command.IconPhoto != null && command.IconPhoto.Length > 0 )
+            {
+                iconPhotoFilePath = await _fileStoreService.SaveImage(command.IconPhoto);
+            }
             _mapper.Map(command, existingCategory);
 
             existingCategory.ImageUrl = photoFilePath;
+            existingCategory.IconImageUrl = iconPhotoFilePath;
 
             _appDbContext.Categories.Update(existingCategory);
 

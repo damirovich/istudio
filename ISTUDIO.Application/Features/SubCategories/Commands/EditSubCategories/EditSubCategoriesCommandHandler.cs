@@ -24,14 +24,20 @@ public class EditSubCategoriesCommandHandler : IRequestHandler<EditSubCategories
                 return ResModel.Failure(new[] { "Под категория не найдена" });
 
             string photoFilePath = string.Empty;
-            if (command.PhotoCategory != null)
+            string iconPhotoFilePath = string.Empty;
+            if (command.PhotoCategory != null && command.PhotoCategory.Length > 0) 
             {
                 photoFilePath = await _fileStoreService.SaveImage(command.PhotoCategory);
+            }
+            if(command.IconPhotoCategory != null && command.IconPhotoCategory.Length > 0)
+            {
+                iconPhotoFilePath = await _fileStoreService.SaveImage(command.IconPhotoCategory);
             }
             _mapper.Map(command, existingSubCategory);
 
 
             existingSubCategory.ImageUrl = photoFilePath;
+            existingSubCategory.IconImageUrl = iconPhotoFilePath;
 
             _appDbContext.Categories.Update(existingSubCategory);
 

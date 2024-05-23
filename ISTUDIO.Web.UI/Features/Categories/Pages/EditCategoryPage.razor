@@ -23,7 +23,8 @@
             if (resCategory.Status)
             {
                 Categories = _mapper.Map<EditCategoriesVM>(resCategory.Data);
-                Categories.PhotoCategoryBase64 = GetImageBase64(Categories.PhotoCategoryBase64);
+                Categories.PhotoCategoryBase64 = GetImageBase64(Categories.PhotoCategoryBase64 ?? "");
+                Categories.IcontPhotoCategoryBase64 = GetImageBase64(Categories.IcontPhotoCategoryBase64 ?? "");
             }
             else
             {

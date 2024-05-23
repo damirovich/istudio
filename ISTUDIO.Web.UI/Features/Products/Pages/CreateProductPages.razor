@@ -1,0 +1,40 @@
+﻿@page "/products/create"
+
+<CreateProductForm OnSave="CreateProduct" />
+
+@using ISTUDIO.Contracts.Features.Products
+@using ISTUDIO.Web.UI.Features.Products.Commands;
+@using ISTUDIO.Web.UI.Features.Products.Components
+
+@code {
+    
+
+    private async Task CreateProduct(CreateProductsVM newProduct)
+    {
+
+        var res = await _mediatr.Send(new UICreateProductsCommand { Products = newProduct });
+
+        if (res.Status)
+        {
+            _snackbar.Add($"Успешно!!! Продукт успешно добавлено {res.Data.Succeeded}", Severity.Success);
+            _navManager.NavigateTo("/products");
+        }
+        else
+        {
+            var parameters = new DialogParameters()
+            {
+               { "ContentText", $"Ошибка при добавлении нового клиента! {res.Data?.Errors} {res.StatusMessage} "},
+               { "ItemName", $"{newProduct.Name}"},
+            };
+
+            var dialogOptions = new DialogOptions()
+                {
+                    Position = DialogPosition.TopCenter,
+                    CloseButton = true,
+                    DisableBackdropClick = true
+                };
+
+            _dialogService.Show<DialogShow>("Ошибка", parameters, dialogOptions);
+        }
+    }
+}

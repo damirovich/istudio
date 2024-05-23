@@ -8,6 +8,7 @@ public class CategoryResponseDTO : IMapWith<CategoryEntity>
     public string Name { get; set; }
     public string Description { get; set; }
     public string ImageUrl { get; set; }
+    public string IconImageUrl { get; set; }
     public void Mapping(Profile profile)
     {
         profile.CreateMap<CategoryEntity, CategoryResponseDTO>()

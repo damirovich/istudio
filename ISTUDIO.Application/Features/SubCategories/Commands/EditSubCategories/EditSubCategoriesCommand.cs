@@ -8,6 +8,7 @@ public class EditSubCategoriesCommand : IRequest<ResModel>, IMapWith<CategoryEnt
     public string Name { get; set; }
     public string? Description { get; set; }
     public byte[]? PhotoCategory { get; set; }
+    public byte[]? IconPhotoCategory { get; set; }
     public int CategoryId { get; set; }
 
     public void Mapping(Profile profile)

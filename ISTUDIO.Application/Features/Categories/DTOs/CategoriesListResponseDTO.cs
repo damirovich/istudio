@@ -45,6 +45,8 @@ public class CategoriesListResponseDTO : IMapWith<CategoryEntity>
                     Name = category.Name,
                     // Устанавливаем URL изображения категории из свойства ImageUrl категории.
                     PhotoURL = category.ImageUrl,
+                    // Устанавливаем URL Икон изображение категории из свойства IconImageUrl категории.
+                    IconPhotoURL = category.IconImageUrl,
                     // Вызываем метод MapSubCategories для преобразования подкатегорий текущей категории.
                     SubCategories = MapSubCategories(category.SubCategories)
                 };
@@ -75,6 +77,10 @@ public class CategoriesListResponseDTO : IMapWith<CategoryEntity>
                 Name = subCategory.Name,
                 // Устанавливаем URL изображения подкатегории из свойства ImageUrl подкатегории.
                 PhotoURL = subCategory.ImageUrl,
+
+                // Устанавливаем URL изображения подкатегории из свойства IconImageUrl подкатегории.
+                IconPhotoURL = subCategory.IconImageUrl,
+
                 // Рекурсивно вызываем этот же метод для преобразования подкатегорий текущей подкатегории, если они есть.
                 SubCategories = MapSubCategories(subCategory.SubCategories)
             };

@@ -1,0 +1,266 @@
+﻿
+<EditForm Model="@Product" OnValidSubmit="SaveAsync">
+    <MudGrid>
+        <MudItem xs="12" md="12">
+            <MudPaper Class="pa-3 ma-1">
+
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Success">Сохранить</MudButton>
+
+                <MudButton Href="products" Variant="Variant.Text">Отмена</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="12" md="12">
+            <MudPaper Class="pa-16 ma-1">
+
+                <MudGrid>
+
+                    <MudItem xs="12" sm="6" md="4">
+
+                    
+                            <MudSelect @bind-Value="_categoryType" ToStringFunc="@converter" Label="Категория" Margin="Margin.Dense" T="CategoryDTO" Variant="Variant.Outlined">
+                                @foreach (var item in ParentCategory)
+                                {
+                                    <MudSelectItem Value="item">
+                                        <MudText>@item.Name</MudText>
+                                    </MudSelectItem>
+                                }
+                            </MudSelect>
+                       @*  <MudSelect T="int?" Label="Категория" @bind-Value="Product.CategoryId" AdornmentIcon="@Icons.Material.Filled.Category">
+                            @foreach (var item in ParentCategory)
+                            {
+                                <MudSelectItem T="int" Value="@item.Id">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect> *@
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="string" Label="Наименование продукта"
+                                      Variant="@variant" @bind-Text="@Product.Name"
+                                      For="@(() => Product.Name)"
+                                      Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="string" Label="Модель продукта"
+                                      Variant="variant" @bind-Text="@Product.Model"
+                                      For="@(() => Product.Model)"
+                                      Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Edit" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="string" Label="Цвет"
+                                      Variant="@variant" @bind-Text="@Product.Color"
+                                      For="@(() => Product.Color)"
+                                      Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.ColorLens" />
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="decimal" Label="Цена"
+                                      Variant="variant" @bind-Value="@Product.Price"
+                                      For="@(() => Product.Price)"
+                                      Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="int" Label="Количество"
+                                      Variant="variant" @bind-Value="@Product.QuantityInStock"
+                                      For="@(() => Product.QuantityInStock)"
+                                      Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.ProductionQuantityLimits" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect T="int?" Label="Скидка" @bind-Value="Product.DiscountId" AdornmentIcon="@Icons.Material.Filled.Percent"
+                                   Clearable="true">
+                            @foreach (var item in Discounts)
+                            {
+                                <MudSelectItem T="int?" Value="@item.Id">@item.PercenTage</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4"></MudItem>
+                    <MudItem xs="12" sm="12" md="6">
+                        <MudTextField @ref="multilineReference" T="string" Label="Описание Товара" Variant="variant"
+                                      Lines="15" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.CenterFocusWeak"
+                                      @bind-Text="@Product.Description"
+                                      For="@(() => Product.Description)"
+                                      OnAdornmentClick="@(() => multilineReference.SelectRangeAsync(2,10))" />
+                    </MudItem>
+                    <MudItem xs="12" sm="12" md="6">
+                        <EditProductFileUpload UploadFiles="UploadFile" _imageUrls="Product.ProductPhotos" />
+                    </MudItem>
+
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="12" md="12">
+            <MudPaper Class="pa-3 ma-1">
+
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Success">Сохранить</MudButton>
+
+                <MudButton Href="products" Variant="Variant.Text">Отмена</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@using ISTUDIO.Application.Features.Categories.DTOs
+@using ISTUDIO.Application.Features.Discounts.DTOs
+@using ISTUDIO.Contracts.Features.Products
+@using ISTUDIO.Web.UI.Features.Categories.Queries
+@using ISTUDIO.Web.UI.Features.Discounts.Queries
+
+@code {
+    [Parameter] public EditProductsVM Product { get; set; }
+    [Parameter] public EventCallback<EditProductsVM> OnSave { get; set; }
+    private CategoryDTO _categoryType = new();
+    private List<CategoryDTO> ParentCategory { get; set; } = new ();
+    private IEnumerable<DiscountResponseListDTO> Discounts { get; set; } = new List<DiscountResponseListDTO>();
+
+    private Variant variant = Variant.Text;
+    private MudTextField<string> multilineReference;
+    private Func<CategoryDTO, string> converter = p => p?.Name;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCategories();
+        await GetDiscounts();
+    }
+    private async Task SaveAsync()
+    {
+        await OnSave.InvokeAsync(Product);
+    }
+
+    private async Task GetCategories()
+    {
+        try
+        {
+            var resCategories = await _mediatr.Send(new UIGetCategoriesQuery());
+
+            if (resCategories.Status)
+            {
+                var productCategoryId = Product.CategoryId;
+                var categories = resCategories.Data.Categories.ToList();
+                var allCategories = new List<CategoryDTO>();
+                var category = await FindCategoryById(productCategoryId, categories);
+                if (category != null)
+                {
+                    _categoryType = category;
+                }
+                else
+                {
+                    _snackbar.Add("Инфо: Категория не найдена", Severity.Warning);
+                }
+
+                async Task GetSubCategoriesRecursively(List<CategoryDTO> subCategories)
+                {
+                    foreach (var subCategory in subCategories)
+                    {
+                        // Добавляем текущую подкатегорию в общий список
+                        allCategories.Add(subCategory);
+
+                        // Получаем подкатегории для текущей подкатегории
+                        var childSubCategories = await GetSubCategories(subCategory.SubCategories);
+
+                        // Рекурсивно вызываем эту же функцию для дочерних подкатегорий
+                        await GetSubCategoriesRecursively(childSubCategories);
+                    }
+                }
+
+                // Проходим по основным категориям
+                foreach (var item in categories)
+                {
+                    // Добавляем основную категорию в общий список
+                    allCategories.Add(item);
+
+                    // Получаем подкатегории для текущей категории
+                    var subCategories = await GetSubCategories(item.SubCategories);
+
+                    // Вызываем рекурсивную функцию для обработки всех уровней подкатегорий
+                    await GetSubCategoriesRecursively(subCategories);
+                }
+                ParentCategory = allCategories;
+               
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resCategories.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task GetDiscounts()
+    {
+        try
+        {
+            var resDiscounts = await _mediatr.Send(new UIGetDiscountListQuery { PageNumber = 0, PageSize = 100 });
+
+            if (resDiscounts.Status)
+            {
+                Discounts = resDiscounts.Data.Items;
+
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resDiscounts.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+    private async Task<List<CategoryDTO>> GetSubCategories(List<CategoryDTO> subCategories)
+    {
+        var subCategoryList = new List<CategoryDTO>();
+        foreach (var subCategory in subCategories)
+        {
+            subCategoryList.Add(subCategory);
+        }
+        return subCategoryList;
+    }
+    private async Task<CategoryDTO> FindCategoryById(int? categoryId, List<CategoryDTO> categories)
+    {
+        foreach (var category in categories)
+        {
+            if (category.Id == categoryId)
+            {
+                return category; // Нашли категорию в текущем уровне
+            }
+
+            // Рекурсивный поиск в подкатегориях текущего уровня
+            var foundCategory = await FindCategoryById(categoryId, category.SubCategories);
+            if (foundCategory != null)
+            {
+                return foundCategory; // Нашли категорию в подкатегории
+            }
+        }
+        return null; // Категория не найдена
+    }
+
+    private async void UploadFile(IReadOnlyList<IBrowserFile> files)
+    {
+        foreach (var item in files)
+        {
+            var fileBase64 = await ConvertFileToBase64(item);
+            Product.ProductPhotos.Add(fileBase64);
+        }
+    }
+
+    private async Task<string> ConvertFileToBase64(IBrowserFile file)
+    {
+        using (var stream = file.OpenReadStream(maxAllowedSize: 512 * 5120))
+        using (var memoryStream = new MemoryStream())
+        {
+            await stream.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
+            return Convert.ToBase64String(bytes);
+        }
+    }
+}

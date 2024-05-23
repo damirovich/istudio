@@ -6,7 +6,7 @@
 
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Success">Добавить</MudButton>
 
-                <MudButton Href="customers" Variant="Variant.Text">Отмена</MudButton>
+                <MudButton Href="categories" Variant="Variant.Text">Отмена</MudButton>
             </MudPaper>
         </MudItem>
     </MudGrid>
@@ -25,22 +25,43 @@
                                       Variant="variant" @bind-Text="@Category.Description"
                                       For="@(() => Category.Description)" />
                     </MudItem>
-                    <MudItem xs="12" sm="6" md="4">
-                        <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="UploadFiles">
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="UploadPhotoIcon">
                             <ButtonTemplate>
                                 <MudButton HtmlTag="label"
                                            Variant="Variant.Filled"
                                            Color="Color.Primary"
                                            StartIcon="@Icons.Material.Filled.CloudUpload"
                                            for="@fileInput">
-                                   Загрузить фото
+                                   Загрузить фото иконки
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="UploadPhoto">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                                           for="@fileInput">
+                                    Загрузить фото
                                 </MudButton>
                             </ButtonTemplate>
                         </MudFileUpload>
                     </MudItem>
                     <MudItem xs="12" sm="6" md="4">
-                        @if (files != null) { 
-                            <h3>@files.Name</h3>
+                        @if (IconFiles != null) { 
+                            <h3>@IconFiles.Name</h3>
+                            <img src="data:image/png;base64, @Category.IcontPhotoCategoryBase64" alt="Category Icon" style="width: 100px; height: 100px; margin-bottom: 3px; margin-right: 5px;" />
+                        }
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        @if (PhotoFiles != null)
+                        {
+                            <h3>@PhotoFiles.Name</h3>
                             <img src="data:image/png;base64, @Category.PhotoCategoryBase64" alt="Category Icon" style="width: 100px; height: 100px; margin-bottom: 3px; margin-right: 5px;" />
                         }
                     </MudItem>
@@ -62,24 +83,28 @@
     public CreateCategoriesVM Category { get; set; } = new();
     [Parameter] public EventCallback<CreateCategoriesVM> OnSave { get; set; }
     private Variant variant = Variant.Text;
-    private IBrowserFile files { get; set; }
-    private async Task UploadFiles(IBrowserFile file)
+    private IBrowserFile IconFiles { get; set; }
+    private IBrowserFile PhotoFiles { get; set; }
+    private async Task UploadPhotoIcon(IBrowserFile file)
     {
-        files = file;
-        Category.PhotoCategoryBase64 = await ConvertFileToBase64(files);
+        IconFiles = file;
+        Category.IcontPhotoCategoryBase64 = await ConvertFileToBase64(IconFiles);
+        StateHasChanged();
+    }
+    private async Task UploadPhoto(IBrowserFile file)
+    {
+        PhotoFiles = file;
+        Category.PhotoCategoryBase64 = await ConvertFileToBase64(PhotoFiles);
+        StateHasChanged();
     }
     private async Task SaveAsync()
     {
-        if (files != null)
-        {
-            Category.PhotoCategoryBase64 = await ConvertFileToBase64(files);
-        }
         await OnSave.InvokeAsync(Category);
     }
 
     private async Task<string> ConvertFileToBase64(IBrowserFile file)
     {
-        using (var stream = file.OpenReadStream())
+        using (var stream = file.OpenReadStream(maxAllowedSize: 512 * 5120))
         using (var memoryStream = new MemoryStream())
         {
             await stream.CopyToAsync(memoryStream);

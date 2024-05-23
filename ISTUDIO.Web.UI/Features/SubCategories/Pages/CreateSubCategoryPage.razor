@@ -1,0 +1,43 @@
+﻿@page "/categories/sub/create"
+
+
+<CreateSubCategoriesForm OnSave="CreateCategories" />
+
+
+@using ISTUDIO.Application.Features.Categories.DTOs;
+@using ISTUDIO.Contracts.Features.SubCategories
+@using ISTUDIO.Web.UI.Components
+@using ISTUDIO.Web.UI.Features.SubCategories.Commands
+@using ISTUDIO.Web.UI.Features.SubCategories.Components;
+
+@code {
+
+    private async Task CreateCategories(CreateSubCategoriesVM newCategory)
+    {
+      
+        var res = await _mediatr.Send(new UISubCreateCategoriesCommand { Categories = newCategory });
+
+        if (res.Status)
+        {
+            _snackbar.Add($"Успешно!!! Данные новой категории успешно добавлено {res.Data.Succeeded}", Severity.Success);
+            _navManager.NavigateTo("/categories");
+        }
+        else
+        {
+            var parameters = new DialogParameters()
+            {
+               { "ContentText", $"Ошибка при добавлении нового клиента! {res.Data?.Errors} {res.StatusMessage} "},
+               { "ItemName", $"{newCategory.Name}"},
+            };
+
+            var dialogOptions = new DialogOptions()
+                {
+                    Position = DialogPosition.TopCenter,
+                    CloseButton = true,
+                    DisableBackdropClick = true
+                };
+
+            _dialogService.Show<DialogShow>("Ошибка", parameters, dialogOptions);
+        }
+    }
+}

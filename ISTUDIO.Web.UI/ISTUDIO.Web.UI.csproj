@@ -21,6 +21,9 @@
   <ItemGroup>
     <Folder Include="Features\Auth\Commands\" />
     <Folder Include="Features\Auth\Components\" />
+    <Folder Include="Features\Discounts\Commands\" />
+    <Folder Include="Features\Discounts\Components\" />
+    <Folder Include="Features\Discounts\Pages\" />
   </ItemGroup>
 
 </Project>

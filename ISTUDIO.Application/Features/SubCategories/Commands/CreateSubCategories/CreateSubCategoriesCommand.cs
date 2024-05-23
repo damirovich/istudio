@@ -8,6 +8,7 @@ public class CreateSubCategoriesCommand : IRequest<ResModel>
     public string Name { get; set; }
     public string? Description { get; set; }
     public byte[]? PhotoCategory { get; set; }
+    public byte[] IconPhoto { get; set; }
     public int CategoryId { get; set; }
 
     public class Handler : IRequestHandler<CreateSubCategoriesCommand, ResModel>
@@ -23,16 +24,22 @@ public class CreateSubCategoriesCommand : IRequest<ResModel>
             try
             {
                 string photoFilePath = string.Empty;
+                string iconPhotoFilePath = string.Empty;
 
-                if (command.PhotoCategory != null)
+                if (command.PhotoCategory != null && command.PhotoCategory.Length > 0)
                 {
                     photoFilePath = await _fileStoreService.SaveImage(command.PhotoCategory);
+                }
+                if(command.IconPhoto != null && command.IconPhoto.Length>0)
+                {
+                    iconPhotoFilePath = await _fileStoreService.SaveImage(command.IconPhoto);
                 }
                 var subCategory = new CategoryEntity
                 {
                     Name = command.Name,
                     Description = command.Description,
                     ImageUrl = photoFilePath,
+                    IconImageUrl = iconPhotoFilePath,
                     ParentCategoryId = command.CategoryId
                 };
                 await _appDbContext.Categories.AddAsync(subCategory);
