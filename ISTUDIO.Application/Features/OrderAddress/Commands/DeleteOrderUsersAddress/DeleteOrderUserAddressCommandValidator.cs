@@ -1,8 +1,8 @@
 ﻿namespace ISTUDIO.Application.Features.OrderAddress.Commands.DeleteOrderAddress;
 
-public class DeleteOrderAddressCommandValidator : AbstractValidator<DeleteOrderAddressCommand>
+public class DeleteOrderUserAddressCommandValidator : AbstractValidator<DeleteOrderUserAddressCommand>
 {
-    public DeleteOrderAddressCommandValidator()
+    public DeleteOrderUserAddressCommandValidator()
     {
         RuleFor(v=>v.Id)
             .NotEmpty().WithMessage("Id не должен быть пустым.")

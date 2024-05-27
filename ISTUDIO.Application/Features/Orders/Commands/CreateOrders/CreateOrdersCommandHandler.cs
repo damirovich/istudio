@@ -1,6 +1,7 @@
 ﻿namespace ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
 
 using ISTUDIO.Domain.EntityModel;
+using System.Threading;
 using ResModel = Result;
 public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, ResModel>
 {
@@ -13,7 +14,7 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
         _mapper = mapper;
     }
 
-    public async Task<ResModel> Handle(CreateOrdersCommand command, CancellationToken cancellation)
+    public async Task<ResModel> Handle(CreateOrdersCommand command, CancellationToken cancellationToken)
     {
         try
         {
@@ -21,12 +22,21 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
             {
 
                 Status = "New Order",
-                ShippingAddress = command.ShippingAddress,
+                ShippingAddress = $"{command.OrderAddress.Region} {command.OrderAddress.City} {command.OrderAddress.Address}",
                 TotalPrice = command.TotalAmount,
                 TotalQuantyProduct = command.TotalQuantyProduct,
                 UserId = command.UserId
             };
 
+            var orderAddress = new OrderAddressEntity
+            {
+                Region = command.OrderAddress.Region,
+                City = command.OrderAddress.City,
+                Address = command.OrderAddress.Address,
+                Comments = command.OrderAddress.Comments,
+                UserId = orderEntity.UserId,
+                Orders = orderEntity
+            };
 
             // Добавляем продукты к заказу
             foreach (var productDto in command.ProductOrders)
@@ -38,26 +48,23 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                     {
                         Product = productEntity,
                         Quantity = productDto.QuantyProductCart,
-                        UnitPrice = productDto.Price
+                        UnitPrice = productDto.Price,
+                        Order = orderEntity
                     };
 
-                    _appDbContext.OrderDetails.Add(orderDetail);
-
-                    //Добавление в OrderDetails продукт
                     orderEntity.Details.Add(orderDetail);
-
-                    //Добавление в Order продукт
                     orderEntity.Products.Add(productEntity);
+
+                    _appDbContext.OrderDetails.Add(orderDetail);
                 }
                 else
                 {
-                    // Если продукт не найден, вернуть ошибку
-                    return ResModel.Failure(new[] { "One or more products not found." });
+                    return Result.Failure(new[] { "One or more products not found." });
                 }
             }
-            _appDbContext.Orders.Add(orderEntity);
-
-            await _appDbContext.SaveChangesAsync(cancellation);
+            await _appDbContext.OrderAddresses.AddAsync(orderAddress, cancellationToken);
+            await _appDbContext.Orders.AddAsync(orderEntity, cancellationToken);
+            await _appDbContext.SaveChangesAsync(cancellationToken);
 
             return ResModel.Success();
         }

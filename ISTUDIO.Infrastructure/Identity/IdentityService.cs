@@ -194,4 +194,27 @@ public class IdentityService : IIdentityService
             return Result.Failure(new[] { $"An error occurred while updating user profile. {ex.Message}" });
         }
     }
+
+    public async Task<Result> UpdateUserPhotoProfile(string photoUrl, string userId)
+    {
+        try
+        {
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (user == null)
+            {
+                throw new NotFoundException("User not found");
+            }
+
+            user.PhotoUsersUrl = photoUrl;
+
+            await _appDbContext.SaveChangesAsync();
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            // Здесь вы можете выполнить логирование исключения или любые другие необходимые действия
+            return Result.Failure(new[] { $"An error occurred while updating user profile Photo. {ex.Message}" });
+        }
+    }
 }

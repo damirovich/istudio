@@ -22,7 +22,7 @@ public class GetOrderAddressByUserIdQuery : IRequest<ResModel>
         {
             var orderAddresses = await _appDbContext.OrderAddresses
                 .Where(x => x.UserId == query.UserId && x.OrderId == null)
-                .ToListAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken);
 
             return _mapper.Map<ResModel>(orderAddresses);
         }

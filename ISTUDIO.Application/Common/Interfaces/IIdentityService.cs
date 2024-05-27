@@ -13,4 +13,5 @@ public interface IIdentityService
     Task<(Result Result, string UserId)> UpdateUserOTP(string userId, int codeOTP);
 
     Task<Result> UpdateUserProfile(string userId, string phoneNumber, string email);
+    Task<Result> UpdateUserPhotoProfile(string photoUrl, string userId);
 }

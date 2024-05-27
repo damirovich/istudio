@@ -1,17 +1,16 @@
-﻿namespace ISTUDIO.Application.Features.OrderAddress.Commands.CreateOrderAddress;
+﻿namespace ISTUDIO.Application.Features.OrderAddress.Commands.CreateOrderUserAddress;
 
 using ISTUDIO.Domain.EntityModel;
 using ResModel = Result;
-public class CreateOrderAddressCommand : IRequest<ResModel>
+public class CreateOrderUserAddressCommand : IRequest<ResModel>
 {
     public string Region { get; set; }
     public string City { get; set; }
     public string? Address { get; set; }
     public string? Comments { get; set; }
     public string? UserId { get; set; }
-    public int? OrderId { get; set; }
 
-    public class Handler : IRequestHandler<CreateOrderAddressCommand, ResModel>
+    public class Handler : IRequestHandler<CreateOrderUserAddressCommand, ResModel>
     {
         private readonly IAppDbContext _appDbContext;
 
@@ -20,7 +19,7 @@ public class CreateOrderAddressCommand : IRequest<ResModel>
             _appDbContext = appDbContext;
         }
 
-        public async Task<ResModel> Handle(CreateOrderAddressCommand command, CancellationToken cancellationToken)
+        public async Task<ResModel> Handle(CreateOrderUserAddressCommand command, CancellationToken cancellationToken)
         {
             try
             {
@@ -30,8 +29,7 @@ public class CreateOrderAddressCommand : IRequest<ResModel>
                     City = command.City,
                     Address = command.Address,
                     Comments = command.Comments,
-                    UserId = command.UserId,
-                    OrderId = command.OrderId
+                    UserId = command.UserId
                 };
 
                 await _appDbContext.OrderAddresses.AddAsync(orderAddress);

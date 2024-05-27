@@ -2,11 +2,11 @@
 namespace ISTUDIO.Application.Features.OrderAddress.Commands.DeleteOrderAddress;
 
 using ResModel = Result;
-public class DeleteOrderAddressCommand : IRequest<ResModel>
+public class DeleteOrderUserAddressCommand : IRequest<ResModel>
 {
     public int Id { get; set; }
 
-    public class Handler : IRequestHandler<DeleteOrderAddressCommand, ResModel>
+    public class Handler : IRequestHandler<DeleteOrderUserAddressCommand, ResModel>
     {
         private readonly IAppDbContext _appDbContext;
 
@@ -15,7 +15,7 @@ public class DeleteOrderAddressCommand : IRequest<ResModel>
             _appDbContext = appDbContext;
         }
 
-        public async Task<ResModel> Handle(DeleteOrderAddressCommand command, CancellationToken cancellationToken)
+        public async Task<ResModel> Handle(DeleteOrderUserAddressCommand command, CancellationToken cancellationToken)
         {
             try
             {

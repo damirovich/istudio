@@ -1,6 +1,6 @@
 ﻿namespace ISTUDIO.Application.Features.OrderAddress.Commands.EditOrderAddress;
 using ResModel = Result;
-public class EditOrderAddressCommand : IRequest<ResModel>
+public class EditOrderUserAddressCommand : IRequest<ResModel>
 {
     public int Id { get; set; }
     public string Region { get; set; }
@@ -8,9 +8,8 @@ public class EditOrderAddressCommand : IRequest<ResModel>
     public string? Address { get; set; }
     public string? Comments { get; set; }
     public string? UserId { get; set; }
-    public int? OrderId { get; set; }
 
-    public class Handler : IRequestHandler<EditOrderAddressCommand, ResModel>
+    public class Handler : IRequestHandler<EditOrderUserAddressCommand, ResModel>
     {
         private readonly IAppDbContext _appDbContext;
 
@@ -19,7 +18,7 @@ public class EditOrderAddressCommand : IRequest<ResModel>
             _appDbContext = appDbContext;
         }
 
-        public async Task<ResModel> Handle(EditOrderAddressCommand command, CancellationToken cancellationToken)
+        public async Task<ResModel> Handle(EditOrderUserAddressCommand command, CancellationToken cancellationToken)
         {
             try
             {
@@ -35,7 +34,6 @@ public class EditOrderAddressCommand : IRequest<ResModel>
                 orderAddress.Address = command.Address;
                 orderAddress.Comments = command.Comments;
                 orderAddress.UserId = command.UserId;
-                orderAddress.OrderId = command.OrderId;
 
                 _appDbContext.OrderAddresses.Update(orderAddress);
                 await _appDbContext.SaveChangesAsync(cancellationToken);

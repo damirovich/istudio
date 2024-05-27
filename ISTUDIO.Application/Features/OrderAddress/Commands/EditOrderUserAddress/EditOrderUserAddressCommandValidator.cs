@@ -1,10 +1,12 @@
-﻿
-namespace ISTUDIO.Application.Features.OrderAddress.Commands.CreateOrderAddress;
+﻿namespace ISTUDIO.Application.Features.OrderAddress.Commands.EditOrderAddress;
 
-public class CreateOrderAddressCommandValidator : AbstractValidator<CreateOrderAddressCommand>
+public class EditOrderUserAddressCommandValidator : AbstractValidator<EditOrderUserAddressCommand>
 {
-    public CreateOrderAddressCommandValidator()
+    public EditOrderUserAddressCommandValidator()
     {
+        RuleFor(x => x.Id)
+            .GreaterThan(0).WithMessage("Id must be greater than 0.");
+
         RuleFor(x => x.Region)
             .NotEmpty().WithMessage("Region is required.");
 

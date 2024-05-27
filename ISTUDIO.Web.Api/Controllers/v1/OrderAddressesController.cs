@@ -1,5 +1,4 @@
-﻿
-using ISTUDIO.Application.Features.OrderAddress.Commands.CreateOrderAddress;
+﻿using ISTUDIO.Application.Features.OrderAddress.Commands.CreateOrderUserAddress;
 using ISTUDIO.Application.Features.OrderAddress.Commands.DeleteOrderAddress;
 using ISTUDIO.Application.Features.OrderAddress.Commands.EditOrderAddress;
 using ISTUDIO.Application.Features.OrderAddress.Queries;
@@ -40,11 +39,11 @@ public class OrderAddressesController : BaseController
     /// Получение данных адреса заказа по Id
     /// </summary>
     /// <returns></returns>
-    [HttpGet("{id}")]
+    [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ICsmActionResult> GetOrderAddressById(int id)
+    public async Task<ICsmActionResult> GetOrderAddressById([FromQuery] int id)
     {
         try
         {
@@ -65,10 +64,10 @@ public class OrderAddressesController : BaseController
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    [HttpGet("user/{userId}")]
+    [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> GetOrderAddressesByUserId(string userId)
+    public async Task<ICsmActionResult> GetOrderAddressesByUserId([FromQuery] string userId)
     {
         try
         {
@@ -83,18 +82,18 @@ public class OrderAddressesController : BaseController
     }
 
     /// <summary>
-    /// Добавление адреса заказа
+    /// Создание адреса заказа пользователя
     /// </summary>
     /// <param name="orderAddress"></param>
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> CreateOrderAddress([FromBody] CreateOrderAddressVM orderAddress)
+    public async Task<ICsmActionResult> CreateOrderUserAddress([FromBody] CreateOrderUserAddressVM orderAddress)
     {
         try
         {
-            var command = _mapper.Map<CreateOrderAddressCommand>(orderAddress);
+            var command = _mapper.Map<CreateOrderUserAddressCommand>(orderAddress);
             var result = await Mediator.Send(command);
 
             if (result.Succeeded)
@@ -108,6 +107,7 @@ public class OrderAddressesController : BaseController
         }
     }
 
+
     /// <summary>
     /// Редактирование данных адреса заказа
     /// </summary>
@@ -116,11 +116,11 @@ public class OrderAddressesController : BaseController
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> EditOrderAddress([FromBody] EditOrderAddressVM orderAddress)
+    public async Task<ICsmActionResult> EditOrderUserAddress([FromBody] EditOrderUserAddressVM orderAddress)
     {
         try
         {
-            var command = _mapper.Map<EditOrderAddressCommand>(orderAddress);
+            var command = _mapper.Map<EditOrderUserAddressCommand>(orderAddress);
             var result = await Mediator.Send(command);
 
             return new CsmActionResult(result);
@@ -139,11 +139,11 @@ public class OrderAddressesController : BaseController
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> DeleteOrderAddress([FromQuery] int id)
+    public async Task<ICsmActionResult> DeleteOrderUserAddress([FromQuery] int id)
     {
         try
         {
-            var result = await Mediator.Send(new DeleteOrderAddressCommand { Id = id });
+            var result = await Mediator.Send(new DeleteOrderUserAddressCommand { Id = id });
             return new CsmActionResult(result);
         }
         catch (Exception ex)
