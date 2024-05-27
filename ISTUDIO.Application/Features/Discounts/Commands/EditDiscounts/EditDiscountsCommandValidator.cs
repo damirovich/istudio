@@ -4,19 +4,23 @@ public class EditDiscountsCommandValidator : AbstractValidator<EditDiscountsComm
 {
     public EditDiscountsCommandValidator()
     {
+        RuleFor(v => v.Id)
+            .NotEmpty().WithMessage("Id обязателен для заполнения.")
+            .GreaterThan(0).WithMessage("Id должен быть положительным числом.");
+
         RuleFor(v => v.PercenTage)
-          .NotEmpty().WithMessage("Percentage is required.")
-          .GreaterThan(0).WithMessage("Percentage must be greater than 0.")
-          .LessThanOrEqualTo(100).WithMessage("Percentage must be less than or equal to 100.");
+            .NotEmpty().WithMessage("Процент обязателен для заполнения.")
+            .GreaterThan(0).WithMessage("Процент должен быть больше 0.")
+            .LessThanOrEqualTo(100).WithMessage("Процент должен быть меньше или равен 100.");
 
         RuleFor(v => v.StartTime)
-            .NotEmpty().WithMessage("Start time is required.")
-            .Must(BeAValidDateTime).WithMessage("Invalid start time.");
+            .NotEmpty().WithMessage("Время начала обязательно для заполнения.")
+            .Must(BeAValidDateTime).WithMessage("Некорректное время начала.");
 
         RuleFor(v => v.EndTime)
-            .NotEmpty().WithMessage("End time is required.")
-            .Must(BeAValidDateTime).WithMessage("Invalid end time.")
-            .GreaterThan(v => v.StartTime).WithMessage("End time must be greater than start time.");
+            .NotEmpty().WithMessage("Время окончания обязательно для заполнения.")
+            .Must(BeAValidDateTime).WithMessage("Некорректное время окончания.")
+            .GreaterThan(v => v.StartTime).WithMessage("Время окончания должно быть позже времени начала.");
     }
     private bool BeAValidDateTime(DateTime dateTime)
     {

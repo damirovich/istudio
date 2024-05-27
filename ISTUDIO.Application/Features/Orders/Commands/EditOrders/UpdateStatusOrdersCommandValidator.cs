@@ -5,9 +5,11 @@ public class UpdateStatusOrdersCommandValidator : AbstractValidator<UpdateStatus
 {
     public UpdateStatusOrdersCommandValidator()
     {
-        RuleFor(v => v.OrderId).NotEmpty().WithMessage("OrderId не должен быть пустым.")
+        RuleFor(v => v.OrderId)
+          .NotEmpty().WithMessage("OrderId не должен быть пустым.")
           .GreaterThan(0).WithMessage("OrderId должен быть положительным числом.");
 
-        RuleFor(v => v.OrderStatus).NotEmpty().WithMessage("Status не должен быть пустым.");
+        RuleFor(v => v.OrderStatus)
+            .NotEmpty().WithMessage("Status не должен быть пустым.");
     }
 }

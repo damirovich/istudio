@@ -1,5 +1,5 @@
 ﻿
-namespace ISTUDIO.Application.Features.FavoriteProducts.Commands;
+namespace ISTUDIO.Application.Features.FavoriteProducts.Commands.CreateFavoriteProducts;
 
 using ISTUDIO.Domain.EntityModel;
 using ResModel = Result;
@@ -11,9 +11,9 @@ public class CreateFavoriteProductsCommand : IRequest<ResModel>
     public class Handler : IRequestHandler<CreateFavoriteProductsCommand, ResModel>
     {
         private readonly IAppDbContext _appDbContext;
-       
 
-        public Handler (IAppDbContext appDbContext)
+
+        public Handler(IAppDbContext appDbContext)
         {
             _appDbContext = appDbContext;
         }
@@ -51,5 +51,5 @@ public class CreateFavoriteProductsCommand : IRequest<ResModel>
         }
     }
 
-   
+
 }

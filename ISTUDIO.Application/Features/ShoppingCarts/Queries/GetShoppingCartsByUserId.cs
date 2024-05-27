@@ -28,7 +28,7 @@ public class GetShoppingCartsByUserId : IRequest<ResModel>
             var shoppingCarts = await _appDbContext.ShoppingCarts
                 .Where(cart => cart.UserId == query.UserId)
                 .AsNoTracking()
-                .ProjectTo<ShopingResponseDTO>(_mapper.ConfigurationProvider)
+                .ProjectTo<ResModel>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
 
             // Если не найдено корзин покупок, вернем null или можем выбросить исключение, если необходимо
@@ -46,7 +46,7 @@ public class GetShoppingCartsByUserId : IRequest<ResModel>
             }
 
             // Вычисляем TotalAmount и TotalQuantyProduct для группы
-            var shopingResponseDTO = new ShopingResponseDTO
+            var shopingResponseDTO = new ResModel
             {
                 UserId = group.Key,
                 TotalAmount = group.SelectMany(cart => cart.Products)

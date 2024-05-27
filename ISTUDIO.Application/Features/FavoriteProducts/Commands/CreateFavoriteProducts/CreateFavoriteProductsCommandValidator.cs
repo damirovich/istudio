@@ -1,5 +1,4 @@
-﻿
-namespace ISTUDIO.Application.Features.FavoriteProducts.Commands;
+﻿namespace ISTUDIO.Application.Features.FavoriteProducts.Commands.CreateFavoriteProducts;
 
 public class CreateFavoriteProductsCommandValidator : AbstractValidator<CreateFavoriteProductsCommand>
 {

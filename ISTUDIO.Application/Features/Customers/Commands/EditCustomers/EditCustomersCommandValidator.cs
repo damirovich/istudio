@@ -1,60 +1,64 @@
 ﻿namespace ISTUDIO.Application.Features.Customers.Commands.EditCustomers;
 
-internal class EditCustomersCommandValidator : AbstractValidator<EditCustomersCommand>
+public class EditCustomersCommandValidator : AbstractValidator<EditCustomersCommand>
 {
     public EditCustomersCommandValidator()
     {
-        RuleFor(v => v.Id).NotEmpty().WithMessage("Id  не должен быть пустым.")
-           .GreaterThan(0).WithMessage("Id должен быть положительным числом.");
+        RuleFor(v => v.Id)
+            .NotEmpty().WithMessage("Id не должен быть пустым.")
+            .GreaterThan(0).WithMessage("Id должен быть положительным числом.");
 
         RuleFor(v => v.PIN)
-            .NotEmpty().WithMessage("PIN is required.")
-            .Length(14).WithMessage("PIN must be between 14 characters.");
+            .NotEmpty().WithMessage("PIN обязателен для заполнения.")
+            .Length(14).WithMessage("PIN должен состоять из 14 символов.");
 
         RuleFor(v => v.FullName)
-            .NotEmpty().WithMessage("Full name is required.")
-            .MaximumLength(100).WithMessage("Full name cannot exceed 100 characters.");
+            .NotEmpty().WithMessage("Полное имя обязательно для заполнения.")
+            .MaximumLength(100).WithMessage("Полное имя не должно превышать 100 символов.")
+            .Matches(@"^[а-яА-ЯёЁa-zA-Z\s]+$").WithMessage("Полное имя должно содержать только буквы.");
 
         RuleFor(v => v.Name)
-            .NotEmpty().WithMessage("Name is required.")
-            .MaximumLength(50).WithMessage("Name cannot exceed 50 characters.");
+            .NotEmpty().WithMessage("Имя обязательно для заполнения.")
+            .MaximumLength(50).WithMessage("Имя не должно превышать 50 символов.")
+            .Matches(@"^[а-яА-ЯёЁa-zA-Z\s]+$").WithMessage("Имя должно содержать только буквы.");
 
         RuleFor(v => v.Surname)
-            .NotEmpty().WithMessage("Surname is required.")
-            .MaximumLength(50).WithMessage("Surname cannot exceed 50 characters.");
+            .NotEmpty().WithMessage("Фамилия обязательна для заполнения.")
+            .MaximumLength(50).WithMessage("Фамилия не должна превышать 50 символов.")
+            .Matches(@"^[а-яА-ЯёЁa-zA-Z\s]+$").WithMessage("Фамилия должна содержать только буквы.");
 
         RuleFor(v => v.Patronymic)
-            .MaximumLength(50).WithMessage("Patronymic cannot exceed 50 characters.");
+            .MaximumLength(50).WithMessage("Отчество не должно превышать 50 символов.")
+            .Matches(@"^[а-яА-ЯёЁa-zA-Z\s]*$").WithMessage("Отчество должно содержать только буквы.");
 
         RuleFor(v => v.Sex)
-            .MaximumLength(10).WithMessage("Sex cannot exceed 10 characters.");
+            .MaximumLength(10).WithMessage("Пол не должен превышать 10 символов.");
 
         RuleFor(v => v.Nationality)
-            .MaximumLength(50).WithMessage("Nationality cannot exceed 50 characters.");
+            .MaximumLength(50).WithMessage("Национальность не должна превышать 50 символов.");
 
         RuleFor(v => v.DateOfBirth)
-            .NotNull().WithMessage("Date of birth is required.");
+            .NotNull().WithMessage("Дата рождения обязательна для заполнения.");
 
         RuleFor(v => v.SeriesNumDocument)
-            .MaximumLength(50).WithMessage("Series/number document cannot exceed 50 characters.");
+            .MaximumLength(50).WithMessage("Серия/номер документа не должны превышать 50 символов.");
 
         RuleFor(v => v.DateOfExpiry)
-            .NotNull().WithMessage("Date of expiry is required.");
+            .NotNull().WithMessage("Дата окончания срока действия обязательна для заполнения.");
 
         RuleFor(v => v.PlaceOfBirth)
-            .NotNull().WithMessage("Place Of Birth  is required.");
+            .NotNull().WithMessage("Место рождения обязательно для заполнения.");
 
         RuleFor(v => v.Authority)
-            .MaximumLength(100).WithMessage("Authority cannot exceed 100 characters.");
+            .MaximumLength(100).WithMessage("Орган, выдавший документ, не должен превышать 100 символов.");
 
         RuleFor(v => v.DateOfIssue)
-            .NotNull().WithMessage("Date of issue is required.");
+            .NotNull().WithMessage("Дата выдачи обязательна для заполнения.");
 
         RuleFor(v => v.Ethnicity)
-            .MaximumLength(50).WithMessage("Ethnicity cannot exceed 50 characters.");
+            .MaximumLength(50).WithMessage("Этническая принадлежность не должна превышать 50 символов.");
 
         RuleFor(v => v.Address)
-            .MaximumLength(250).WithMessage("Address cannot exceed 250 characters.");
-
+            .MaximumLength(250).WithMessage("Адрес не должен превышать 250 символов.");
     }
 }

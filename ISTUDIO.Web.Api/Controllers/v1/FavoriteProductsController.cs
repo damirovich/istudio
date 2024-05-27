@@ -1,4 +1,5 @@
-﻿using ISTUDIO.Application.Features.FavoriteProducts.Commands;
+﻿using ISTUDIO.Application.Features.FavoriteProducts.Commands.DeleteFavoriteProducts;
+using ISTUDIO.Application.Features.FavoriteProducts.Commands.CreateFavoriteProducts;
 using ISTUDIO.Application.Features.FavoriteProducts.Queries;
 using ISTUDIO.Contracts.Features.FavoriteProducts;
 

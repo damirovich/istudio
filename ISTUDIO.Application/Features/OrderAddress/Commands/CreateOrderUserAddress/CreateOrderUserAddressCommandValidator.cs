@@ -5,18 +5,22 @@ public class CreateOrderUserAddressCommandValidator : AbstractValidator<CreateOr
     public CreateOrderUserAddressCommandValidator()
     {
         RuleFor(x => x.Region)
-            .NotEmpty().WithMessage("Region is required.");
+           .NotEmpty().WithMessage("Регион обязателен для заполнения.")
+           .Matches(@"^[а-яА-ЯёЁa-zA-Z\s]+$").WithMessage("Регион должен содержать только буквы.");
 
         RuleFor(x => x.City)
-            .NotEmpty().WithMessage("City is required.");
+            .NotEmpty().WithMessage("Город обязателен для заполнения.")
+            .Matches(@"^[а-яА-ЯёЁa-zA-Z\s]+$").WithMessage("Город должен содержать только буквы.");
 
         RuleFor(x => x.Address)
-            .MaximumLength(200).WithMessage("Address must not exceed 200 characters.");
+            .NotEmpty().WithMessage("Адрес обязателен для заполнения.")
+            .MaximumLength(200).WithMessage("Адрес не должен превышать 200 символов.");
 
         RuleFor(x => x.Comments)
-            .MaximumLength(500).WithMessage("Comments must not exceed 500 characters.");
+            .MaximumLength(500).WithMessage("Комментарии не должны превышать 500 символов.");
 
         RuleFor(x => x.UserId)
-            .MaximumLength(500).WithMessage("UserId must not exceed 50 characters.");
+            .NotEmpty().WithMessage("UserId обязателен для заполнения.")
+            .MaximumLength(250).WithMessage("UserId не должен превышать 250 символов.");
     }
 }

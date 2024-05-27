@@ -1,5 +1,5 @@
 ﻿
-namespace ISTUDIO.Application.Features.FavoriteProducts.Commands;
+namespace ISTUDIO.Application.Features.FavoriteProducts.Commands.DeleteFavoriteProducts;
 using ResModel = Result;
 public class DeleteFavoriteProductsCommand : IRequest<ResModel>
 {

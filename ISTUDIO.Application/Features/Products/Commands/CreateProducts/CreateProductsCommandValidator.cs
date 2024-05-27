@@ -27,33 +27,8 @@ public class CreateProductsCommandValidator : AbstractValidator<CreateProductsCo
         RuleFor(v => v.Description)
             .MaximumLength(5000).WithMessage("Описание продукта должно быть не длиннее 5000 символов.");
 
-        //RuleFor(x => x.CategoryId)
-        //    .NotNull().WithMessage("Идентификатор категории не может быть пустым.")
-        //    .GreaterThan(0).WithMessage("Идентификатор категории должен быть больше нуля.");
-
+     
         RuleFor(v => v.CategoryId)
-            .NotNull().WithMessage("Категория продукта не может быть пустой.");
-
-        //RuleFor(x => x.DiscountId)
-        //    .NotNull().WithMessage("Скидка на продукт не может быть пустой.");
-
-        //RuleForEach(x => x.Images)
-        //    .SetValidator(new ProductImagesDTOValidator())
-        //    .WithMessage("Один или несколько элементов в списке изображений недопустимы.");
+            .NotNull().WithMessage("Категория продукта не может быть пустой.");   
     }
 }
-
-//public class ProductImagesDTOValidator : AbstractValidator<ProductImagesDTO>
-//{
-//    public ProductImagesDTOValidator()
-//    {
-//        RuleFor(x => x.Url)
-//            .NotEmpty().WithMessage("URL изображения не может быть пустым.")
-//            .MaximumLength(255).WithMessage("URL изображения должен быть не длиннее 255 символов.")
-//            .Matches(@"\.(jpg|jpeg|png)$").WithMessage("Формат изображения должен быть JPG, JPEG или PNG.");
-
-//        RuleFor(x => x.ImageAltText)
-//            .NotEmpty().WithMessage("Alt текст изображения не может быть пустым.")
-//            .MaximumLength(100).WithMessage("Alt текст изображения должен быть не длиннее 100 символов.");
-//    }
-//}

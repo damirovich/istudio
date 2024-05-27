@@ -5,19 +5,10 @@ public class CreateBannersCommandValidator : AbstractValidator<CreateBannersComm
     public CreateBannersCommandValidator()
     {
         RuleFor(x => x.PhotoBanner)
-            .NotEmpty().WithMessage("PhotoBanner is required.");
+            .NotEmpty().WithMessage("PhotoBanner обязательный.");
 
         RuleFor(x => x.Status)
-            .InclusiveBetween(0, 1).WithMessage("Status must be either 0 or 1.");
-
-        //RuleFor(x => x.CategoryId)
-        //    .GreaterThan(0).When(x => x.CategoryId.HasValue).WithMessage("CategoryId must be greater than 0 if provided.");
-
-        //RuleFor(x => x.DiscountId)
-        //    .GreaterThan(0).When(x => x.DiscountId.HasValue).WithMessage("DiscountId must be greater than 0 if provided.");
-
-        //RuleFor(x => x.ProductId)
-        //    .GreaterThan(0).When(x => x.ProductId.HasValue).WithMessage("ProductId must be greater than 0 if provided.");
+            .InclusiveBetween(0, 1).WithMessage("Статус должен быть 0 или 1.");
     }
     
 }

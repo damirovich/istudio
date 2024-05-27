@@ -15,12 +15,4 @@ public class CreateCategoriesCommandValidator : AbstractValidator<CreateCategori
         //    .NotEmpty().WithMessage("URL изображения категории обязателен.")
         //    .Must(BeAValidUrl).WithMessage("Недопустимый формат URL изображения.");
     }
-
-    //private bool BeAValidUrl(string url)
-    //{
-    //    // Проверка на корректность URL
-    //    Uri uriResult;
-    //    return Uri.TryCreate(url, UriKind.Absolute, out uriResult)
-    //        && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-    //}
 }

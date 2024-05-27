@@ -5,6 +5,6 @@ public class DeleteBannerCommandValidator : AbstractValidator<DeleteBannerComman
     public DeleteBannerCommandValidator()
     {
         RuleFor(x => x.BannerId)
-            .GreaterThan(0).WithMessage("BannerId must be greater than 0.");
+            .GreaterThan(0).WithMessage("BannerId должен быть больше 0.");
     }
 }

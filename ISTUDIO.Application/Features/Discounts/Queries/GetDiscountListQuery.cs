@@ -1,7 +1,6 @@
 ﻿
 using AutoMapper.QueryableExtensions;
 using ISTUDIO.Application.Features.Discounts.DTOs;
-using ISTUDIO.Application.Features.Products.DTOs;
 
 namespace ISTUDIO.Application.Features.Discounts.Queries;
 using ResModel = PaginatedList<DiscountResponseListDTO>;

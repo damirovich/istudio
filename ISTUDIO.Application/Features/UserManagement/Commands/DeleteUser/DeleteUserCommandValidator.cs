@@ -4,6 +4,6 @@ public class DeleteUserCommandValidator : AbstractValidator<DeleteUserCommand>
 {
     public DeleteUserCommandValidator()
     {
-        RuleFor(v => v.UserId).NotEmpty().WithMessage("User Id не должен быть пустым");
+        RuleFor(v => v.UserId).NotEmpty().WithMessage("UserId не должен быть пустым");
     }
 }

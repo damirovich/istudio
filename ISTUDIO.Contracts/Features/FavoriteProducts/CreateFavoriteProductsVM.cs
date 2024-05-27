@@ -1,4 +1,4 @@
-﻿using ISTUDIO.Application.Features.FavoriteProducts.Commands;
+﻿using ISTUDIO.Application.Features.FavoriteProducts.Commands.CreateFavoriteProducts;
 
 namespace ISTUDIO.Contracts.Features.FavoriteProducts;
 
