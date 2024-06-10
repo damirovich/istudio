@@ -1,6 +1,5 @@
-﻿
-
-@page "/products"
+﻿@page "/products"
+@attribute [Authorize]
 
 <MudButton Href="products/create" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.AddRoad" Color="Color.Success">Добавить</MudButton>
 <ProductTable/>

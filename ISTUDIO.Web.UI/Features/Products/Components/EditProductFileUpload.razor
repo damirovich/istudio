@@ -66,13 +66,13 @@
     </MudForm>
 </MudStack>
 @code {
-#nullable enable
+    #nullable enable
     public class Model
     {
         public IReadOnlyList<IBrowserFile>? Files { get; set; } = new List<IBrowserFile>();
     }
     [Parameter] public EventCallback<IReadOnlyList<IBrowserFile>> UploadFiles { get; set; }
-    [Parameter] public List<string> _imageUrls { get; set; } 
+    private List<string> _imageUrls = new();
     private Model _model = new();
     private ModelFluentValidator _validationRules = new();
     private bool _isValid;
@@ -82,6 +82,7 @@
 
     private async Task Upload()
     {
+        
         _imageUrls.Clear();
         foreach (var file in _model.Files)
         {
@@ -103,6 +104,7 @@
     private void ClearDragClass()
     {
         _dragClass = DefaultDragClass;
+       
         _imageUrls.Clear();
     }
     public class ModelFluentValidator : AbstractValidator<Model>

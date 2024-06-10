@@ -1,0 +1,184 @@
+﻿
+<MudTable Items="Elements" Elevation="25" ServerData="@(new Func<TableState, Task<TableData<TableModel>>>(ServerReload))"
+          Loading="@_processing" Dense="true" Striped="true" Hover="true" FixedHeader="true" @ref="table">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Заказы</MudText>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Поиск" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>№ заказа</MudTh>
+        <MudTh>Клиент</MudTh>
+        <MudTh>Статус</MudTh>
+        <MudTh>Добавлено</MudTh>
+        <MudTh>Количество</MudTh>
+        <MudTh>Общая сумма</MudTh>
+        <MudTh>Адрес</MudTh>
+        <MudTh>Действия</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="OrderNumber">@context.Id</MudTd>
+        <MudTd DataLabel="CustomerName">@context.CustomerName</MudTd>
+        <MudTd DataLabel="Status">
+            <MudSelect  Label="Статус" Dense="true" T="string" Variant="Variant.Text" Placeholder="Please Select" Required="true"
+                       Value="context.Status" ValueChanged="value => UpdateStatus(context.Id, value)">
+                <MudSelectItem T="string" Value="@("OrderProcessing")">Новый</MudSelectItem>
+                <MudSelectItem T="string" Value="@("OrderPaid")">Оплачен</MudSelectItem>
+                <MudSelectItem T="string" Value="@("OrderShipped")">Отправлено</MudSelectItem>
+                <MudSelectItem T="string" Value="@("OrderDelivered")">Доставлено</MudSelectItem>
+                <MudSelectItem T="string" Value="@("OrderCompleted")">Завершен</MudSelectItem>
+                <MudSelectItem T="string" Value="@("OrderCanceled")">Возврат</MudSelectItem>
+                <MudSelectItem T="string" Value="@("OrderReturned")">Отменен</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="CreatedDate">@context.CreateDate.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="TotalQuentyProduct">@context.TotalQuentyProduct</MudTd>
+        <MudTd DataLabel="TotalAmount">@context.TotalAmount</MudTd>
+        <MudTd DataLabel="Address">@context.ShippingAddress</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Href="@($"orders/edit/{context.Id}")" Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" />
+            <MudIconButton Href="@($"orders/details/{context.Id}")" Icon="@Icons.Material.Filled.Info" Size="Size.Medium" Color="Color.Inherit" />
+            <MudIconButton OnClick="async() => await DeleteOrders(context.Id, context.Id)" Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>Здесь никого нет!...</MudText>
+        <MudProgressCircular Color="Color.Primary" Size="Size.Medium" Indeterminate="true" />
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>ищем...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] {10, 15, 25, 50, 100}" />
+    </PagerContent>
+</MudTable>
+
+@using ISTUDIO.Application.Features.Orders.Queries
+@using ISTUDIO.Contracts.Features.Orders
+@using ISTUDIO.Web.UI.Features.Orders.Commands
+@using ISTUDIO.Web.UI.Features.Orders.Queries
+@using TableModel = ISTUDIO.Application.Features.Orders.DTOs.OrderResponseDTO;
+@code {
+    private IEnumerable<TableModel> pagedData;
+    private MudTable<TableModel> table;
+    IEnumerable<TableModel> Elements = new List<TableModel>();
+
+    private bool _processing = false;
+    private int totalItems;
+    private string searchText = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await table.ReloadServerData();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task<TableData<TableModel>> ServerReload(TableState state)
+    {
+        _processing = true;
+        try
+        {
+            var resLegalPersons = await _mediatr.Send(new UIGetOrdersListQuery { PageNumber = state.Page, PageSize = state.PageSize });
+            if (resLegalPersons.Status)
+            {
+                totalItems = resLegalPersons.Data.TotalCount;
+                Elements = (IEnumerable<TableModel>)resLegalPersons.Data.Items;
+                _snackbar.Add($"Успешно!!! Количество найденных объектов: " + Elements.Count(), Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resLegalPersons.StatusMessage} ", Severity.Warning);
+            }
+            var data = Elements;
+            data = await FilterTableData(data, state);
+            SortTableData(ref data, state);
+            _processing = false;
+
+            return new TableData<TableModel> { TotalItems = totalItems, Items = data };
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message} ", Severity.Error);
+            _processing = false;
+            return new TableData<TableModel> { TotalItems = totalItems, Items = pagedData };
+        }
+    }
+
+    private async Task OnSearch(string text)
+    {
+        searchText = text;
+        await table.ReloadServerData();
+    }
+
+    private async Task<IEnumerable<TableModel>> FilterTableData(IEnumerable<TableModel> data, TableState state)
+    {
+        // Add your filtering logic here if needed
+        return data;
+    }
+
+    private void SortTableData(ref IEnumerable<TableModel> data, TableState state)
+    {
+        switch (state.SortLabel)
+        {
+            case "Name":
+                data = data.OrderByDirection(state.SortDirection, o => o.CustomerName);
+                break;
+        }
+    }
+
+    private async Task UpdateStatus(int orderId, string newStatus)
+    {
+        var updateStatus = new UpdateStatusOrdersVM { OrderId = orderId, OrderStatus = newStatus };
+        var command = new UIUpdateStatusOrdersCommand { UpStatusOrders = updateStatus };
+        var result = await _mediatr.Send(command);
+
+        if (result.Status)
+        {
+            _snackbar.Add($"Статус успешно обновлен!", Severity.Success);
+            await table.ReloadServerData();
+        }
+        else
+        {
+            _snackbar.Add($"Не удалось обновить статус: {result.StatusMessage}", Severity.Error);
+        }
+    }
+    private async Task DeleteOrders(int orderId, int numberOrder)
+    {
+        var dialogParameters = new DialogParameters
+        {
+            { "ContentText", $"Вы действительно хотите удалить эти данные? Этот процесс нельзя отменить. Заказ под номером {numberOrder}" },
+            { "ButtonText", "Удалить" },
+            { "ItemName", numberOrder.ToString() },
+            { "Color", Color.Error }
+        };
+
+        var dialogOptions = new DialogOptions
+            {
+                Position = DialogPosition.TopCenter,
+                CloseButton = true,
+                DisableBackdropClick = true
+            };
+
+        var dialog = _dialogService.Show<DeleteDialog>("Удалить", dialogParameters, dialogOptions);
+        var resDialog = await dialog.Result;
+
+        if (!resDialog.Canceled)
+        {
+            var resDelOrders = await _mediatr.Send(new UIDeleteOrdersCommand { OrderId = orderId });
+
+            if (resDelOrders.Status)
+            {
+                _snackbar.Add($"Успешно!!! {resDelOrders.Data.Succeeded}", Severity.Success);
+                await table.ReloadServerData();
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resDelOrders.StatusMessage}", Severity.Warning);
+            }
+        }
+    }
+}

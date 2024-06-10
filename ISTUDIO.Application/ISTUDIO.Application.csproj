@@ -15,6 +15,7 @@
     <Folder Include="Features\CustomerImages\Queries\" />
     <Folder Include="Features\SmsNikita\Queries\" />
     <Folder Include="Features\SubCategories\DTOs\" />
+    <Folder Include="Features\TotalOrdersFavorite\Commands\" />
   </ItemGroup>
 
   <ItemGroup>

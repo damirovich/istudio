@@ -1,6 +1,7 @@
 ﻿using ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
 using ISTUDIO.Application.Features.Orders.Commands.DeleteOrders;
-using ISTUDIO.Application.Features.Orders.Commands.EditOrders;
+using ISTUDIO.Application.Features.Orders.Commands.EditOrders.AddReceoptPhoto;
+using ISTUDIO.Application.Features.Orders.Commands.EditOrders.UpdateStatusOrders;
 using ISTUDIO.Application.Features.Orders.Queries;
 using ISTUDIO.Contracts.Features.Orders;
 
@@ -30,11 +31,12 @@ public class OrdersController :BaseController
 
             var result = await Mediator.Send(command);
 
-            if (result.Succeeded)
-                return new CsmActionResult(result);
+            return new CsmActionResult(result);
 
-            return new CsmActionResult(result.Errors);
-
+        }
+        catch (BadRequestException ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
         catch (Exception ex)
         {
@@ -127,7 +129,32 @@ public class OrdersController :BaseController
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
-
+    /// <summary>
+    /// Получение данные заказа по Id
+    /// </summary>
+    /// <param name="orderId"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ICsmActionResult> GetOrdersById([FromQuery] int orderId)
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetOrderByIdQuery
+            {
+                OrderId = orderId
+            }));
+        }
+        catch (NotFoundException ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
 
     /// <summary>
     /// Обновление статуса заказа
@@ -137,7 +164,7 @@ public class OrdersController :BaseController
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> UpdateStatusOrders([FromBody] EditOrdersVM orders)
+    public async Task<ICsmActionResult> UpdateStatusOrders([FromBody] UpdateStatusOrdersVM orders)
     {
         try
         {
@@ -177,4 +204,27 @@ public class OrdersController :BaseController
         }
     }
 
+
+    /// <summary>
+    /// Добавление фотографии квитанции к заказу
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ICsmActionResult> AddReceiptPhoto([FromBody] AddReceiptPhotoOrderVM model)
+    {
+        try
+        {
+            var command = _mapper.Map<AddReceipPhotoOrdersCommand>(model);
+            var result = await Mediator.Send(command);
+
+            return new CsmActionResult<Result>(result);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
 }

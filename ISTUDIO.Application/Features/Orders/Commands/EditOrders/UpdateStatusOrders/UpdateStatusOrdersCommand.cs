@@ -1,5 +1,5 @@
 ﻿
-namespace ISTUDIO.Application.Features.Orders.Commands.EditOrders;
+namespace ISTUDIO.Application.Features.Orders.Commands.EditOrders.UpdateStatusOrders;
 
 using ResModel = Result;
 public class UpdateStatusOrdersCommand : IRequest<ResModel>
@@ -14,10 +14,10 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
 
         public async Task<ResModel> Handle(UpdateStatusOrdersCommand command, CancellationToken cancellationToken)
         {
-            try 
+            try
             {
                 var existingOrder = await _appDbContext.Orders.FindAsync(command.OrderId);
-                
+
                 if (existingOrder == null)
                     return ResModel.Failure(new[] { "Orders не найдена" });
 

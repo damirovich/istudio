@@ -1,5 +1,6 @@
 ﻿
 using ISTUDIO.Application.Features.Banners.Commands.EditBanners;
+using ISTUDIO.Application.Features.Banners.DTOs;
 
 namespace ISTUDIO.Contracts.Features.Banners;
 
@@ -22,6 +23,14 @@ public class EditBannerVM : IMapWith<EditBannerCommand>
         profile.CreateMap<EditBannerVM, EditBannerCommand>()
             .ForMember(dest => dest.BannerId, opt => opt.MapFrom(src => src.BannerId))
             .ForMember(dest => dest.PhotoBanner, opt => opt.MapFrom(src => src.PhotoBannerBase64 != null ? Convert.FromBase64String(src.PhotoBannerBase64) : null))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+            .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId))
+            .ForMember(dest => dest.DiscountId, opt => opt.MapFrom(src => src.DiscountId))
+            .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId));
+
+        profile.CreateMap<BannerDTO, EditBannerVM>()
+            .ForMember(dest => dest.BannerId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.PhotoBannerBase64, opt => opt.MapFrom(src => src.PhotoUrl))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
             .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId))
             .ForMember(dest => dest.DiscountId, opt => opt.MapFrom(src => src.DiscountId))

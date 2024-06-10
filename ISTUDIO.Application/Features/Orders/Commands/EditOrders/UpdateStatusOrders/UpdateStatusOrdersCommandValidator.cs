@@ -1,5 +1,4 @@
-﻿
-namespace ISTUDIO.Application.Features.Orders.Commands.EditOrders;
+﻿namespace ISTUDIO.Application.Features.Orders.Commands.EditOrders.UpdateStatusOrders;
 
 public class UpdateStatusOrdersCommandValidator : AbstractValidator<UpdateStatusOrdersCommand>
 {

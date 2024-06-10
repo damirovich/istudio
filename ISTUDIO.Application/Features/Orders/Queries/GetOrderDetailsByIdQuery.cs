@@ -20,8 +20,10 @@ public class GetOrderDetailsByIdQuery : IRequest<ResModel>
         public async Task<ResModel> Handle(GetOrderDetailsByIdQuery query, CancellationToken cancellationToken)
         {
             var orderDetails = await _appDbContext.OrderDetails
-                .Include(s => s.Product)
-                .ThenInclude(s => s.Images)
+                .Include(o => o.Product)
+                     .ThenInclude(pi => pi.Images)
+                .Include(o => o.Product)
+                     .ThenInclude(pd => pd.Discount)
                 .Where(s => s.OrderId == query.OrderId)
                 .ToListAsync(cancellationToken);
 

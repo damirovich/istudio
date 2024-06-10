@@ -19,7 +19,9 @@ public class OrderEntity
     public string Status { get; set; }
 
     public DateTime CreateDate { get; set; }
+    public string PaymentMethod { get; set; }
 
+    public string? ReceiptPhoto { get; set; }
     // Идентификатор пользователя, сделавшего этот заказ
     public string UserId { get; set; }
     public int? InvoiceId { get; set; }

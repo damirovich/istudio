@@ -140,6 +140,11 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 6, 9, 12, 7, 43, 777, DateTimeKind.Utc).AddTicks(7881));
+
                     b.Property<int?>("CustomerId")
                         .IsRequired()
                         .HasColumnType("int");
@@ -494,10 +499,17 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 23, 7, 46, 38, 756, DateTimeKind.Utc).AddTicks(74));
+                        .HasDefaultValue(new DateTime(2024, 6, 9, 12, 7, 43, 780, DateTimeKind.Utc).AddTicks(1424));
 
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReceiptPhoto")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
@@ -631,7 +643,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 23, 7, 46, 38, 769, DateTimeKind.Utc).AddTicks(8479));
+                        .HasDefaultValue(new DateTime(2024, 6, 9, 12, 7, 43, 785, DateTimeKind.Utc).AddTicks(3725));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -791,7 +803,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 5, 23, 7, 46, 38, 742, DateTimeKind.Utc).AddTicks(5664));
+                        .HasDefaultValue(new DateTime(2024, 6, 9, 12, 7, 43, 777, DateTimeKind.Utc).AddTicks(5434));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)

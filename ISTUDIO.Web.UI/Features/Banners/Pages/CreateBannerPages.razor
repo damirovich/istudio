@@ -1,0 +1,38 @@
+﻿@page "/banner/create"
+
+@using ISTUDIO.Contracts.Features.Banners
+@using ISTUDIO.Web.UI.Features.Banners.Commands
+@using ISTUDIO.Web.UI.Features.Banners.Components
+
+<CreateBannerForm OnSave="CreateBanners" />
+
+@code {
+    private async Task CreateBanners(CreateBannerVM banners)
+    {
+
+        var res = await _mediatr.Send(new UICreateBannerCommand { Banners = banners });
+
+        if (res.Status)
+        {
+            _snackbar.Add($"Успешно!!! Данные новой категории успешно добавлено {res.Data.Succeeded}", Severity.Success);
+            _navManager.NavigateTo("/categories");
+        }
+        else
+        {
+            var parameters = new DialogParameters()
+            {
+               { "ContentText", $"Ошибка при добавлении нового клиента! {res.Data?.Errors} {res.StatusMessage} "},
+               { "ItemName", $"Banner"},
+            };
+
+            var dialogOptions = new DialogOptions()
+                {
+                    Position = DialogPosition.TopCenter,
+                    CloseButton = true,
+                    DisableBackdropClick = true
+                };
+
+            _dialogService.Show<DialogShow>("Ошибка", parameters, dialogOptions);
+        }
+    }
+}

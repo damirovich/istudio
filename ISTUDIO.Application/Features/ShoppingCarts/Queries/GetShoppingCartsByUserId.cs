@@ -1,4 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
+using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Application.Features.ShoppingCarts.DTOs;
 using System.ComponentModel.DataAnnotations;
 
@@ -24,39 +25,52 @@ public class GetShoppingCartsByUserId : IRequest<ResModel>
 
         public async Task<ResModel> Handle(GetShoppingCartsByUserId query, CancellationToken cancellationToken)
         {
-            // Получаем все корзины покупок для указанного пользователя из базы данных
-            var shoppingCarts = await _appDbContext.ShoppingCarts
-                .Where(cart => cart.UserId == query.UserId)
-                .AsNoTracking()
-                .ProjectTo<ResModel>(_mapper.ConfigurationProvider)
-                .ToListAsync(cancellationToken);
 
-            // Если не найдено корзин покупок, вернем null или можем выбросить исключение, если необходимо
+            var shoppingCarts = await _appDbContext.ShoppingCarts
+                 .Include(sc => sc.Products)
+                     .ThenInclude(p => p.Discount)
+                 .Include(sc => sc.Products)
+                     .ThenInclude(p => p.Images)
+                 .Where(cart => cart.UserId == query.UserId)
+                 .AsNoTracking()
+                 .ToListAsync(cancellationToken);
+
             if (!shoppingCarts.Any())
             {
                 return null;
             }
 
-            // Группируем корзины покупок по UserId (в данном случае это будет одна группа)
-            var group = shoppingCarts.GroupBy(cart => cart.UserId).FirstOrDefault();
+            var groupedCarts = shoppingCarts.GroupBy(cart => cart.UserId).FirstOrDefault();
 
-            if (group == null)
+            if (groupedCarts == null)
             {
                 return null;
             }
 
-            // Вычисляем TotalAmount и TotalQuantyProduct для группы
-            var shopingResponseDTO = new ResModel
+            var products = groupedCarts.SelectMany(cart => cart.Products)
+                .GroupBy(p => new { p.Id, p.Name, p.Model, p.Price })
+                .Select(g => new ProductsShoppinDTO
+                {
+                    CartId = g.FirstOrDefault().ShoppingCarts.FirstOrDefault()?.Id ?? 0,
+                    Id = g.Key.Id,
+                    Name = g.Key.Name,
+                    Model = g.Key.Model,
+                    Price = g.Key.Price,
+                    QuantyProductCart = g.Sum(p => p.ShoppingCarts.FirstOrDefault()?.QuantyProduct ?? 0),
+                    SumProductCart = g.Key.Price * g.Sum(p => p.ShoppingCarts.FirstOrDefault()?.QuantyProduct ?? 0),
+                    Images = _mapper.Map<ICollection<ProductImagesDTO>>(g.FirstOrDefault()?.Images),
+                    ProductDiscount = _mapper.Map<ProductDiscountDTO>(g.FirstOrDefault()?.Discount)
+                }).ToList();
+
+            var response = new ResModel
             {
-                UserId = group.Key,
-                TotalAmount = group.SelectMany(cart => cart.Products)
-                                   .Sum(product => product.Price * product.QuantyProductCart),
-                TotalQuantyProduct = group.Sum(cart => cart.QuantyProduct),
-                Products = group.SelectMany(cart => cart.Products).ToList()
+                UserId = groupedCarts.Key,
+                TotalAmount = products.Sum(p => p.SumProductCart),
+                TotalQuantyProduct = products.Sum(p => p.QuantyProductCart),
+                Products = products
             };
 
-            // Возвращаем результат в виде объекта ShopingResponseDTO
-            return shopingResponseDTO;
+            return response;
         }
     }
 }

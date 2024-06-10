@@ -56,8 +56,12 @@ public class FavoriteProductsController : BaseController
             if (result.Succeeded)
                 return Ok(result);
 
-            return StatusCode(StatusCodes.Status503ServiceUnavailable,  result.Errors);
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, result.Errors);
 
+        }
+        catch (BadRequestException ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
         }
         catch (Exception ex)
         {

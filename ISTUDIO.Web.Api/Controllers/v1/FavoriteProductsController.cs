@@ -53,9 +53,13 @@ public class FavoriteProductsController : BaseController
 
             if (result.Succeeded)
                 return new CsmActionResult(result);
+            else
+                return new CsmActionResult(result.Errors);
 
-            return new CsmActionResult(result.Errors);
-
+        }
+        catch (BadRequestException ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
         catch (Exception ex)
         {

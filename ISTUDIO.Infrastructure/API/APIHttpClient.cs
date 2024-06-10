@@ -59,7 +59,6 @@ public class APIHttpClient
         {
             var auth = await _authentication.GetAuthenticationStateAsync();
             var accessToken = auth.User.Claims.FirstOrDefault(x => x.Type == "access_jwtToken")?.Value;
-
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             using var response = await _httpClient.PutAsJsonAsync(url, req);

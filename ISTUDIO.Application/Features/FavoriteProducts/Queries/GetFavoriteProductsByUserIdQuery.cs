@@ -1,4 +1,5 @@
 ﻿using ISTUDIO.Application.Features.FavoriteProducts.DTOs;
+using ISTUDIO.Application.Features.Products.DTOs;
 
 
 namespace ISTUDIO.Application.Features.FavoriteProducts.Queries;
@@ -23,11 +24,24 @@ public class GetFavoriteProductsByUserIdQuery : IRequest<ResModel>
                 .Where(fp => fp.UserId == query.UserId)
                 .OrderByDescending(fp => fp.Id)
                 .ProjectToListAsync<ResModel>(_mapper.ConfigurationProvider);
-
+            var products = favoriteProducts.SelectMany(fp => fp.Products.Select(p => new ProductsFavoriteDTO
+            {
+                FavoriteProductId = fp.Id,
+                Id = p.Id,
+                Name = p.Name,
+                Model = p.Model,
+                Color = p.Color,
+                Price = p.Price,
+                QuantityInStock = p.QuantityInStock,
+                Description = p.Description,
+                Images = _mapper.Map<ICollection<ProductImagesDTO>>(p.Images),
+                ProductDiscount = _mapper.Map<ProductDiscountDTO>(p.ProductDiscount),
+                ProductCategory = p.ProductCategory
+            })).ToList();
             return new ResModel
             {
                 UserId = query.UserId,
-                Products = favoriteProducts.SelectMany(fp => fp.Products).ToList()
+                Products = products
             };
         }
     }

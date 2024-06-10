@@ -1,31 +1,42 @@
-﻿namespace ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
+﻿using ISTUDIO.Application.Features.Orders.DTOs;
+
+namespace ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
 
 using ISTUDIO.Domain.EntityModel;
 using System.Threading;
-using ResModel = Result;
+
+
+using ResModel = CreateOrderResponseDTO;
 public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, ResModel>
 {
     private readonly IAppDbContext _appDbContext;
-    private readonly IMapper _mapper;
+    private readonly IFileStoreService _fileStoreService;
 
-    public CreateOrdersCommandHandler(IAppDbContext appDbContext, IMapper mapper)
+    public CreateOrdersCommandHandler(IAppDbContext appDbContext, IFileStoreService fileStoreService)
     {
         _appDbContext = appDbContext;
-        _mapper = mapper;
+        _fileStoreService = fileStoreService;
     }
 
     public async Task<ResModel> Handle(CreateOrdersCommand command, CancellationToken cancellationToken)
     {
         try
         {
+            string photoFilePath = string.Empty;
+            if (command.ReceiptPhoto != null && command.ReceiptPhoto.Length > 0)
+            {
+                photoFilePath = await _fileStoreService.SaveImage(command.ReceiptPhoto);
+            }
             var orderEntity = new OrderEntity
             {
 
-                Status = "New Order",
+                Status = "OrderProcessing",
                 ShippingAddress = $"{command.OrderAddress.Region} {command.OrderAddress.City} {command.OrderAddress.Address}",
                 TotalPrice = command.TotalAmount,
                 TotalQuantyProduct = command.TotalQuantyProduct,
-                UserId = command.UserId
+                PaymentMethod = command.PaymentMethod,
+                UserId = command.UserId,
+                ReceiptPhoto = photoFilePath
             };
 
             var orderAddress = new OrderAddressEntity
@@ -59,18 +70,18 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                 }
                 else
                 {
-                    return Result.Failure(new[] { "One or more products not found." });
+                    throw new BadRequestException("One or more products not found." );
                 }
             }
             await _appDbContext.OrderAddresses.AddAsync(orderAddress, cancellationToken);
             await _appDbContext.Orders.AddAsync(orderEntity, cancellationToken);
             await _appDbContext.SaveChangesAsync(cancellationToken);
 
-            return ResModel.Success();
+            return new ResModel { OrderId = orderEntity.Id };
         }
         catch (Exception ex)
         {
-            return ResModel.Failure(new[] { $"Error add Orders or OrderDetails {ex.Message}" });
+            throw new BadRequestException($"Error add Orders or OrderDetails {ex.Message}");
         }
     }
 }

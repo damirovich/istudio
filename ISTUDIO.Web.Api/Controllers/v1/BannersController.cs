@@ -35,6 +35,28 @@ public class BannersController : BaseController
     }
 
     /// <summary>
+    /// Получение данные баннера 
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetBannersById([FromQuery] int id)
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetBannersByIdQuery 
+            {
+                BannerId = id
+            }));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
     /// Добавление баннера
     /// </summary>
     /// <param name="banner"></param>

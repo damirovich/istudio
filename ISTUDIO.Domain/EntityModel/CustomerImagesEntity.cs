@@ -14,6 +14,7 @@ public class CustomerImagesEntity
     // Наименование изображения (если применимо)
     public string? Name { get; set; }
     public string? UserId { get; set; }
+    public DateTime? CreatedDate { get; set; }
     //Идентификатор Customer который принадлежит изображение
     public int? CustomerId { get; set; }
     public CustomersEntity? Customers { get; set; }  

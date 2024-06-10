@@ -15,6 +15,9 @@ public class CustomerImagesConfiguration : IEntityTypeConfiguration<CustomerImag
         builder.Property(e => e.Url).IsRequired();
         builder.Property(e => e.Name).HasMaxLength(350).IsRequired(false);
         builder.Property(e => e.UserId).IsRequired(false);
+        builder.Property(e => e.CreatedDate)
+           .HasDefaultValue(DateTime.UtcNow)
+           .ValueGeneratedOnAdd();
 
 
         builder.HasOne(e => e.Customers)

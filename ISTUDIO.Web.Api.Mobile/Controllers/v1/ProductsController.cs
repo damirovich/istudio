@@ -119,4 +119,54 @@ public class ProductsController : BaseController
         }
     }
 
+    /// <summary>
+    /// Получение списка продуктов по категории без пагинации
+    /// </summary>
+    /// <param name="page"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetProductsBySubCategory([FromQuery] int categoryId)
+    {
+        try
+        {
+            var result = await Mediator.Send(new GetProductsBySubCategoryId
+            {
+                CategoryId = categoryId
+            });
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Получение данные продукта по ProductId
+    /// </summary>
+    /// <param name="page"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetProductsById([FromQuery] int productId)
+    {
+        try
+        {
+            var result = await Mediator.Send(new GetProductsByIdQuery
+            {
+                ProductId = productId
+            });
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
 }

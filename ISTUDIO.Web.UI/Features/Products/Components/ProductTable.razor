@@ -69,16 +69,16 @@
         try
         {
 
-            var resLegalPersons = await _mediatr.Send(new UIGetProductsListQuery { PageNumber = state.Page, PageSize = state.PageSize });
-            if (resLegalPersons.Status)
+            var resProducts = await _mediatr.Send(new UIGetProductsListQuery { PageNumber = state.Page, PageSize = state.PageSize });
+            if (resProducts.Status)
             {
-                totalItems = resLegalPersons.Data.TotalCount;
-                Elements = (IEnumerable<TableModel>)resLegalPersons.Data.Items;
+                totalItems = resProducts.Data.TotalCount;
+                Elements = (IEnumerable<TableModel>)resProducts.Data.Items;
                 _snackbar.Add($"Успешно!!! Количество найденных объектов: " + Elements.Count(), Severity.Success);
             }
             else
             {
-                _snackbar.Add($"Инфо: Что-то пошло не так {resLegalPersons.StatusMessage} ", Severity.Warning);
+                _snackbar.Add($"Инфо: Что-то пошло не так {resProducts.StatusMessage} ", Severity.Warning);
             }
             var data = Elements;
             // Поиск в таблице

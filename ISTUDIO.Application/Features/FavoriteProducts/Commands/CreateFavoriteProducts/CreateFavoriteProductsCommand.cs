@@ -20,34 +20,34 @@ public class CreateFavoriteProductsCommand : IRequest<ResModel>
 
         public async Task<ResModel> Handle(CreateFavoriteProductsCommand command, CancellationToken cancellationToken)
         {
-            try
+            // Проверка, существует ли уже избранный продукт для данного пользователя
+            var existingFavorite = await _appDbContext.FavoriteProducts
+                .Include(fp => fp.Products)
+                .FirstOrDefaultAsync(fav => fav.UserId == command.UserId && fav.Products.Any(p => p.Id == command.ProductId), cancellationToken);
+
+            if (existingFavorite != null)
             {
-                var existingFavorite = await _appDbContext.FavoriteProducts
-                        .Where(cart => cart.UserId == command.UserId)
-                        .ToListAsync();
-
-                var product = await _appDbContext.Products.FirstOrDefaultAsync(p => p.Id == command.ProductId);
-
-                if (product == null)
-                {
-                    throw new NotFoundException("Продукт не найден.");
-                }
-
-                var favoriteProduct = new FavoriteProductsEntity
-                {
-                    UserId = command.UserId,
-                    Products = new List<ProductsEntity> { product },
-                };
-
-                _appDbContext.FavoriteProducts.Add(favoriteProduct);
-                await _appDbContext.SaveChangesAsync(cancellationToken);
-
-                return ResModel.Success();
+                throw new BadRequestException("Продукт уже добавлен в избранное.");
             }
-            catch (Exception ex)
+
+            var product = await _appDbContext.Products.FirstOrDefaultAsync(p => p.Id == command.ProductId);
+
+            if (product == null)
             {
-                return ResModel.Failure(new[] { ex.Message });
+                throw new NotFoundException("Продукт не найден.");
             }
+
+            var favoriteProduct = new FavoriteProductsEntity
+            {
+                UserId = command.UserId,
+                Products = new List<ProductsEntity> { product },
+            };
+
+            _appDbContext.FavoriteProducts.Add(favoriteProduct);
+            await _appDbContext.SaveChangesAsync(cancellationToken);
+
+            return ResModel.Success();
+
         }
     }
 

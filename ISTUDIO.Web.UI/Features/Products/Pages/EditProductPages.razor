@@ -1,5 +1,5 @@
 ﻿@page "/products/edit/{Id:int}"
-
+@attribute [Authorize]
 
 <EditProductForm Product="Products" OnSave="SaveProducts" />
 

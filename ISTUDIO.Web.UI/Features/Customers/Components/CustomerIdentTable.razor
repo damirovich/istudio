@@ -1,0 +1,174 @@
+﻿
+<MudTable Elevation="25" ServerData="@(new Func<TableState, Task<TableData<TableModel>>>(ServerReload))"
+          Loading="true" Dense="true" Striped="true" Hover="true" Height="650px" HorizontalScrollbar="true" FixedHeader="true"
+          @ref="table">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Продукты</MudText>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Поиск" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="UserId" T="TableModel">UserId</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="UserName" T="TableModel">User Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="UserPhoneNumber" T="TableModel">Phone Number</MudTableSortLabel></MudTh>
+        
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowBtnPress(context.UserId))">@((context.ShowPhotes == true) ? "Hide" : "Show") Показать фотографии</MudButton></MudTd>
+        <MudTd DataLabel="UserId">@context.UserId</MudTd>
+        <MudTd DataLabel="UserName">@context.UserName</MudTd>
+        <MudTd DataLabel="UserPhoneNumber">@context.UserPhoneNumber</MudTd>
+        
+       @*  <div style="justify-self: end;">
+            <MudTd><MudIconButton Href="@($"products/edit/")" Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" /></MudTd>
+            <MudTd> <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" /></MudTd>
+        </div> *@
+    </RowTemplate>
+    <ChildRowContent>
+        @if (context.ShowPhotes)
+        {
+            <MudTr>
+                <td colspan="4">
+                    <MudCard Elevation="0">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1">Address Details for <strong>@context.UserName</strong></MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent Class="pa-0">
+                            <MudTable Items="@context.Images" Context="ImagesContext" Hover="true" Breakpoint="Breakpoint.Sm" Elevation="0">
+                                <ColGroup>
+                                    <col />
+                                    <col />
+                                    <col style="width:200px;" />
+                                </ColGroup>
+                                <HeaderContent>
+                                    <MudTh>##</MudTh>
+                                    <MudTh></MudTh>
+                                    <MudTh>Фото URL</MudTh>
+                                    <MudTh>Наименование</MudTh>
+                                    <MudTh>Дата создание</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="Id"> @ImagesContext.Id</MudTd>
+                                    <MudTd> <img src="@GetImageBase64(@ImagesContext.PhototUrl)" alt="Product Photo" style="width: 98px; height: 98px; margin-bottom: 3px; margin-right: 5px;" /> </MudTd>
+                                    <MudTd DataLabel="PhototUrl">@ImagesContext.PhototUrl</MudTd>
+                                    <MudTd DataLabel="NameImage">@ImagesContext.NameImage</MudTd>
+                                    <MudTd DataLabel="CreatedDate">@ImagesContext.CreatedDate</MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        </MudCardContent>
+                    </MudCard>
+                </td>
+            </MudTr>
+        }
+    </ChildRowContent>
+
+    <NoRecordsContent>
+        <MudText>Здесь никого нет!...</MudText>
+        <MudProgressCircular Color="Color.Primary" Size="Size.Medium" Indeterminate="_processing" />
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>ищем...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] {10, 15, 25,50, 100}" />
+    </PagerContent>
+</MudTable>
+
+
+@using ISTUDIO.Application.Features.Customers.Queries
+@using ISTUDIO.Web.UI.Features.Customers.Commands
+@using ISTUDIO.Web.UI.Features.Customers.Queries
+@using TableModel = ISTUDIO.Application.Features.Customers.DTOs.GroupedCustomerImagesResponseDTO;
+@code {
+
+    private IEnumerable<TableModel> pagedData;
+    private MudTable<TableModel> table;
+    IEnumerable<TableModel> Elements = new List<TableModel>();
+
+
+    private bool _processing = false;
+    private int totalItems;
+    private string serachText = string.Empty;
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        // table.SetRowsPerPage(5);
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task<TableData<TableModel>> ServerReload(TableState state)
+    {
+        try
+        {
+            var resProducts = await _mediatr.Send(new UIGetCustomerIdentListQuery { PageNumber = state.Page, PageSize = state.PageSize });
+            if (resProducts.Status)
+            {
+                totalItems = resProducts.Data.TotalCount;
+                Elements = (IEnumerable<TableModel>)resProducts.Data.Items;
+                _snackbar.Add($"Успешно!!! Количество найденных объектов: " + Elements.Count(), Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resProducts.StatusMessage} ", Severity.Warning);
+            }
+            var data = Elements;
+            // Поиск в таблице
+            data = await FilterTableData(data, state);
+            SortTableData(ref data, state);
+
+            return new TableData<TableModel>() { TotalItems = totalItems, Items = data };
+
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message} ", Severity.Error);
+            return new TableData<TableModel>() { TotalItems = totalItems, Items = pagedData };
+        }
+    }
+    public string GetImageBase64(string imageUrl)
+    {
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
+
+        return $"data:image/png;base64,{baseFile64.FileBase64}";
+
+    }
+
+    private async Task OnSearch(string text)
+    {
+        serachText = text;
+        await table.ReloadServerData();
+    }
+    private async Task<IEnumerable<TableModel>> FilterTableData(IEnumerable<TableModel> data, TableState state)
+
+    {
+        if (string.IsNullOrWhiteSpace(serachText))
+        {
+            // Если поисковый термин пуст или состоит только из пробелов, возвращаем исходные данные
+            return data;
+        }
+
+        return Elements ?? Enumerable.Empty<TableModel>();
+    }
+    //Сортировка списка
+    private void SortTableData(ref IEnumerable<TableModel> data, TableState state)
+    {
+        switch (state.SortLabel)
+        {
+            case "Name":
+                data = data.OrderByDirection(state.SortDirection, o => o.UserName);
+                break;
+        }
+    }
+
+    private void ShowBtnPress(string userId)
+    {
+        TableModel tableModel = Elements.First(f => f.UserId == userId);
+        tableModel.ShowPhotes = !tableModel.ShowPhotes;
+    }
+  
+}

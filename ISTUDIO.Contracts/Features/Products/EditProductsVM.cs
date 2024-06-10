@@ -15,7 +15,7 @@ public class EditProductsVM : IMapWith<EditProductsCommand>
     public string Description { get; set; }
     public int? CategoryId { get; set; }
     public int? DiscountId { get; set; }
-    public List<string> ProductPhotos { get; set; }
+    public List<string> ProductPhotos { get; set; } = new List<string>();
     public void Mapping(Profile profile)
     {
         profile.CreateMap<EditProductsVM, EditProductsCommand>();
@@ -30,7 +30,7 @@ public class EditProductsVM : IMapWith<EditProductsCommand>
             .ForMember(dest => dest.QuantityInStock, opt => opt.MapFrom(src => src.QuantityInStock))
             .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
             .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.ProductCategory));
-
+           // .ForMember(dest=> dest.DiscountId, opt=>opt.MapFrom(src=>src.))
             //.ForMember(dest =>dest.ProductPhotos, opt=>opt.MapFrom(src=>src.Images.Select(s=>s))
            // .ForMember(dest=>dest.DiscountId, opt=>opt.MapFrom(src=>src.ProductDiscount.))
            // .ForMember(dest=>dest.Id, opt=>opt.MapFrom(src=>src.Id))

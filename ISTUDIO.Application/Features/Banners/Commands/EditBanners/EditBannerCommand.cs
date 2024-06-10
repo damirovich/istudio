@@ -9,7 +9,6 @@ public class EditBannerCommand : IRequest<ResModel>
     public int? CategoryId { get; set; }
     public int? DiscountId { get; set; }
     public int? ProductId { get; set; }
-
     public class Handler : IRequestHandler<EditBannerCommand, ResModel>
     {
         private readonly IAppDbContext _appDbContext;

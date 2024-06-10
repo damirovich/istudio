@@ -1,0 +1,268 @@
+﻿
+<EditForm Model="@Banner" OnValidSubmit="SaveAsync">
+    <MudGrid>
+        <MudItem xs="12" md="12">
+            <MudPaper Class="pa-3 ma-1">
+
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Success">Сохранить</MudButton>
+
+                <MudButton Href="products" Variant="Variant.Text">Отмена</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="12" md="12">
+            <MudPaper Class="pa-16 ma-1">
+                <MudGrid>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="int" Label="Статус"
+                                      Variant="@variant" @bind-Value="@Banner.Status"
+                                      For="@(() => Banner.Status)" />
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect T="int?" Label="Категория" @bind-Value="Banner.CategoryId" AdornmentIcon="@Icons.Material.Filled.Category">
+                            @foreach (var item in ParentCategory)
+                            {
+                                <MudSelectItem T="int?" Value="@item.Id">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect T="int?" Label="Скидка" @bind-Value="Banner.DiscountId" AdornmentIcon="@Icons.Material.Filled.Percent"
+                                   Clearable="true">
+                            @foreach (var item in Discounts)
+                            {
+                                <MudSelectItem T="int?" Value="@item.Id">@item.PercenTage</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect T="int?" Label="Продукт" @bind-Value="Banner.ProductId" AdornmentIcon="@Icons.Material.Filled.Percent"
+                                   Clearable="true">
+                            @foreach (var item in Products)
+                            {
+                                <MudSelectItem T="int?" Value="@item.Id">@item.Name @item.Model</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="6">
+                        <img src="data:image/png;base64, @Banner.PhotoBannerBase64" alt="Category Icon" style="width: 100px; height: 100px; margin-bottom: 3px; margin-right: 5px;" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="UploadPhoto">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                                           for="@fileInput">
+                                    Загрузить фото Баннера
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                    </MudItem>
+                    
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="12" md="12">
+            <MudPaper Class="pa-3 ma-1">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Success">Сохранить</MudButton>
+                <MudButton Href="products" Variant="Variant.Text">Отмена</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@using ISTUDIO.Application.Features.Categories.DTOs
+@using ISTUDIO.Application.Features.Discounts.DTOs
+@using ISTUDIO.Application.Features.Products.DTOs
+@using ISTUDIO.Contracts.Features.Banners
+@using ISTUDIO.Web.UI.Features.Categories.Queries
+@using ISTUDIO.Web.UI.Features.Discounts.Queries
+@using ISTUDIO.Web.UI.Features.Products.Queries
+
+@code {
+    [Parameter] public EditBannerVM Banner { get; set; }
+    [Parameter] public EventCallback<EditBannerVM> OnSave { get; set; }
+    private CategoryDTO _categoryType = new();
+    private IEnumerable<CategoryDTO> ParentCategory { get; set; } = new List<CategoryDTO>();
+    private DiscountResponseListDTO _dictount = new ();
+    private IEnumerable<DiscountResponseListDTO> Discounts { get; set; } = new List<DiscountResponseListDTO>();
+    private IBrowserFile PhotoFiles { get; set; }
+
+    private ProductsResponseDTO _product = new();
+    private IEnumerable<ProductsResponseDTO> Products { get; set; } = new List<ProductsResponseDTO>();
+    private Variant variant = Variant.Text;
+    private MudTextField<string> multilineReference;
+    private Func<CategoryDTO, string> converter = p => p?.Name;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCategories();
+        await GetDiscounts();
+        await GetProducts();
+    }
+    private async Task UploadPhoto(IBrowserFile file)
+    {
+        PhotoFiles = file;
+        Banner.PhotoBannerBase64 = await ConvertFileToBase64(PhotoFiles);
+        StateHasChanged();
+    }
+    private async Task SaveAsync()
+    {
+        await OnSave.InvokeAsync(Banner);
+    }
+
+    private async Task<string> ConvertFileToBase64(IBrowserFile file)
+    {
+        using (var stream = file.OpenReadStream(maxAllowedSize: 512 * 5120))
+        using (var memoryStream = new MemoryStream())
+        {
+            await stream.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
+            return Convert.ToBase64String(bytes);
+        }
+    }
+
+    private async Task GetCategories()
+    {
+        try
+        {
+            var resCategories = await _mediatr.Send(new UIGetCategoriesQuery());
+        
+            if (resCategories.Status)
+            {
+                var productCategoryId = Banner.CategoryId;
+                var categories = resCategories.Data.Categories.ToList();
+                var allCategories = new List<CategoryDTO>();
+                var resFindCategory = await FindCategoryById(productCategoryId, categories);
+                if (resFindCategory != null)
+                {
+                    _categoryType = resFindCategory;
+                }
+                else
+                {
+                    _snackbar.Add("Инфо: Категория не найдена", Severity.Warning);
+                }
+
+                // Рекурсивная функция для получения всех подкатегорий
+                async Task GetSubCategoriesRecursively(List<CategoryDTO> subCategories)
+                {
+                    foreach (var subCategory in subCategories)
+                    {
+                        // Добавляем текущую подкатегорию в общий список
+                        allCategories.Add(subCategory);
+
+                        // Получаем подкатегории для текущей подкатегории
+                        var childSubCategories = await GetSubCategories(subCategory.SubCategories);
+
+                        // Рекурсивно вызываем эту же функцию для дочерних подкатегорий
+                        await GetSubCategoriesRecursively(childSubCategories);
+                    }
+                }
+
+                // Проходим по основным категориям
+                foreach (var category in categories)
+                {
+                    // Добавляем основную категорию в общий список
+                    allCategories.Add(category);
+
+                    // Получаем подкатегории для текущей категории
+                    var subCategories = await GetSubCategories(category.SubCategories);
+
+                    // Вызываем рекурсивную функцию для обработки всех уровней подкатегорий
+                    await GetSubCategoriesRecursively(subCategories);
+                }
+
+                // Присваиваем обновленный список категорий основной категории
+                ParentCategory = allCategories;
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resCategories.StatusMessage}", Severity.Warning);
+            }
+            // StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+    private async Task<CategoryDTO> FindCategoryById(int? categoryId, List<CategoryDTO> categories)
+    {
+        foreach (var category in categories)
+        {
+            if (category.Id == categoryId)
+            {
+                return category; // Нашли категорию в текущем уровне
+            }
+
+            // Рекурсивный поиск в подкатегориях текущего уровня
+            var foundCategory = await FindCategoryById(categoryId, category.SubCategories);
+            if (foundCategory != null)
+            {
+                return foundCategory; // Нашли категорию в подкатегории
+            }
+        }
+        return null; // Категория не найдена
+    }
+    private async Task<List<CategoryDTO>> GetSubCategories(List<CategoryDTO> subCategories)
+    {
+        var subCategoryList = new List<CategoryDTO>();
+        foreach (var subCategory in subCategories)
+        {
+            subCategoryList.Add(subCategory);
+        }
+        return subCategoryList;
+    }
+    private async Task GetDiscounts()
+    {
+        try
+        {
+            var resDiscounts = await _mediatr.Send(new UIGetDiscountListQuery { PageNumber = 0, PageSize = 100 });
+
+            if (resDiscounts.Status)
+            {
+                Discounts = resDiscounts.Data.Items;
+
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resDiscounts.StatusMessage}", Severity.Warning);
+            }
+            // StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task GetProducts()
+    {
+        try
+        {
+            var resProducts = await _mediatr.Send(new UIGetProductsListQuery { PageNumber = 0, PageSize = 1000 });
+            if (resProducts.Status)
+            {
+                Products = resProducts.Data.Items;
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resProducts.StatusMessage} ", Severity.Warning);
+            }
+            //   StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message} ", Severity.Error);
+        }
+    }
+}

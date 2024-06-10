@@ -16,7 +16,7 @@ public class UIEditProductsCommand : IRequest<ResponseAPI<ResModel>>
         {
             var res = await _apiClient.PutJsonAsync<ResModel, EditProductsVM>(request.Products, $"Products/EditProducts");
 
-            return res.IsSuccess() ?
+             return res.IsSuccess() ?
                new()
                {
                    Status = true,

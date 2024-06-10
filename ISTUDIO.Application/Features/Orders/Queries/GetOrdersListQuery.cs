@@ -1,7 +1,6 @@
 ﻿
 using AutoMapper.QueryableExtensions;
 using ISTUDIO.Application.Features.Orders.DTOs;
-using ISTUDIO.Application.Features.Products.DTOs;
 using System.ComponentModel.DataAnnotations;
 
 namespace ISTUDIO.Application.Features.Orders.Queries;

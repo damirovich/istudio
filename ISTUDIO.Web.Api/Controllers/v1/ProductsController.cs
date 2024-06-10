@@ -196,7 +196,7 @@ public class ProductsController : BaseController
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> EditProducts([FromForm] EditProductsVM product)
+    public async Task<ICsmActionResult> EditProducts([FromBody] EditProductsVM product)
     {
         try
         {

@@ -95,8 +95,32 @@ public class CustomersController : BaseController
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
-
-
+    /// <summary>
+    /// Получение всех фотографий паспортов который отправили на идентификациию
+    /// </summary>
+    /// <param name="page"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ICsmActionResult> GetCustomerIdentListQuery([FromQuery] PaginatedListVM page)
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetCustomerIdentListQuery
+            {
+                Parameters = new PaginatedParameters
+                {
+                    PageNumber = page.PageNumber,
+                    PageSize = page.PageSize
+                }
+            }));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
     /// <summary>
     /// Получение списка Клиентов
     /// </summary>

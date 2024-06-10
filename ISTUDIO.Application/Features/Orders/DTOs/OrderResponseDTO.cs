@@ -12,7 +12,7 @@ public class OrderResponseDTO : IMapWith<OrderEntity>
     public string CustomerName { get; set; }
     public string ShippingAddress { get; set; }
     public DateTime CreateDate { get; set; }
-
+    public List<ProductOrderResDTO> ProductOrders { get; set; }
     public void Mapping(Profile profile)
     {
         profile.CreateMap<OrderEntity, OrderResponseDTO>()
@@ -21,7 +21,8 @@ public class OrderResponseDTO : IMapWith<OrderEntity>
             .ForMember(dest => dest.TotalQuentyProduct, opt => opt.MapFrom(src => src.TotalQuantyProduct))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
             .ForMember(dest => dest.ShippingAddress, opt => opt.MapFrom(src => src.ShippingAddress))
-            .ForMember(dest => dest.CustomerName, opt=>opt.MapFrom(src=>src.Customers.FirstOrDefault().FullName));
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customers.FirstOrDefault().FullName))
+            .ForMember(dest => dest.ProductOrders, opt => opt.MapFrom(src => src.Products));
 
     }
 }

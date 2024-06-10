@@ -1,0 +1,76 @@
+﻿@page "/banners/edit/{Id:int}"
+
+@using ISTUDIO.Contracts.Features.Banners
+@using ISTUDIO.Web.UI.Features.Banners.Commands
+@using ISTUDIO.Web.UI.Features.Banners.Components
+@using ISTUDIO.Web.UI.Features.Banners.Queries
+
+<EditBannerForm Banner="@Banner" OnSave="SaveBanners" />
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private EditBannerVM Banner { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetBannerEdit(Id);
+    }
+
+    private async Task GetBannerEdit(int Id)
+    {
+        try
+        {
+            var resBanner = await _mediatr.Send(new UIGetBannersByIdQuery { BannerId = Id });
+            if (resBanner.Status)
+            {
+                Banner = _mapper.Map<EditBannerVM>(resBanner.Data);
+                Banner.PhotoBannerBase64 = GetImageBase64(Banner.PhotoBannerBase64 ?? "");
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resBanner.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+    public string GetImageBase64(string imageUrl)
+    {
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
+
+        return baseFile64.FileBase64;
+
+    }
+    private async Task SaveBanners(EditBannerVM editBanner)
+    {
+
+        var res = await _mediatr.Send(new UIEditBannerCommand { Banners = editBanner });
+
+        if (res.Status)
+        {
+            _snackbar.Add($"Успешно!!! Данные Баннера успешно измененно {res.Data.Succeeded}", Severity.Success);
+            _navManager.NavigateTo("/products");
+        }
+        else
+        {
+            var parameters = new DialogParameters()
+            {
+               { "ContentText", $"Ошибка при сохранении данные! {res.Data?.Errors} {res.StatusMessage} "},
+               { "ItemName", $"Banner"},
+            };
+
+            var dialogOptions = new DialogOptions()
+                {
+                    Position = DialogPosition.TopCenter,
+                    CloseButton = true,
+                    DisableBackdropClick = true
+                };
+
+            _dialogService.Show<DialogShow>("Ошибка", parameters, dialogOptions);
+        }
+    }
+}

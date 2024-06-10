@@ -126,18 +126,22 @@ public class CsmActionResult : ICsmActionResult
         }
         else
         {
-            if (data is IList && data.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(List<>)))
-                if ((data as IList).Count == 0)
+            if (data is IList list && data.GetType().IsGenericType && data.GetType().GetGenericTypeDefinition() == typeof(List<>))
+            {
+                if (list.Count == 0)
+                {
                     CsmReturnStatuses.Add(new CsmReturnStatus(1, "Empty!"));
+                }
                 else
                 {
                     CsmReturnStatuses.Add(new CsmReturnStatus(0, "Success!"));
                     Data = data;
                 }
-            else if (data is CsmReturnStatus)
+            }
+            else if (data is CsmReturnStatus returnStatus)
             {
-                CsmReturnStatuses.Add(data as CsmReturnStatus);
-                Data = (data as CsmReturnStatus).Output;
+                CsmReturnStatuses.Add(returnStatus);
+                Data = returnStatus.Output;
             }
             else
             {

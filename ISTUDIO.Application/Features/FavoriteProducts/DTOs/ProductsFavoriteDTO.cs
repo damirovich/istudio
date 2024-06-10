@@ -21,7 +21,7 @@ public class ProductsFavoriteDTO : IMapWith<ProductsEntity>
     public void Mapping(Profile profile)
     {
         profile.CreateMap<ProductsEntity, ProductsFavoriteDTO>()
-             .ForMember(dest => dest.FavoriteProductId, opt => opt.MapFrom(src => src.FavoriteProducts.FirstOrDefault().Id))
+             .ForMember(dest => dest.FavoriteProductId, opt => opt.Ignore())
              .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
              .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
              .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Model))
@@ -32,6 +32,6 @@ public class ProductsFavoriteDTO : IMapWith<ProductsEntity>
              .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
              .ForMember(dest => dest.ProductDiscount, opt => opt.MapFrom(src => src.Discount))
              .ForMember(dest => dest.ProductCategory, opt => opt.MapFrom(src => src.CategoryId));
-
+            
     }
 }

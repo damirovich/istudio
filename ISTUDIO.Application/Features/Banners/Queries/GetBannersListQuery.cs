@@ -27,7 +27,11 @@ public class GetBannersListQuery : IRequest<ResModel>
                 return new ResModel { Banners = cachedResult };
             }
 
-            var banners = await _appDbContext.Banners.ToListAsync(cancellationToken);
+            var banners = await _appDbContext.Banners
+                .Include(s=>s.Products)
+                .Include(s=>s.Discounts)
+                .Include(s=>s.Categories)
+                .ToListAsync(cancellationToken);
             var bannersDto = _mapper.Map<List<BannerDTO>>(banners);
 
             await _redisCacheService.SetAsync(cacheKey, bannersDto, TimeSpan.FromDays(10));

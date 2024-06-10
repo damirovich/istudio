@@ -15,5 +15,9 @@ public class CreateOrdersCommandValidator : AbstractValidator<CreateOrdersComman
 
         RuleFor(v => v.ProductOrders)
             .NotEmpty().WithMessage("ProductOrders не должен быть пустым.");
+
+        RuleFor(v => v.PaymentMethod)
+            .NotEmpty().WithMessage("PaymentMethod не должен быть пустым.");
+
     }
 }

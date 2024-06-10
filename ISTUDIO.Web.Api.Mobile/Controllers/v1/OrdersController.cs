@@ -1,4 +1,5 @@
 ﻿using ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
+using ISTUDIO.Application.Features.Orders.Commands.EditOrders.AddReceoptPhoto;
 using ISTUDIO.Application.Features.Orders.Queries;
 using ISTUDIO.Contracts.Features.Orders;
 
@@ -23,11 +24,11 @@ public class OrdersController :BaseController
 
             var result = await Mediator.Send(command);
 
-            if (result.Succeeded)
-                return Ok(result);
-
-            return StatusCode(StatusCodes.Status503ServiceUnavailable, result.Errors);
-
+            return Ok(result);
+        }
+        catch (BadRequestException ex)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
         }
         catch (Exception ex)
         {
@@ -60,6 +61,30 @@ public class OrdersController :BaseController
     }
 
 
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetOrdersById([FromQuery] int orderId)
+    {
+        try
+        {
+            var result = await Mediator.Send(new GetOrderByIdQuery
+            {
+                OrderId = orderId
+            });
+
+            return Ok(result);
+        }
+        catch (NotFoundException ex)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
     /// <summary>
     /// Получение детальную информацию о заказе 
     /// </summary>
@@ -83,6 +108,34 @@ public class OrdersController :BaseController
         catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Добавление фотографии квитанции к заказу
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddReceiptPhoto([FromBody] AddReceiptPhotoOrderVM model)
+    {
+        try
+        {
+            var command = _mapper.Map<AddReceipPhotoOrdersCommand>(model);
+            var result = await Mediator.Send(command);
+
+            if (result.Succeeded)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result.Errors);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
         }
     }
 

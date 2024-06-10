@@ -18,11 +18,16 @@ public class DeleteOrdersCommand : IRequest<ResModel>
         {
             try 
             {
+                var existingOrderAddress = await _appDbContext.OrderAddresses.FirstOrDefaultAsync(x=>x.OrderId == command.OrderId);
                 var existingOrder = await _appDbContext.Orders.FindAsync(command.OrderId);
+
+                if (existingOrderAddress == null)
+                    return ResModel.Failure(new[] { "OrderAddress не найдена" });
 
                 if (existingOrder == null)
                     return ResModel.Failure(new[] { "Orders не найдена" });
 
+                _appDbContext.OrderAddresses.Remove(existingOrderAddress);
                 _appDbContext.Orders.Remove(existingOrder);
 
                 await _appDbContext.SaveChangesAsync(cancellationToken);

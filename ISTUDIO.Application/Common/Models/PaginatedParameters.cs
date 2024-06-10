@@ -14,12 +14,12 @@ public class PaginatedParametersValidator : AbstractValidator<PaginatedParameter
 {
     public PaginatedParametersValidator()
     {
-        RuleFor(x => x.PageNumber)
-            .GreaterThan(0).WithMessage("PageNumber должен быть больше нуля.");
+        //RuleFor(x => x.PageNumber)
+        //    .GreaterThan(0).WithMessage("PageNumber должен быть больше нуля.");
 
         RuleFor(x => x.PageSize)
             .GreaterThan(0).WithMessage("PageSize должен быть больше нуля.")
-            .LessThanOrEqualTo(100).WithMessage("PageSize не должен превышать 100.");
+            .LessThanOrEqualTo(1000).WithMessage("PageSize не должен превышать 1000.");
     }
 }
 
@@ -30,6 +30,6 @@ public class PaginationWithSearchParametersValidator : AbstractValidator<Paginat
         Include(new PaginatedParametersValidator());
 
         RuleFor(x => x.SearchTerm)
-            .MaximumLength(100).WithMessage("SearchTerm не должен превышать 250 символов.");
+            .MaximumLength(250).WithMessage("SearchTerm не должен превышать 250 символов.");
     }
 }

@@ -1,0 +1,127 @@
+﻿@page "/orders/details/{Id:int}"
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h6">Заказ</MudText>
+    <MudDivider Class="mb-4" />
+
+    <MudGrid>
+        <MudItem xs="12">
+            <MudText Typo="Typo.subtitle1">Детали заказа</MudText>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText>№ Заказа @Order.Id</MudText>
+            <MudText>Добавлено @Order.CreateDate.ToString("dd.MM.yyyy")</MudText>
+        </MudItem>
+
+        <MudItem xs="12" Class="mt-4">
+            <MudText Typo="Typo.subtitle1">Платёжный адрес</MudText>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText>@Order.ShippingAddress</MudText> 
+        </MudItem>
+
+        <MudItem xs="12" Class="mt-4">
+            <MudText Typo="Typo.subtitle1">Название товара</MudText>
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudTable Items="Elements" Loading="@_processing" Dense="true" Striped="true" Hover="true" >
+                <HeaderContent>
+                    <MudTh>Название товара</MudTh>
+                    <MudTh>Модель</MudTh>
+                    <MudTh>Количество</MudTh>
+                    <MudTh>Цена</MudTh>
+                    <MudTh>Всего</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Название товара">@context.ProductOrders.Name</MudTd>
+                    <MudTd DataLabel="Модель">@context.ProductOrders.Model</MudTd>
+                    <MudTd DataLabel="Количество">@context.QuentyProduct</MudTd>
+                    <MudTd DataLabel="Цена">@context.ProductPrice</MudTd>
+                    <MudTd DataLabel="Всего">@context.Subtotal</MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText>Здесь никого нет!</MudText>
+                    <MudProgressCircular Color="Color.Primary" Size="Size.Medium" Indeterminate="true" />
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>ищем...</MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager PageSizeOptions="new int[] {10, 15, 25, 50, 100}" />
+                </PagerContent>
+            </MudTable>
+        </MudItem>
+
+        <MudItem xs="12" Class="mt-4">
+            <MudText Typo="Typo.subtitle1">Итоговая сумма</MudText>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText>Сумма: @OrderDetails.Sum(x => x.Subtotal)</MudText>
+            <MudText>Итого: @OrderDetails.Sum(x => x.TotalPrice)</MudText>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@using ISTUDIO.Application.Features.Orders.DTOs
+@using ISTUDIO.Web.UI.Features.Orders.Queries
+@using TableModel = ISTUDIO.Application.Features.Orders.DTOs.OrderDetailsResponseDTO;
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private List<OrderDetailsResponseDTO> OrderDetails { get; set; } = new();
+    private OrderResponseDTO Order { get; set; } = new();
+    IEnumerable<TableModel> Elements = new List<TableModel>();
+
+    private bool _processing = false;
+    private int totalItems;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetOrderDetails(Id);
+        await GetOrder(Id);
+    }
+
+    private async Task GetOrder(int Id)
+    {
+        try
+        {
+            var resOrders = await _mediatr.Send(new UIGetOrderByIdQuery { OrderId = Id });
+            if (resOrders.Status)
+            {
+                Order = _mapper.Map<OrderResponseDTO>(resOrders.Data);
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resOrders.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task GetOrderDetails(int Id)
+    {
+        try
+        {
+            var resDetailsOrders = await _mediatr.Send(new UIGetOrderDetailsByIdQuery { OrderId = Id });
+            if (resDetailsOrders.Status)
+            {
+                OrderDetails = _mapper.Map<List<OrderDetailsResponseDTO>>(resDetailsOrders.Data);
+                Elements = OrderDetails;
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resDetailsOrders.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+}

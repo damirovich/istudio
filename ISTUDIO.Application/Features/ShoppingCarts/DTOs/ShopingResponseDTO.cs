@@ -7,8 +7,6 @@ public class ShopingResponseDTO : IMapWith<ShoppingCartEntity>
 {
     public string UserId { get; set; }
     public decimal TotalAmount { get; set; }
-    [JsonIgnore]
-    public int QuantyProduct { get; set; }
     public int TotalQuantyProduct { get; set; }
     public IList<ProductsShoppinDTO> Products { get; set; }
 
@@ -17,8 +15,7 @@ public class ShopingResponseDTO : IMapWith<ShoppingCartEntity>
         profile.CreateMap<ShoppingCartEntity, ShopingResponseDTO>()
           .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
           .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Products))
-          .ForMember(dest => dest.QuantyProduct, opt => opt.MapFrom(src => src.QuantyProduct));
-
+          .ForMember(dest => dest.TotalQuantyProduct, opt => opt.MapFrom(src => src.Products.Sum(p => p.ShoppingCarts.FirstOrDefault().QuantyProduct)))
+          .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Products.Sum(p => p.Price * p.ShoppingCarts.FirstOrDefault().QuantyProduct)));
     }
 }
-

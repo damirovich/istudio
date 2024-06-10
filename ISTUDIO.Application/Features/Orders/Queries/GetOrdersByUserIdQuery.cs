@@ -19,11 +19,20 @@ public class GetOrdersByUserIdQuery : IRequest<ResModel>
 
         public async Task<ResModel> Handle(GetOrdersByUserIdQuery query, CancellationToken cancellationToken)
         {
-            var order = await _appDbContext.Orders
-                .Include(o=>o.Customers)
-                .Where(o => o.UserId == query.UserId).ToListAsync();
-
-            var responseDto = _mapper.Map<ResModel>(order);
+            var orders = await _appDbContext.Orders
+                .Include(o => o.Customers)
+                .Include(o => o.Products)
+                    .ThenInclude(pi => pi.Images)
+                .Include(o => o.Products)
+                    .ThenInclude(pd => pd.Discount)
+                .Where(o => o.UserId == query.UserId)
+                .OrderByDescending(o => o.Id)
+                .ToListAsync();
+            if (orders == null || !orders.Any())
+            {
+                return new ResModel();
+            }
+            var responseDto = _mapper.Map<ResModel>(orders);
            
             return responseDto;
         }

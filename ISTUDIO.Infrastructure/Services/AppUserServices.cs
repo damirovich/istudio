@@ -31,6 +31,7 @@ public class AppUserServices : IAppUserService
             {
                 UserId = user.Id,
                 UserName = user.UserName,
+                UserPhoneNumber = user.PhoneNumber,
                 Email = user.Email,
                 Roles = roles.ToList()
             });
@@ -48,7 +49,7 @@ public class AppUserServices : IAppUserService
         }
         var roles = await _userManager.GetRolesAsync(user);
 
-        return new AppUsersDTO() { UserId = user.Id!, UserName = user.UserName!, Email = user.Email!, Roles = roles };
+        return new AppUsersDTO() { UserId = user.Id!, UserName = user.UserName!, UserPhoneNumber = user.PhoneNumber!, Email = user.Email!, Roles = roles };
     }
     public async Task<AppUsersDTO> GetUserDetailsByUserNameAsync(string userName)
     {
@@ -63,6 +64,7 @@ public class AppUserServices : IAppUserService
         {
             UserId = user.Id!,
             UserName = user.UserName!,
+            UserPhoneNumber = user.PhoneNumber!,
             Email = user.Email!,
             RefreshToken = user.RefreshToken,
             RefreshTokenExpiryTime = user.RefreshTokenExpiryTime,
@@ -90,6 +92,7 @@ public class AppUserServices : IAppUserService
         {
             UserId = user.Id!,
             UserName = user.UserName!,
+            UserPhoneNumber = user.PhoneNumber!,
             Email = user.Email!,
             RefreshToken = user.RefreshToken,
             RefreshTokenExpiryTime = user.RefreshTokenExpiryTime,
