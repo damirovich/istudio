@@ -1,6 +1,7 @@
 ﻿using ISTUDIO.Application.Features.CustomerImages.Commands;
 using ISTUDIO.Application.Features.UserManagement.Commands.DeleteUser;
 using ISTUDIO.Application.Features.UserManagement.Commands.UpdateUserPhotoProfile;
+using ISTUDIO.Application.Features.UserManagement.Queries;
 using ISTUDIO.Application.Helpers;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
@@ -53,6 +54,27 @@ public class UsersController : BaseController
             return StatusCode(StatusCodes.Status503ServiceUnavailable, result.Errors);
         }
         catch (Exception ex) {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetUsers([FromQuery] string userId)
+    {
+        try
+        {
+            var result = await Mediator.Send(new GetMobileUserByIdQuery { UserId = userId });
+            return Ok(result);
+        }
+        catch (NotFoundException ex)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+        }
+        catch (Exception ex)
+        {
+
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }

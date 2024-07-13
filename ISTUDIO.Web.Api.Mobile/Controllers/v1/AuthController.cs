@@ -36,6 +36,8 @@ public class AuthController : BaseController
             {
                 PhoneNumber = user.PhoneNumber,
                 OTPCode = user.CodeOTP,
+                HasAgreedToPrivacyPolicy = user.HasAgreedToPrivacyPolicy,
+                ConsentToTheUserAgreement = user.ConsentToTheUserAgreement,
                 Roles = new List<string> { "MobileUser" }
             }));
         }

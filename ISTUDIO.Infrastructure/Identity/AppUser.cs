@@ -12,4 +12,6 @@ public class AppUser : IdentityUser
     public string? NormalizedEmail { get; set; }
     public DateTime CreatedDate { get; set; }
     public string? PhotoUsersUrl { get; set; }
+    public bool? HasAgreedToPrivacyPolicy { get; set; }
+    public bool? ConsentToTheUserAgreement { get; set; }
 }

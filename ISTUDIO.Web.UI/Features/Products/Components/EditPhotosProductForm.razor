@@ -1,0 +1,80 @@
+﻿
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            @foreach (var image in ProductImages)
+            {
+                <th>Фото</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            @foreach (var image in ProductImages)
+            {
+                <td>
+                    <img src="@GetImageBase64(image.Url)" class="img-fluid" alt="Product Image" style="max-width: 200px; max-height: 200px;">
+                </td>
+            }
+        </tr>
+        <tr>
+            @foreach (var image in ProductImages)
+            {
+                <td>
+                    <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="@(async(files) => await Upload(files, image.Id))">
+                        <ButtonTemplate>
+                            <MudButton HtmlTag="label"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.CloudUpload"
+                                       for="@fileInput">
+                                Загрузить фото
+                            </MudButton>
+                        </ButtonTemplate>
+                    </MudFileUpload>
+
+
+                </td>
+            }
+        </tr>
+    </tbody>
+</table>
+
+
+<MudItem xs="12" sm="12" md="6">
+    <CreateProductFileUpload UploadFiles="UploadFile" />
+</MudItem>
+
+@using ISTUDIO.Application.Features.Products.DTOs
+@using ISTUDIO.Web.UI.Features.Products.Commands;
+@using ISTUDIO.Contracts.Features.Products;
+@using ISTUDIO.Web.UI.Features.Products.Models
+@code {
+    [Parameter] public List<ProductImagesDTO> ProductImages { get; set; }
+   // [Parameter] public int ProductId { get; set; }
+    [Parameter] public EventCallback<PhotoUploadEventArgs> UploadPhoto { get; set; }
+    [Parameter] public EventCallback<IReadOnlyList<IBrowserFile>> UploadAllPhotos { get; set; }
+
+    private async void UploadFile(IReadOnlyList<IBrowserFile> files)
+    {
+        await UploadAllPhotos.InvokeAsync(files);
+    }
+
+   
+    public string GetImageBase64(string imageUrl)
+    {
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
+
+        return "data:image/jpeg;base64," + baseFile64.FileBase64;
+
+    }
+    private async Task Upload(IBrowserFile file, int? Id)
+    {
+        var photoProduct = new PhotoUploadEventArgs() { PhotoProduct = file, ProductId = Id!.Value };
+        await UploadPhoto.InvokeAsync(photoProduct);
+        _snackbar.Add($"Успешно!!! Фотография загружена", MudBlazor.Severity.Success);
+    }
+
+
+}

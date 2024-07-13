@@ -4,14 +4,21 @@ public class RegistrUsersMobileCommandValidator : AbstractValidator<RegistrUsers
 {
     public RegistrUsersMobileCommandValidator()
     {
-        RuleFor(command => command.PhoneNumber)
+        RuleFor(v => v.PhoneNumber)
             .Cascade(CascadeMode.Stop)
             .NotEmpty().WithMessage("Phone number is required.")
             .Must(BeValidPhoneNumber).WithMessage("Invalid phone number format.");
 
-        RuleFor(command => command.OTPCode)
+        RuleFor(v => v.OTPCode)
             .NotEmpty().WithMessage("OTP code is required.")
             .Must(BeValidOTPCode).WithMessage("OTP code must be a 6-digit number.");
+
+        RuleFor(v => v.HasAgreedToPrivacyPolicy)
+            .NotEmpty().WithMessage("HasAgreedToPrivacyPolicy code is required.");
+
+        RuleFor(v => v.ConsentToTheUserAgreement)
+             .NotEmpty().WithMessage("ConsentToTheUserAgreement code is required.");
+
     }
     private bool BeValidPhoneNumber(string phoneNumber)
     {

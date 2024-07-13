@@ -14,49 +14,52 @@ public class AddProductToCartsCommand : IRequest<ResModel>
 
         public async Task<ResModel> Handle(AddProductToCartsCommand command, CancellationToken cancellationToken)
         {
-            try
-            {
-                var existingCarts = await _appDbContext.ShoppingCarts
-                        .Include(cart => cart.Products)
-                        .Where(cart => cart.UserId == command.UserId)
-                        .ToListAsync();
 
-                foreach (var cart in existingCarts)
+            var product = await _appDbContext.Products.FirstOrDefaultAsync(p => p.Id == command.ProductId);
+
+            if (product == null)
+            {
+                throw new NotFoundException("Продукт не найден.");
+            }
+            if (product.QuantityInStock < 1)
+            {
+                throw new BadRequestException($"{product.Name} {product.Model}  в наличии не остался.");
+            }
+
+            var existingCarts = await _appDbContext.ShoppingCarts
+                    .Include(cart => cart.Products)
+                    .Where(cart => cart.UserId == command.UserId)
+                    .ToListAsync();
+
+            foreach (var cart in existingCarts)
+            {
+                var existingProductInCart = cart.Products.FirstOrDefault(p => p.Id == command.ProductId);
+                if (existingProductInCart != null)
                 {
-                    var existingProductInCart = cart.Products.FirstOrDefault(p => p.Id == command.ProductId);
-                    if (existingProductInCart != null)
+                    if (product.QuantityInStock < cart.QuantyProduct + 1)
                     {
-                        // Если продукт уже есть в текущей корзине, увеличиваем количество
-                        cart.QuantyProduct++;
-
-                        await _appDbContext.SaveChangesAsync(cancellationToken);
-                        return ResModel.Success();
+                        throw new BadRequestException($"{product.Name} {product.Model}  в наличии не остался.");
                     }
+                    // Если продукт уже есть в текущей корзине, увеличиваем количество
+                    cart.QuantyProduct++;
+
+                    await _appDbContext.SaveChangesAsync(cancellationToken);
+                    return ResModel.Success();
                 }
-
-                var product = await _appDbContext.Products.FirstOrDefaultAsync(p => p.Id == command.ProductId);
-
-                if (product == null)
-                {
-                    throw new NotFoundException("Продукт не найден.");
-                }
-
-                var shoppingCart = new ShoppingCartEntity
-                {
-                    UserId = command.UserId,
-                    Products = new List<ProductsEntity> { product },
-                    QuantyProduct = 1
-                };
-
-                _appDbContext.ShoppingCarts.Add(shoppingCart);
-                await _appDbContext.SaveChangesAsync(cancellationToken);
-
-                return ResModel.Success();
             }
-            catch (Exception ex)
+
+            var shoppingCart = new ShoppingCartEntity
             {
-                return ResModel.Failure(new[] { ex.Message });
-            }
+                UserId = command.UserId,
+                Products = new List<ProductsEntity> { product },
+                QuantyProduct = 1
+            };
+
+            _appDbContext.ShoppingCarts.Add(shoppingCart);
+            await _appDbContext.SaveChangesAsync(cancellationToken);
+
+            return ResModel.Success();
+
         }
     }
 }

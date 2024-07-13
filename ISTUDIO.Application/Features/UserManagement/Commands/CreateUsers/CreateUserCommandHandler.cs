@@ -11,7 +11,8 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ResMo
     {
         try
         {
-            var result = await _identityService.CreateUserAsync(command.UserName!, command.PhoneNumber!, command.Email!, command.Password!);
+            var result = await _identityService.CreateUserAsync(command.UserName!, command.PhoneNumber!, command.Email!, command.Password!, 
+                                                                command.HasAgreedToPrivacyPolicy, command.ConsentToTheUserAgreement);
 
             if (!result.Result.Succeeded)
             {

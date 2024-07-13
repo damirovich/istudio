@@ -1,0 +1,124 @@
+﻿@page "/products/edit/photos/{Id:int}"
+
+@attribute [Authorize]
+
+
+<EditPhotosProductForm ProductImages="@ProductImages" UploadAllPhotos="UploadAllPhotos" UploadPhoto="UploadPhoto" />
+
+@using ISTUDIO.Application.Features.Products.DTOs
+@using ISTUDIO.Contracts.Features.Products
+@using ISTUDIO.Web.UI.Features.Products.Models
+@using ISTUDIO.Web.UI.Features.Products.Queries;
+@using ISTUDIO.Web.UI.Features.Products.Commands;
+@using ISTUDIO.Web.UI.Features.Products.Components;
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private List<ProductImagesDTO> ProductImages { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetPhotosProductById(Id);
+    }
+
+    private async Task GetPhotosProductById(int Id)
+    {
+        try
+        {
+            var resProduct = await _mediatr.Send(new UIGetProductPhotosByIdQuery { ProductId = Id });
+            if (resProduct.Status)
+            {
+                ProductImages = resProduct.Data ?? new List<ProductImagesDTO>();
+                StateHasChanged();
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resProduct.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+    private async Task UploadPhoto(PhotoUploadEventArgs photo)
+    {
+        var buffer = new byte[photo.PhotoProduct.Size];
+        await photo.PhotoProduct.OpenReadStream().ReadAsync(buffer);
+
+        var base64Image = Convert.ToBase64String(buffer);
+
+        try
+        {
+            var resPhotoProductUp = await _mediatr.Send(new UIEditPhotoProductCommand
+                {
+
+                    ProductPhoto = new EditPhotoProductVM() { Id = photo.ProductId, ProductPhotos = base64Image }
+                });
+
+            if (resPhotoProductUp.Status)
+            {
+                await GetPhotosProductById(Id);
+                StateHasChanged();
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resPhotoProductUp.StatusMessage}", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+
+         StateHasChanged();
+
+    }
+    private async void UploadAllPhotos(IReadOnlyList<IBrowserFile> files)
+    {
+        var productPhotos = new List<string>();
+        foreach (var item in files)
+        {
+            var fileBase64 = await ConvertFileToBase64(item);
+            productPhotos.Add(fileBase64);
+        }
+
+        try
+        {
+            var resPhotosProductUp = await _mediatr.Send(new UIEditAllPhotosProductCommand
+                {
+
+                    ProductImages = new EditAllPhotosProductVM() { ProductId = Id, ProductPhotos = productPhotos }
+                });
+
+            if (resPhotosProductUp.Status)
+            {
+                await GetPhotosProductById(Id);
+                StateHasChanged();
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resPhotosProductUp.StatusMessage}", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+
+        StateHasChanged();
+    }
+    private async Task<string> ConvertFileToBase64(IBrowserFile file)
+    {
+
+        using (var stream = file.OpenReadStream(maxAllowedSize: 512 * 5120))
+        using (var memoryStream = new MemoryStream())
+        {
+            await stream.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
+            return Convert.ToBase64String(bytes);
+        }
+    }   
+}

@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using ISTUDIO.Application.Features.ModelsDTO;
+using ISTUDIO.Application.Features.UserManagement.DTOs;
 using ISTUDIO.Infrastructure.AppDbContext;
 using ISTUDIO.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -97,6 +98,23 @@ public class AppUserServices : IAppUserService
             RefreshToken = user.RefreshToken,
             RefreshTokenExpiryTime = user.RefreshTokenExpiryTime,
             Roles = roles
+        };
+    }
+    public async Task<MobileUsersDTO> GetMobileDataAsync(string userId)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
+        if (user == null)
+        {
+            throw new Application.Common.Exceptions.NotFoundException("User not found");
+        }
+        var roles = await _userManager.GetRolesAsync(user);
+
+        return new MobileUsersDTO()
+        {
+            UserId = user.Id!,
+            UserPhoneNumber = user.PhoneNumber!,
+            UserPhotoURL = user.PhotoUsersUrl!
+            
         };
     }
 }

@@ -54,8 +54,8 @@ internal class CreateCustomersCommandValidator : AbstractValidator<CreateCustome
         RuleFor(v => v.DateOfIssue)
             .NotNull().WithMessage("Дата выдачи обязательна для заполнения.");
 
-        RuleFor(v => v.Ethnicity)
-            .MaximumLength(50).WithMessage("Этническая принадлежность не должна превышать 50 символов.");
+        //RuleFor(v => v.Ethnicity)
+        //    .MaximumLength(50).WithMessage("Этническая принадлежность не должна превышать 50 символов.");
 
         RuleFor(v => v.Address)
             .MaximumLength(250).WithMessage("Адрес не должен превышать 250 символов.");

@@ -1198,7 +1198,7 @@ namespace ISTUDIO.Infrastructure.Migrations
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductImagesEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", "Products")
-                        .WithMany("Images")
+                        .WithMany("Photo")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1370,7 +1370,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                 {
                     b.Navigation("Baners");
 
-                    b.Navigation("Images");
+                    b.Navigation("Photo");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaRequest", b =>

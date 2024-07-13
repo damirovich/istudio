@@ -82,14 +82,17 @@ public class IdentityService : IIdentityService
     }
 
     //Создание нового пользователя
-    public async Task<(Result Result, string UserId)> CreateUserAsync(string userName, string phoneNumber, string email, string password)
+    public async Task<(Result Result, string UserId)> CreateUserAsync(string userName, string phoneNumber, string email, string password,
+                                                                      bool hasAgreedToPrivacyPolicy, bool consentToTheUserAgreement)
     {
         var user = new AppUser
         {
             UserName = userName,
             Email = email,
             PhoneNumber = phoneNumber,
-            LockoutEnabled = true
+            LockoutEnabled = true,
+            HasAgreedToPrivacyPolicy = hasAgreedToPrivacyPolicy,
+            ConsentToTheUserAgreement = consentToTheUserAgreement
         };
 
         var result = await _userManager.CreateAsync(user, password);
@@ -97,14 +100,17 @@ public class IdentityService : IIdentityService
         return (result.ToApplicationResult(), user.Id);
     }
     //Регистрация пользователя
-    public async Task<(Result Result, string UserId)> CreateUserMoblieAsync(string userName, string phoneNumber, int codeOTP)
+    public async Task<(Result Result, string UserId)> CreateUserMoblieAsync(string userName, string phoneNumber, int codeOTP,
+                                                                            bool hasAgreedToPrivacyPolicy, bool consentToTheUserAgreement)
     {
         var user = new AppUser
         {
             UserName = userName,
             PhoneNumber = phoneNumber,
             CodeOTP = codeOTP,
-            LockoutEnabled = true
+            LockoutEnabled = true, 
+            HasAgreedToPrivacyPolicy = hasAgreedToPrivacyPolicy,
+            ConsentToTheUserAgreement = consentToTheUserAgreement
         };
         
         _appDbContext.Add(user);

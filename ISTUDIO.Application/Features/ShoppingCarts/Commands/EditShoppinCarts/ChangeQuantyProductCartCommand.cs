@@ -1,5 +1,5 @@
 ﻿
-namespace ISTUDIO.Application.Features.ShoppingCarts.Commands.EditShoppinCarts; 
+namespace ISTUDIO.Application.Features.ShoppingCarts.Commands.EditShoppinCarts;
 
 using System.ComponentModel.DataAnnotations;
 using ResModel = Result;
@@ -21,27 +21,32 @@ public class ChangeQuantyProductCartCommand : IRequest<ResModel>
 
         public async Task<ResModel> Handle(ChangeQuantyProductCartCommand command, CancellationToken cancellationToken)
         {
-            try
-            {
-                var shoppingCart = await _appDbContext.ShoppingCarts
-                    .FirstOrDefaultAsync(sc => sc.Id == command.CartId);
 
-                if (shoppingCart == null)
-                    return ResModel.Failure(new[] { "Shopping cart not found for the Id" });
+            var shoppingCart = await _appDbContext.ShoppingCarts
+                .Include(sc => sc.Products)
+                .FirstOrDefaultAsync(sc => sc.Id == command.CartId);
 
-                shoppingCart.QuantyProduct = command.QuantyProduct;
+            if (shoppingCart == null)
+                throw new NotFoundException("Корзина не найдена по Id");
 
-                _appDbContext.ShoppingCarts.Update(shoppingCart);
+            if (shoppingCart.Products == null || !shoppingCart.Products.Any())
+                throw new NotFoundException("В корзине нет товаров.");
 
-                await _appDbContext.SaveChangesAsync(cancellationToken);
+            var product = shoppingCart.Products.FirstOrDefault();
+            if (product == null)
+                throw new NotFoundException("Товар не найден в корзине.");
+            int quantyCart = shoppingCart.QuantyProduct + command.QuantyProduct;
+            if (product.QuantityInStock < quantyCart)
+                throw new BadRequestException($"Недостаточно количество продукта. {product.Name} Доступный количество продуктов: {product.QuantityInStock}");
 
-                return ResModel.Success();
-            }
-            catch (Exception ex)
-            {
-                return ResModel.Failure(new[] { ex.Message ?? ex.InnerException.Message });
-            }
+            shoppingCart.QuantyProduct = command.QuantyProduct;
+
+            _appDbContext.ShoppingCarts.Update(shoppingCart);
+
+            await _appDbContext.SaveChangesAsync(cancellationToken);
+
+            return ResModel.Success();
+
         }
     }
 }
-    

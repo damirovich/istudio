@@ -14,6 +14,10 @@ public class RegistrUsersMobileCommand : IRequest<ResModel>
     public string PhoneNumber { get; set; }
     [Required]
     public int OTPCode { get; set; }
+    [Required]
+    public bool HasAgreedToPrivacyPolicy { get; set; }
+    [Required]
+    public bool ConsentToTheUserAgreement { get; set; }
 
     public List<string>? Roles { get; set; } = new List<string>();
 
@@ -41,7 +45,8 @@ public class RegistrUsersMobileCommand : IRequest<ResModel>
             }
 
             // Если пользователя нет с этим номером телефона, создаем нового пользователя
-            var creationResult = await _identityService.CreateUserMoblieAsync(command.PhoneNumber!, command.PhoneNumber, command.OTPCode);
+            var creationResult = await _identityService.CreateUserMoblieAsync(command.PhoneNumber!, command.PhoneNumber, command.OTPCode,
+                                                                              command.HasAgreedToPrivacyPolicy, command.ConsentToTheUserAgreement);
             if (!creationResult.Result.Succeeded)
             {
                 var errors = string.Join(Environment.NewLine, creationResult.Result.Errors);

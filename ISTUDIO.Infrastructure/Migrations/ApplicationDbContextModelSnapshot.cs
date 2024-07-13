@@ -143,7 +143,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 9, 12, 7, 43, 777, DateTimeKind.Utc).AddTicks(7881));
+                        .HasDefaultValue(new DateTime(2024, 6, 17, 12, 20, 31, 443, DateTimeKind.Utc).AddTicks(3556));
 
                     b.Property<int?>("CustomerId")
                         .IsRequired()
@@ -499,7 +499,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 9, 12, 7, 43, 780, DateTimeKind.Utc).AddTicks(1424));
+                        .HasDefaultValue(new DateTime(2024, 6, 17, 12, 20, 31, 445, DateTimeKind.Utc).AddTicks(8097));
 
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
@@ -535,6 +535,34 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Orders", (string)null);
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderStatusHistoryEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ChangeDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 6, 17, 12, 20, 31, 455, DateTimeKind.Utc).AddTicks(4271));
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderStatusHistory", (string)null);
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.PaymentMethodEntity", b =>
@@ -643,7 +671,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 9, 12, 7, 43, 785, DateTimeKind.Utc).AddTicks(3725));
+                        .HasDefaultValue(new DateTime(2024, 6, 17, 12, 20, 31, 451, DateTimeKind.Utc).AddTicks(4609));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -800,16 +828,24 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("ConsentToTheUserAgreement")
+                        .IsRequired()
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 9, 12, 7, 43, 777, DateTimeKind.Utc).AddTicks(5434));
+                        .HasDefaultValue(new DateTime(2024, 6, 17, 12, 20, 31, 443, DateTimeKind.Utc).AddTicks(890));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("HasAgreedToPrivacyPolicy")
+                        .IsRequired()
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -1185,6 +1221,17 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderStatusHistoryEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.OrderEntity", "Order")
+                        .WithMany("StatusHistories")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.PaymentMethodEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.PaymentTypeEntity", "PaymentType")
@@ -1199,7 +1246,7 @@ namespace ISTUDIO.Infrastructure.Migrations
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductImagesEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", "Products")
-                        .WithMany("Images")
+                        .WithMany("Photo")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1360,6 +1407,8 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("OrderAddresses");
+
+                    b.Navigation("StatusHistories");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.PaymentTypeEntity", b =>
@@ -1371,7 +1420,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                 {
                     b.Navigation("Baners");
 
-                    b.Navigation("Images");
+                    b.Navigation("Photo");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaRequest", b =>

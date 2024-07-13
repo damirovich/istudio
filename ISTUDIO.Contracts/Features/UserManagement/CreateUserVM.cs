@@ -12,6 +12,8 @@ public class CreateUserVM : IMapWith<CreateUserCommand>
     public string Email { get; set; }
     [Required]
     public string Password { get; set; }
+    public bool HasAgreedToPrivacyPolicy { get; set; }
+    public bool ConsentToTheUserAgreement { get; set; }
     public List<string> Roles { get; set; }
 
     public void Mapping(Profile profile)

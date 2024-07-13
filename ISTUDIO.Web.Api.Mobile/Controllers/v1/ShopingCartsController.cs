@@ -53,6 +53,14 @@ public class ShopingCartsController : BaseController
             return StatusCode(StatusCodes.Status503ServiceUnavailable, result.Errors);
 
         }
+        catch (NotFoundException ex)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+        }
+        catch (BadRequestException ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
+        }
         catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
@@ -73,6 +81,14 @@ public class ShopingCartsController : BaseController
                 return Ok(result);
 
             return StatusCode(StatusCodes.Status503ServiceUnavailable, result.Errors);
+        }
+        catch (NotFoundException ex)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+        }
+        catch (BadRequestException ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
         }
         catch (Exception ex)
         {

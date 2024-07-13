@@ -92,7 +92,7 @@
         }
 
         await UploadFiles.InvokeAsync(_model.Files);
-        _snackbar.Add($"Успешно!!! Фотографии загружены нажмите добавить что бы сохранить данные продукта", MudBlazor.Severity.Success);
+        _snackbar.Add($"Успешно!!! Фотографии загружены ", MudBlazor.Severity.Success);
     }
 
     private void SetDragClass()

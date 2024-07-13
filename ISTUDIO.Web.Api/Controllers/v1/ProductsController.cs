@@ -1,5 +1,6 @@
 ﻿using ISTUDIO.Application.Features.Products.Commands.CreateProducts;
 using ISTUDIO.Application.Features.Products.Commands.DeleteProducts;
+using ISTUDIO.Application.Features.Products.Commands.EditPhotosProducts;
 using ISTUDIO.Application.Features.Products.Commands.EditProducts;
 using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Application.Features.Products.Queries;
@@ -200,27 +201,7 @@ public class ProductsController : BaseController
     {
         try
         {
-            var productImages = new List<ProductImagesDTO>();
-
-            foreach (var photo in product.ProductPhotos)
-            {
-                if (photo != null)
-                {
-                    var fileByte = Convert.FromBase64String(photo);
-
-                    var photoUrl = await _fileStoreService.SaveImage(fileByte);
-
-                    productImages.Add(new ProductImagesDTO
-                    {
-                        Url = photoUrl,
-                        Name = $"image_{DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss")}.png",
-                        ContentType = "image/png",
-                    });
-                }
-            }
-
             var command = _mapper.Map<EditProductsCommand>(product);
-            command.Images = productImages;
 
             var result = await Mediator.Send(command);
             if (result.Succeeded)
@@ -233,8 +214,7 @@ public class ProductsController : BaseController
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
-
-
+    
     // <summary>
     /// Удаление данных продукта
     /// </summary>

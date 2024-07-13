@@ -1,5 +1,181 @@
-﻿<h3>CustomersTable</h3>
+﻿
+<MudTable Elevation="25" ServerData="@(new Func<TableState, Task<TableData<TableModel>>>(ServerReload))"
+          Loading="true" Dense="true" Striped="true" Hover="true" Height="650px" HorizontalScrollbar="true" FixedHeader="true"
+          @ref="table">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Клиенты</MudText>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Поиск" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="PIN" T="TableModel">ПИН</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="FullName" T="TableModel">ФИО клиента</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="SeriesNumDocument" T="TableModel">№ и серия документа</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="DateOfBirth" T="TableModel">Дата рождения</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Address" T="TableModel">Адресс</MudTableSortLabel></MudTh>
 
+    </HeaderContent>
+    <RowTemplate>        
+        <MudTd DataLabel="PIN">@context.PIN</MudTd>
+        <MudTd DataLabel="FullName">@context.FullName</MudTd>
+        <MudTd DataLabel="SeriesNumDocument">@context.SeriesNumDocument</MudTd>
+        <MudTd DataLabel="DateOfBirth">@context.DateOfBirth</MudTd>
+        <MudTd DataLabel="Address">@context.Address</MudTd>
+        <div style="justify-self: end;">
+            <MudTd><MudIconButton Href="@($"customer/edit/{context.Id}")" Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" /></MudTd>
+            <MudTd> <MudIconButton OnClick="async() => await DeleteCustomers(context.Id, context.FullName)" Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" /></MudTd>
+        </div>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>Здесь никого нет!...</MudText>
+        <MudProgressCircular Color="Color.Primary" Size="Size.Medium" Indeterminate="_processing" />
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>ищем...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] {10, 15, 25,50, 100}" />
+    </PagerContent>
+</MudTable>
+
+
+@using ISTUDIO.Application.Features.Customers.Queries
+@using ISTUDIO.Web.UI.Features.Customers.Commands
+@using ISTUDIO.Web.UI.Features.Customers.Queries
+@using TableModel = ISTUDIO.Application.Features.Customers.DTOs.CustomerResponseDTO;
 @code {
 
+    private IEnumerable<TableModel> pagedData;
+    private MudTable<TableModel> table;
+    IEnumerable<TableModel> Elements = new List<TableModel>();
+
+
+    private bool _processing = false;
+    private int totalItems;
+    private string serachText = string.Empty;
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        // table.SetRowsPerPage(5);
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task<TableData<TableModel>> ServerReload(TableState state)
+    {
+        try
+        {
+
+            var resCustomers = await _mediatr.Send(new UIGetCustomersListQuery { PageNumber = state.Page, PageSize = state.PageSize });
+            if (resCustomers.Status)
+            {
+                totalItems = resCustomers.Data.TotalCount;
+                Elements = (IEnumerable<TableModel>)resCustomers.Data.Items;
+                _snackbar.Add($"Успешно!!! Количество найденных объектов: " + Elements.Count(), Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resCustomers.StatusMessage} ", Severity.Warning);
+            }
+            var data = Elements;
+            // Поиск в таблице
+            data = await FilterTableData(data, state);
+            SortTableData(ref data, state);
+
+            return new TableData<TableModel>() { TotalItems = totalItems, Items = data };
+
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message} ", Severity.Error);
+            return new TableData<TableModel>() { TotalItems = totalItems, Items = pagedData };
+        }
+    }
+    public string GetImageBase64(string imageUrl)
+    {
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
+
+        return $"data:image/png;base64,{baseFile64.FileBase64}";
+
+    }
+
+    private async Task OnSearch(string text)
+    {
+        serachText = text;
+        await table.ReloadServerData();
+    }
+    private async Task<IEnumerable<TableModel>> FilterTableData(IEnumerable<TableModel> data, TableState state)
+
+    {
+        if (string.IsNullOrWhiteSpace(serachText))
+        {
+            // Если поисковый термин пуст или состоит только из пробелов, возвращаем исходные данные
+            return data;
+        }
+
+        // var resSearch = await _mediatr.Send(new UIGetSearchProductsQuery { PageNumber = state.Page, PageSize = state.PageSize, SearchTerm = serachText });
+
+        // if (resSearch.Status)
+        // {
+        //     totalItems = resSearch.Data.PageNumber;
+        //     Elements = (IEnumerable<TableModel>)resSearch.Data.Items;
+        //     _snackbar.Add($"Успешно!!! Количество найденных объектов: " + Elements.Count(), Severity.Success);
+        // }
+        // else
+        // {
+        //     _snackbar.Add($"Инфо: Что-то пошло не так {resSearch.StatusMessage} ", Severity.Warning);
+        // }
+
+        // Возвращаем данные из запроса к базе данных или пустой набор данных, если запрос не удался
+        return Elements ?? Enumerable.Empty<TableModel>();
+    }
+    //Сортировка списка
+    private void SortTableData(ref IEnumerable<TableModel> data, TableState state)
+    {
+        switch (state.SortLabel)
+        {
+            case "Name":
+                data = data.OrderByDirection(state.SortDirection, o => o.Name);
+                break;
+        }
+    }
+
+
+    private async Task DeleteCustomers(int customerId, string Name)
+    {
+        var dialogParameters = new DialogParameters
+            {
+                { "ContentText", $"Вы действительно хотите удалить эти данные? Этот процесс нельзя отменить. Продукт {Name}" },
+                { "ButtonText", "Удалить" },
+                { "ItemName", Name },
+                { "Color", Color.Error }
+            };
+
+        var dialogOptions = new DialogOptions()
+            {
+                Position = DialogPosition.TopCenter,
+                CloseButton = true,
+                DisableBackdropClick = true
+            };
+
+        var dialog = _dialogService.Show<DeleteDialog>("Удалить", dialogParameters, dialogOptions);
+        var resDialog = await dialog.Result;
+
+        if (!resDialog.Canceled)
+        {
+            var resDelCustomers = await _mediatr.Send(new UIDeleteCustomersCommand { CustomerId = customerId });
+
+            if (resDelCustomers.Status)
+            {
+                _snackbar.Add($"Успешно!!! {resDelCustomers.Data.Succeeded}", Severity.Success);
+                await table.ReloadServerData();
+            }
+            else
+                _snackbar.Add($"Инфо: Что-то пошло не так {resDelCustomers.StatusMessage}", Severity.Warning);
+
+        }
+
+    }
 }

@@ -14,6 +14,13 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
             .Matches("[a-z]").WithMessage("Пароль должен содержать хотя бы одну строчную букву.")
             .Matches("[0-9]").WithMessage("Пароль должен содержать хотя бы одну цифру.")
             .Matches("[!@#$%^&*]").WithMessage("Пароль должен содержать хотя бы один специальный символ: !@#$%^&*");
+
+        RuleFor(v => v.HasAgreedToPrivacyPolicy)
+          .NotEmpty().WithMessage("HasAgreedToPrivacyPolicy обязательное поле.");
+
+        RuleFor(v => v.ConsentToTheUserAgreement)
+             .NotEmpty().WithMessage("ConsentToTheUserAgreement обязательное поле.");
+
         RuleFor(v => v.Roles).NotEmpty().WithMessage("Список ролей не должен быть пустым.")
             .Must(roles => roles.Count >= 1).WithMessage("Список ролей должен содержать как минимум одну роль.");
     }

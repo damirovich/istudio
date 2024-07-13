@@ -22,6 +22,7 @@ public interface IAppDbContext
     DbSet<FavoriteProductsEntity> FavoriteProducts { get; set; }
     DbSet<OrderAddressEntity> OrderAddresses { get; set; }
     DbSet<BannerEntity> Banners { get; set; }
+    DbSet<OrderStatusHistoryEntity> OrderStatusHistories { get; set; }
     DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

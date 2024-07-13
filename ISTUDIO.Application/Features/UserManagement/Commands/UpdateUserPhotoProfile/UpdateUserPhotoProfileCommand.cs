@@ -10,7 +10,6 @@ public class UpdateUserPhotoProfileCommand : IRequest<ResModel>
         private readonly IIdentityService _identityService;
         public Handler(IIdentityService identityService) =>
                                 (_identityService) = (identityService);
-
         public async Task<ResModel> Handle(UpdateUserPhotoProfileCommand command, CancellationToken cancellationToken)
         {
             try

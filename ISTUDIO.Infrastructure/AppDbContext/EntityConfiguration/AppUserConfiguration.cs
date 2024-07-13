@@ -21,6 +21,9 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
 
         builder.Property(e => e.PhotoUsersUrl).HasMaxLength(500).IsRequired(false);
 
+        builder.Property(e => e.HasAgreedToPrivacyPolicy).IsRequired(true);
+        builder.Property(e => e.ConsentToTheUserAgreement).IsRequired(true);
+
         builder.HasIndex(e => e.Id).IsUnique();
         
     }

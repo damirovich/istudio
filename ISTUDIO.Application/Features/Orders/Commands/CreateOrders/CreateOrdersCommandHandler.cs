@@ -22,21 +22,38 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
     {
         try
         {
+            foreach (var item in command.ProductOrders)
+            {
+                var product = await _appDbContext.Products.FindAsync(item.Id);
+                if (product != null)
+                {
+                    if (product.QuantityInStock < item.QuantyProductCart)
+                    {
+                        throw new BadRequestException($"{product.Name} {product.Model} в наличии не остался");
+                    }
+                }
+                else
+                {
+                    throw new BadRequestException("Product not found.");
+                }
+            }
+
             string photoFilePath = string.Empty;
             if (command.ReceiptPhoto != null && command.ReceiptPhoto.Length > 0)
             {
                 photoFilePath = await _fileStoreService.SaveImage(command.ReceiptPhoto);
             }
+
             var orderEntity = new OrderEntity
             {
-
                 Status = "OrderProcessing",
                 ShippingAddress = $"{command.OrderAddress.Region} {command.OrderAddress.City} {command.OrderAddress.Address}",
                 TotalPrice = command.TotalAmount,
                 TotalQuantyProduct = command.TotalQuantyProduct,
                 PaymentMethod = command.PaymentMethod,
                 UserId = command.UserId,
-                ReceiptPhoto = photoFilePath
+                ReceiptPhoto = photoFilePath,
+                CreateDate = DateTime.UtcNow
             };
 
             var orderAddress = new OrderAddressEntity
@@ -66,22 +83,40 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                     orderEntity.Details.Add(orderDetail);
                     orderEntity.Products.Add(productEntity);
 
-                    _appDbContext.OrderDetails.Add(orderDetail);
+                    await _appDbContext.OrderDetails.AddAsync(orderDetail, cancellationToken);
                 }
                 else
                 {
-                    throw new BadRequestException("One or more products not found." );
+                    throw new BadRequestException("One or more products not found.");
                 }
             }
+         
             await _appDbContext.OrderAddresses.AddAsync(orderAddress, cancellationToken);
             await _appDbContext.Orders.AddAsync(orderEntity, cancellationToken);
             await _appDbContext.SaveChangesAsync(cancellationToken);
 
+            // Добавляем запись в историю статусов
+            var statusHistory = new OrderStatusHistoryEntity
+            {
+                OrderId = orderEntity.Id,
+                Status = orderEntity.Status,
+                ChangeDate = DateTime.UtcNow
+            };
+
+            await _appDbContext.OrderStatusHistories.AddAsync(statusHistory, cancellationToken);
+            await _appDbContext.SaveChangesAsync(cancellationToken);
+
             return new ResModel { OrderId = orderEntity.Id };
+        }
+        catch (BadRequestException ex)
+        {
+            throw;
         }
         catch (Exception ex)
         {
-            throw new BadRequestException($"Error add Orders or OrderDetails {ex.Message}");
+            throw new BadRequestException($"Error add Orders or OrderDetails: {ex.Message}");
         }
+
+
     }
 }

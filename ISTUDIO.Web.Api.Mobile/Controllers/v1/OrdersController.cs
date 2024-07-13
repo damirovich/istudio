@@ -28,7 +28,7 @@ public class OrdersController :BaseController
         }
         catch (BadRequestException ex)
         {
-            return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+            return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
         }
         catch (Exception ex)
         {

@@ -6,11 +6,11 @@ public class CreateOrderUserAddressCommandValidator : AbstractValidator<CreateOr
     {
         RuleFor(x => x.Region)
            .NotEmpty().WithMessage("Регион обязателен для заполнения.")
-           .Matches(@"^[а-яА-ЯёЁa-zA-Z\s]+$").WithMessage("Регион должен содержать только буквы.");
+           .Matches(@"^[а-яА-ЯёЁa-zA-Z\s\-.,]+$").WithMessage("Регион должен содержать только буквы и допустимые символы (-,.,).");
 
         RuleFor(x => x.City)
             .NotEmpty().WithMessage("Город обязателен для заполнения.")
-            .Matches(@"^[а-яА-ЯёЁa-zA-Z\s]+$").WithMessage("Город должен содержать только буквы.");
+            .Matches(@"^[а-яА-ЯёЁa-zA-Z\s\-.,]+$").WithMessage("Город должен содержать только буквы.");
 
         RuleFor(x => x.Address)
             .NotEmpty().WithMessage("Адрес обязателен для заполнения.")

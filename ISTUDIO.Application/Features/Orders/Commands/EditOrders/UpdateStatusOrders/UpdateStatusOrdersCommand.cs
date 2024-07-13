@@ -1,6 +1,7 @@
 ﻿
 namespace ISTUDIO.Application.Features.Orders.Commands.EditOrders.UpdateStatusOrders;
 
+using ISTUDIO.Domain.EntityModel;
 using ResModel = Result;
 public class UpdateStatusOrdersCommand : IRequest<ResModel>
 {
@@ -16,21 +17,50 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
         {
             try
             {
-                var existingOrder = await _appDbContext.Orders.FindAsync(command.OrderId);
+                var existingOrder = await _appDbContext.Orders
+                    .Include(o => o.Details)
+                    .ThenInclude(d => d.Product)
+                    .Include(o => o.StatusHistories) // Включение истории статусов
+                    .FirstOrDefaultAsync(o => o.Id == command.OrderId, cancellationToken);
 
                 if (existingOrder == null)
-                    return ResModel.Failure(new[] { "Orders не найдена" });
+                    return ResModel.Failure(new[] { "Order не найдена" });
 
+                // Сохраните предыдущий статус в истории
+                var statusHistory = new OrderStatusHistoryEntity
+                {
+                    OrderId = existingOrder.Id,
+                    Status = existingOrder.Status,
+                    ChangeDate = DateTime.UtcNow
+                };
+
+                existingOrder.StatusHistories.Add(statusHistory);
+
+                // Проверка и обновление количества товара при изменении статуса на "OrderShipped"
+                if (command.OrderStatus == "OrderShipped")
+                {
+                    foreach (var detail in existingOrder.Details)
+                    {
+                        var product = detail.Product;
+                        if (product.QuantityInStock < detail.Quantity)
+                        {
+                            return ResModel.Failure(new[] { $"Недостаточное количество продукта: {product.Name} {product.Model}" });
+                        }
+
+                        product.QuantityInStock -= detail.Quantity;
+                        _appDbContext.Products.Update(product);
+                    }
+                }
+
+                // Обновление статуса заказа
                 existingOrder.Status = command.OrderStatus;
-
-
                 await _appDbContext.SaveChangesAsync(cancellationToken);
 
                 return ResModel.Success();
             }
             catch (Exception ex)
             {
-                return ResModel.Failure(new[] { $"Error update status {ex.Message}" });
+                return ResModel.Failure(new[] { $"Error update status: {ex.Message}" });
             }
         }
     }
