@@ -12,6 +12,7 @@ public class ProductsShoppinDTO : IMapWith<ProductsEntity>
     public string Name { get; set; }
     public string Model { get; set; }
     public decimal Price { get; set; }
+    public int QuantyProductStock { get; set; }
     public int QuantyProductCart { get; set; } // Количество продукта в корзине
     public decimal SumProductCart { get; set; } // Сумма продукта в корзине
     public ICollection<ProductImagesDTO> Images { get; set; }
@@ -26,6 +27,7 @@ public class ProductsShoppinDTO : IMapWith<ProductsEntity>
             .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
             .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
             .ForMember(dest => dest.CartId, opt => opt.MapFrom(src => src.ShoppingCarts.FirstOrDefault().Id))
+            .ForMember(dest => dest.QuantyProductStock, opt => opt.MapFrom(src => src.QuantityInStock))
             .ForMember(dest => dest.QuantyProductCart, opt => opt.MapFrom(src => src.ShoppingCarts.FirstOrDefault() != null ? src.ShoppingCarts.FirstOrDefault().QuantyProduct : 0))
             .ForMember(dest => dest.SumProductCart, opt => opt.MapFrom(src => src.Price * (src.ShoppingCarts.FirstOrDefault() != null ? src.ShoppingCarts.FirstOrDefault().QuantyProduct : 0)))
             .ForMember(dest => dest.ProductDiscount, opt => opt.MapFrom(src => src.Discount));

@@ -23,6 +23,8 @@ public interface IAppDbContext
     DbSet<OrderAddressEntity> OrderAddresses { get; set; }
     DbSet<BannerEntity> Banners { get; set; }
     DbSet<OrderStatusHistoryEntity> OrderStatusHistories { get; set; }
+    DbSet<MagazineEntity> Magazines { get; set; }
+    DbSet<OrderNotificationRecipientEntity> OrderNotificationRecipients { get; set; }
     DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

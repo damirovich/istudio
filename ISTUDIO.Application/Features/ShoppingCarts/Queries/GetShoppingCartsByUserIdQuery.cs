@@ -7,12 +7,12 @@ namespace ISTUDIO.Application.Features.ShoppingCarts.Queries;
 
 using ResModel = ShopingResponseDTO;
 
-public class GetShoppingCartsByUserId : IRequest<ResModel>
+public class GetShoppingCartsByUserIdQuery : IRequest<ResModel>
 {
     [Required]
     public string UserId { get; set; }
 
-    public class Handler : IRequestHandler<GetShoppingCartsByUserId, ResModel>
+    public class Handler : IRequestHandler<GetShoppingCartsByUserIdQuery, ResModel>
     {
         private readonly IAppDbContext _appDbContext;
         private readonly IMapper _mapper;
@@ -23,7 +23,7 @@ public class GetShoppingCartsByUserId : IRequest<ResModel>
             _mapper = mapper;
         }
 
-        public async Task<ResModel> Handle(GetShoppingCartsByUserId query, CancellationToken cancellationToken)
+        public async Task<ResModel> Handle(GetShoppingCartsByUserIdQuery query, CancellationToken cancellationToken)
         {
 
             var shoppingCarts = await _appDbContext.ShoppingCarts
@@ -48,7 +48,7 @@ public class GetShoppingCartsByUserId : IRequest<ResModel>
             }
 
             var products = groupedCarts.SelectMany(cart => cart.Products)
-                .GroupBy(p => new { p.Id, p.Name, p.Model, p.Price })
+                .GroupBy(p => new { p.Id, p.Name, p.Model, p.Price, p.QuantityInStock })
                 .Select(g => new ProductsShoppinDTO
                 {
                     CartId = g.FirstOrDefault().ShoppingCarts.FirstOrDefault()?.Id ?? 0,
@@ -56,6 +56,7 @@ public class GetShoppingCartsByUserId : IRequest<ResModel>
                     Name = g.Key.Name,
                     Model = g.Key.Model,
                     Price = g.Key.Price,
+                    QuantyProductStock = g.Key.QuantityInStock,
                     QuantyProductCart = g.Sum(p => p.ShoppingCarts.FirstOrDefault()?.QuantyProduct ?? 0),
                     SumProductCart = g.Key.Price * g.Sum(p => p.ShoppingCarts.FirstOrDefault()?.QuantyProduct ?? 0),
                     Images = _mapper.Map<ICollection<ProductImagesDTO>>(g.FirstOrDefault()?.Images),

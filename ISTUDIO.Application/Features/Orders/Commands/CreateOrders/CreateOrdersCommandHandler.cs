@@ -2,7 +2,9 @@
 
 namespace ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
 
+using ISTUDIO.Application.Common.Interfaces;
 using ISTUDIO.Domain.EntityModel;
+using ISTUDIO.Domain.Models;
 using System.Threading;
 
 
@@ -11,11 +13,12 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
 {
     private readonly IAppDbContext _appDbContext;
     private readonly IFileStoreService _fileStoreService;
-
-    public CreateOrdersCommandHandler(IAppDbContext appDbContext, IFileStoreService fileStoreService)
+    private readonly ISmsNikitaService _smsNikitaService;
+    public CreateOrdersCommandHandler(IAppDbContext appDbContext, IFileStoreService fileStoreService, ISmsNikitaService smsNikitaService)
     {
         _appDbContext = appDbContext;
         _fileStoreService = fileStoreService;
+        _smsNikitaService = smsNikitaService;
     }
 
     public async Task<ResModel> Handle(CreateOrdersCommand command, CancellationToken cancellationToken)
@@ -53,7 +56,7 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                 PaymentMethod = command.PaymentMethod,
                 UserId = command.UserId,
                 ReceiptPhoto = photoFilePath,
-                CreateDate = DateTime.UtcNow
+                CreateDate = DateTime.Now
             };
 
             var orderAddress = new OrderAddressEntity

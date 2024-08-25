@@ -14,7 +14,6 @@ public class GetOrdersListQuery : IRequest<ResModel>
     {
         private readonly IAppDbContext _appDbContext;
         private readonly IMapper _mapper;
-
         public Handler (IAppDbContext appDbContext, IMapper mapper)
         {
             _appDbContext = appDbContext;

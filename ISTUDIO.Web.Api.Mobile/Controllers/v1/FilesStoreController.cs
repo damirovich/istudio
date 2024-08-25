@@ -33,10 +33,10 @@ public class FilesStoreController : BaseController
             // Ловим исключение, если файл не найден
             return StatusCode(StatusCodes.Status404NotFound, ex.Message);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             // Ловим любые другие исключения и возвращаем 500 ошибку сервера
-            return StatusCode(500);
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 }

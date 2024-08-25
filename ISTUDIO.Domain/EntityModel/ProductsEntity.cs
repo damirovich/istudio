@@ -31,11 +31,17 @@ public class ProductsEntity
     // Идентификатор скидки, к которой относится продукт
     public int? DiscountId { get; set; }
 
+    //Идентификатор магазина, к которой относится продукт
+    public int? MagazineId { get; set; }
+
     // Категория, к которой относится продукт
     public CategoryEntity Category { get; set; }
 
     // Скидка на продукт
     public DiscountEntity Discount { get; set; }
+   
+    //Магазины
+    public MagazineEntity Magazine { get; set; }
 
     // Коллекция изображений продукта
     public ICollection<ProductImagesEntity> Images { get; set; } = new List<ProductImagesEntity>();

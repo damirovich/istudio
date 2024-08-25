@@ -8,18 +8,18 @@
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>№ заказа</MudTh>
-        <MudTh>Клиент</MudTh>
-        <MudTh>Статус</MudTh>
-        <MudTh>Добавлено</MudTh>
-        <MudTh>Количество</MudTh>
-        <MudTh>Общая сумма</MudTh>
-        <MudTh>Адрес</MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Id" T="TableModel">№ заказа</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Customers" T="TableModel">Клиент</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Status" T="TableModel">Статус</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="CreatedDate" T="TableModel">Добавлено</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Quantity" T="TableModel">Количество</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="TotalAmount" T="TableModel">Общая сумма</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Address" T="TableModel">Адрес</MudTableSortLabel></MudTh>
         <MudTh>Действия</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="OrderNumber">@context.Id</MudTd>
-        <MudTd DataLabel="CustomerName">@context.CustomerName</MudTd>
+        <MudTd DataLabel="CustomerName">@context.UserPhoneNumber</MudTd>
         <MudTd DataLabel="Status">
             <MudSelect  Label="Статус" Dense="true" T="string" Variant="Variant.Text" Placeholder="Please Select" Required="true"
                        Value="context.Status" ValueChanged="value => UpdateStatus(context.Id, value)">
@@ -28,8 +28,8 @@
                 <MudSelectItem T="string" Value="@("OrderShipped")">Отправлено</MudSelectItem>
                 <MudSelectItem T="string" Value="@("OrderDelivered")">Доставлено</MudSelectItem>
                 <MudSelectItem T="string" Value="@("OrderCompleted")">Завершен</MudSelectItem>
-                <MudSelectItem T="string" Value="@("OrderCanceled")">Возврат</MudSelectItem>
-                <MudSelectItem T="string" Value="@("OrderReturned")">Отменен</MudSelectItem>
+                <MudSelectItem T="string" Value="@("OrderReturned")">Возврат</MudSelectItem>
+                <MudSelectItem T="string" Value="@("OrderCanceled")">Отменен</MudSelectItem>
             </MudSelect>
         </MudTd>
         <MudTd DataLabel="CreatedDate">@context.CreateDate.ToString("dd.MM.yyyy")</MudTd>
@@ -116,16 +116,50 @@
 
     private async Task<IEnumerable<TableModel>> FilterTableData(IEnumerable<TableModel> data, TableState state)
     {
-        // Add your filtering logic here if needed
-        return data;
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            return data;
+        }
+        var resSearch = await _mediatr.Send(new UIGetSearchOrdersQuery { PageNumber = state.Page, PageSize = state.PageSize, SearchTerm = searchText });
+
+        if (resSearch.Status)
+        {
+            totalItems = resSearch.Data.PageNumber;
+            Elements = (IEnumerable<TableModel>)resSearch.Data.Items;
+            _snackbar.Add($"Успешно!!! Количество найденных объектов: " + Elements.Count(), Severity.Success);
+        }
+        else
+        {
+            _snackbar.Add($"Инфо: Что-то пошло не так {resSearch.StatusMessage} ", Severity.Warning);
+        }
+
+        return Elements ?? Enumerable.Empty<TableModel>();
     }
 
     private void SortTableData(ref IEnumerable<TableModel> data, TableState state)
     {
         switch (state.SortLabel)
         {
-            case "Name":
-                data = data.OrderByDirection(state.SortDirection, o => o.CustomerName);
+            case "Id":
+                data = data.OrderByDirection(state.SortDirection, o => o.Id);
+                break;
+            case "Customers":
+                data = data.OrderByDirection(state.SortDirection, o => o.UserPhoneNumber);
+                break;
+            case "Status":
+                data = data.OrderByDirection(state.SortDirection, o => o.Status);
+                break;
+            case "CreatedDate":
+                data = data.OrderByDirection(state.SortDirection, o => o.CreateDate);
+                break;
+            case "Quantity":
+                data = data.OrderByDirection(state.SortDirection, o => o.TotalQuentyProduct);
+                break;
+            case "TotalAmount":
+                data = data.OrderByDirection(state.SortDirection, o => o.TotalAmount);
+                break;
+            case "Address":
+                data = data.OrderByDirection(state.SortDirection, o => o.ShippingAddress);
                 break;
         }
     }

@@ -6,14 +6,15 @@
             <MudNavLink Href="/categories" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.AccountTree">Категории</MudNavLink>
             <MudNavLink Href="/products" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.ProductionQuantityLimits">Управление продуктами</MudNavLink>
             <MudNavLink Href="/orders" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.QueryStats">Заказы</MudNavLink>
-            <MudNavLink Href="/accounts" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.ShoppingCart">Актуальные корзины</MudNavLink>
+            <MudNavLink Href="/shopcarts" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.ShoppingCart">Актуальные корзины</MudNavLink>
             <MudNavLink Href="/customers/identifications/table" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.VerifiedUser">Идентификация</MudNavLink>
             <MudNavLink Href="/customers" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.TwoTone.Groups">Клинеты</MudNavLink>
             <MudNavLink Href="/debt" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.Discount">Скидки</MudNavLink>
-            <MudNavLink Href="/promise" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.Shop">Магазины</MudNavLink>
+            <MudNavLink Href="/magazines" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.Shop">Магазины</MudNavLink>
             <MudNavLink Href="/verifiedClient" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.Payments">Способы оплаты</MudNavLink>
             <MudNavLink Href="/banners" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.PhotoLibrary">Баннеры</MudNavLink>
             <MudNavLink Href="/idenClient" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.FavoriteBorder">Акутальные списки желаний</MudNavLink>
+            <MudNavLink Href="/reports" Match="NavLinkMatch.All" IconColor="@IconColor" Icon="@Icons.Material.Filled.Assessment">Отчеты</MudNavLink>
             <MudNavGroup Title="@context.User.Claims.Where(c => c.Type.Equals(ClaimTypes.Name)).Select(c => c.Value).FirstOrDefault()" IconColor="@IconColor" Icon="@Icons.TwoTone.ManageAccounts">
                 <MudNavLink Href="/changepassword" IconColor="@IconColor" Icon="@Icons.TwoTone.Refresh">Смена пароля</MudNavLink>
                 <MudNavLink OnClick="Logout" IconColor="@IconColor" Icon="@Icons.TwoTone.Logout">Выйти</MudNavLink>

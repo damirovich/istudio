@@ -26,10 +26,30 @@ public class ShopingCartsController : BaseController
     {
         try
         {
-            return new CsmActionResult(await Mediator.Send(new GetShoppingCartsByUserId
+            return new CsmActionResult(await Mediator.Send(new GetShoppingCartsByUserIdQuery
             {
                 UserId = userId
             }));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Получение список продуктов в актуальном корзине
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetShoppingCarts()
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetActualShopCartsQuery()));
         }
         catch (Exception ex)
         {

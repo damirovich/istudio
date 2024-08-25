@@ -1,4 +1,6 @@
 ﻿
+using ISTUDIO.Application.Features.Products.Commands.AddPhotosProducts;
+using ISTUDIO.Application.Features.Products.Commands.DeletePhotosProducts;
 using ISTUDIO.Application.Features.Products.Commands.EditPhotosProducts;
 using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Application.Features.Products.Queries;
@@ -63,10 +65,12 @@ public class ProductImagesController : BaseController
 
                     var photoUrl = await _fileStoreService.SaveImage(fileByte);
 
+                    var fileName = Path.GetFileName(photoUrl);
+
                     productImages.Add(new ProductImagesDTO
                     {
                         Url = photoUrl,
-                        Name = $"image_{DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss")}.png",
+                        Name = fileName,
                         ContentType = "image/png",
                     });
                 }
@@ -92,6 +96,46 @@ public class ProductImagesController : BaseController
 
 
     /// <summary>
+    /// Добавление фото продукта 
+    /// </summary>
+    /// <param name="editPhoto"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ICsmActionResult> AddProductPhotos([FromBody] AddPhotosProductsVM addPhoto)
+    {
+        try
+        {
+            var fileByte = Convert.FromBase64String(addPhoto.ProductPhotos);
+
+            var photoUrl = await _fileStoreService.SaveImage(fileByte);
+            var fileName = Path.GetFileName(photoUrl);
+
+            var command = new AddPhotosProductsCommand
+            {
+                ProductId  = addPhoto.ProductId,
+                Photo = new ProductImagesDTO()
+                {
+                    Url = photoUrl,
+                    Name = fileName,
+                    ContentType = "image/png",
+                }
+            };
+
+            var result = await Mediator.Send(command);
+            if (result.Succeeded)
+                return new CsmActionResult(result);
+
+            return new CsmActionResult(result.Errors);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
     /// Изменение фото продукта по Id 
     /// </summary>
     /// <param name="editPhoto"></param>
@@ -106,6 +150,7 @@ public class ProductImagesController : BaseController
             var fileByte = Convert.FromBase64String(editPhoto.ProductPhotos);
 
             var photoUrl = await _fileStoreService.SaveImage(fileByte);
+            var fileName = Path.GetFileName(photoUrl);
 
             var command = new EditPhotosProductCommand
             {
@@ -113,9 +158,40 @@ public class ProductImagesController : BaseController
                 Photo = new ProductImagesDTO()
                 {
                     Url = photoUrl,
-                    Name = $"image_{DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss")}.png",
+                    Name = fileName,
                     ContentType = "image/png",
                 }
+            };
+
+            var result = await Mediator.Send(command);
+            if (result.Succeeded)
+                return new CsmActionResult(result);
+
+            return new CsmActionResult(result.Errors);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+
+
+    /// <summary>
+    /// Удаление фото продукта по Id 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ICsmActionResult> DeleteProductPhotos([FromQuery] int IdPhotoProduct)
+    {
+        try
+        {
+            var command = new DeletePhotosProductCommand
+            {
+                ProductImagesId = IdPhotoProduct
             };
 
             var result = await Mediator.Send(command);

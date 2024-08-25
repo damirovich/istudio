@@ -1,0 +1,108 @@
+﻿
+using ISTUDIO.Application.Features.Magazines.Commands.CreateMagazines;
+using ISTUDIO.Application.Features.Magazines.Commands.DeleteMagazines;
+using ISTUDIO.Application.Features.Magazines.Commands.EditMagazines;
+using ISTUDIO.Application.Features.Magazines.Queries;
+using ISTUDIO.Contracts.Features.Magazines;
+
+namespace ISTUDIO.Web.Api.Controllers.v1;
+
+[ApiVersion("1.0")]
+public class MagazinesController : BaseController
+{
+    private readonly IMapper _mapper;
+
+    public MagazinesController(IMapper mapper)
+    {
+        _mapper = mapper;
+    }
+
+
+    /// <summary>
+    /// Получение списка магазинов
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetMagazinesList()
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetMagazineListQuery()));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Добавление магазина
+    /// </summary>
+    /// <param name="magazine"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> CreateMagazine([FromBody] CreateMagazineVM magazine)
+    {
+        try
+        {
+            var command = _mapper.Map<CreateMagazinesCommand>(magazine);
+            var result = await Mediator.Send(command);
+            if (result.Succeeded)
+                return new CsmActionResult(result);
+
+            return new CsmActionResult(result.Errors);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Редактирование данных магазина
+    /// </summary>
+    /// <param name="magazine"></param>
+    /// <returns></returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> EditMagazine([FromBody] EditMagazineVM magazine)
+    {
+        try
+        {
+            var command = _mapper.Map<EditMagazinesCommand>(magazine);
+            var result = await Mediator.Send(command);
+            return new CsmActionResult(result);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Удаление данные магазина
+    /// </summary>
+    /// <param name="magazineId"></param>
+    /// <returns></returns>
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> DeleteMagazine([FromQuery] int magazineId)
+    {
+        try
+        {
+            var result = await Mediator.Send(new DeleteMagazinesCommand { MagazineId = magazineId });
+            return new CsmActionResult(result);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+}

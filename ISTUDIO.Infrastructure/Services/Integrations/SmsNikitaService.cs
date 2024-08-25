@@ -16,7 +16,10 @@ public class SmsNikitaService : ISmsNikitaService
     }
     public async Task<SmsNikitaResponseModel> SendSms(SmsNikitaRequestModel model)
     {
-        
+
+        model.Login = "istudiokg";
+        model.Password = "7oPbRH5u";
+        model.Sender = "marketkg";
         var xmlString = SerializeToXml(model);
         var content = new StringContent(xmlString, Encoding.UTF8, "application/xml");
 

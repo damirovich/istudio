@@ -2,16 +2,19 @@
 using ISTUDIO.Application.Features.Orders.Commands.EditOrders.AddReceoptPhoto;
 using ISTUDIO.Application.Features.Orders.Queries;
 using ISTUDIO.Contracts.Features.Orders;
+using ISTUDIO.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 
 public class OrdersController :BaseController
 {
     private readonly IMapper _mapper;
-
-    public OrdersController(IMapper mapper) =>
-            _mapper = mapper;
-
+    private readonly IAppDbContext _appDbContext;
+    private readonly IAppUserService _appUserService;
+    private readonly ISmsNikitaService _smsNikitaService;
+    public OrdersController(IMapper mapper, IAppDbContext appDbContext, IAppUserService appUserService, ISmsNikitaService smsNikitaService) =>
+            (_mapper, _appDbContext, _appUserService, _smsNikitaService) = (mapper, appDbContext, appUserService, smsNikitaService);
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -23,6 +26,27 @@ public class OrdersController :BaseController
             var command = _mapper.Map<CreateOrdersCommand>(orders);
 
             var result = await Mediator.Send(command);
+
+            var orderNotification = await _appDbContext.OrderNotificationRecipients.ToListAsync();
+
+            var user = await _appUserService.GetUserDetailsByUserIdAsync(orders.UserId);
+
+            var productList = string.Join("\n", orders.ProductOrders.Select(p =>
+                     $"Название: {p.Name}, Количество: {p.QuantyProductCart}, Модель : {p.Model} сом"));
+
+            var smsRequest = new SmsNikitaRequestModel
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Text = $"Новый заказ в marketkg\n" +
+                       $"Номер заказа {result.OrderId}\n" +
+                       $"Клиент {user.UserPhoneNumber} Товары: {productList}\n" +
+                       $"Общее количество про заказа {orders.TotalQuantyProduct}\n" +
+                       $"Дата заказа {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}",
+                Time = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                Phones = orderNotification.Select(o => o.PhoneNumber).ToArray()
+            };
+            
+            await _smsNikitaService.SendSms(smsRequest);
 
             return Ok(result);
         }

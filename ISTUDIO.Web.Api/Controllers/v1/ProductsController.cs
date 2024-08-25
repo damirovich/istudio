@@ -2,6 +2,7 @@
 using ISTUDIO.Application.Features.Products.Commands.DeleteProducts;
 using ISTUDIO.Application.Features.Products.Commands.EditPhotosProducts;
 using ISTUDIO.Application.Features.Products.Commands.EditProducts;
+using ISTUDIO.Application.Features.Products.Commands.UpdateProductQuantity;
 using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Application.Features.Products.Queries;
 using ISTUDIO.Contracts.Features.Products;
@@ -161,14 +162,17 @@ public class ProductsController : BaseController
             {
                 if (photo != null)
                 {
+                  
                     var fileByte = Convert.FromBase64String(photo);
 
                     var photoUrl = await _fileStoreService.SaveImage(fileByte);
 
+                    var fileName = Path.GetFileName(photoUrl);
+
                     productImages.Add(new ProductImagesDTO
                     {
                         Url = photoUrl,
-                        Name = $"image_{DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss")}.png",
+                        Name = fileName,
                         ContentType = "image/png",
                     });
                 }
@@ -188,6 +192,8 @@ public class ProductsController : BaseController
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
+
+  
     /// <summary>
     /// Редактирование продуктов
     /// </summary>
@@ -214,7 +220,33 @@ public class ProductsController : BaseController
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
-    
+
+    /// <summary>
+    /// Обновление количества продукта
+    /// </summary>
+    /// <param name="updateProductQuantityVM"></param>
+    /// <returns></returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> UpdateProductQuantity([FromBody] UpdateProductQuantityVM updateProductQuantityVM)
+    {
+        try
+        {
+            var command = _mapper.Map<UpdateProductQuantityCommand>(updateProductQuantityVM);
+
+            var result = await Mediator.Send(command);
+            if (result.Succeeded)
+                return new CsmActionResult(result);
+
+            return new CsmActionResult(result.Errors);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
     // <summary>
     /// Удаление данных продукта
     /// </summary>

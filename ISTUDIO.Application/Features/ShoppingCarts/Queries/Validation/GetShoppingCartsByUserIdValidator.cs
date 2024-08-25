@@ -1,6 +1,6 @@
 ﻿namespace ISTUDIO.Application.Features.ShoppingCarts.Queries.Validation;
 
-public class GetShoppingCartsByUserIdValidator : AbstractValidator<GetShoppingCartsByUserId>
+public class GetShoppingCartsByUserIdValidator : AbstractValidator<GetShoppingCartsByUserIdQuery>
 {
     public GetShoppingCartsByUserIdValidator()
     {

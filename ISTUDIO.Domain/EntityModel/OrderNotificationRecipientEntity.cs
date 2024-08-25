@@ -1,0 +1,9 @@
+﻿namespace ISTUDIO.Domain.EntityModel;
+
+public class OrderNotificationRecipientEntity
+{
+    public int Id { get; set; }
+    public string FullName { get; set; }
+    public string PhoneNumber { get; set; }
+    public int Status { get; set; }
+}

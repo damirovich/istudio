@@ -3,7 +3,11 @@
 @attribute [Authorize]
 
 
-<EditPhotosProductForm ProductImages="@ProductImages" UploadAllPhotos="UploadAllPhotos" UploadPhoto="UploadPhoto" />
+<EditPhotosProductForm ProductImages="@ProductImages" 
+                       UploadAllPhotos="UploadAllPhotos" 
+                       UploadPhoto="UploadPhoto"
+                       UploadNewPhoto="UploadNewPhotosProduct"
+                       DeletePhotosProduct="DeletePhotosProduct" />
 
 @using ISTUDIO.Application.Features.Products.DTOs
 @using ISTUDIO.Contracts.Features.Products
@@ -73,10 +77,34 @@
             _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
         }
 
-         StateHasChanged();
-
+        StateHasChanged();
     }
-    private async void UploadAllPhotos(IReadOnlyList<IBrowserFile> files)
+
+    private async Task DeletePhotosProduct(int id)
+    {
+        try
+        {
+            var resDelPhotoProduct = await _mediatr.Send(new UIDeletePhotosProductCommand
+                {
+                    ProductPhotoId = id
+                });
+
+            if (resDelPhotoProduct.Status)
+            {
+                await GetPhotosProductById(Id);
+                StateHasChanged();
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resDelPhotoProduct.StatusMessage}", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+    private async Task UploadAllPhotos(IReadOnlyList<IBrowserFile> files)
     {
         var productPhotos = new List<string>();
         foreach (var item in files)
@@ -91,6 +119,37 @@
                 {
 
                     ProductImages = new EditAllPhotosProductVM() { ProductId = Id, ProductPhotos = productPhotos }
+                });
+
+            if (resPhotosProductUp.Status)
+            {
+                await GetPhotosProductById(Id);
+                StateHasChanged();
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resPhotosProductUp.StatusMessage}", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task UploadNewPhotosProduct(IBrowserFile photo)
+    {
+       
+        var fileBase64 = await ConvertFileToBase64(photo);
+          
+        try
+        {
+            var resPhotosProductUp = await _mediatr.Send(new UIAddPhotosProductsCommand
+                {
+
+                    PhotosProducts = new AddPhotosProductsVM() { ProductId = Id, ProductPhotos = fileBase64 }
                 });
 
             if (resPhotosProductUp.Status)

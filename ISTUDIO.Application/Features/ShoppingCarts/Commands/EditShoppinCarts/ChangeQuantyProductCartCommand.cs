@@ -35,8 +35,8 @@ public class ChangeQuantyProductCartCommand : IRequest<ResModel>
             var product = shoppingCart.Products.FirstOrDefault();
             if (product == null)
                 throw new NotFoundException("Товар не найден в корзине.");
-            int quantyCart = shoppingCart.QuantyProduct + command.QuantyProduct;
-            if (product.QuantityInStock < quantyCart)
+            
+            if (product.QuantityInStock < command.QuantyProduct)
                 throw new BadRequestException($"Недостаточно количество продукта. {product.Name} Доступный количество продуктов: {product.QuantityInStock}");
 
             shoppingCart.QuantyProduct = command.QuantyProduct;

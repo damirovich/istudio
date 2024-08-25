@@ -26,6 +26,7 @@ public class DeleteDiscountsCommand : IRequest<ResModel>
                     return ResModel.Failure(new[] { "Discounts не найден" });
 
                 _appDbContext.Discounts.Remove(existingDiscounts);
+
                 await _appDbContext.SaveChangesAsync(cancellationToken);
 
                 return ResModel.Success();

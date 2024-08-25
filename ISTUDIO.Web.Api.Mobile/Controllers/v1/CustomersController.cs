@@ -34,6 +34,7 @@ public class CustomersController : BaseController
                 if (photo != null)
                 {
                     var fileByte = await HelperServices.ConvertToByteArrayAsync(photo);
+
                     var photoUrl = await _fileStoreService.SaveImage(fileByte);
 
                     // Другие свойства из объекта IFormFile

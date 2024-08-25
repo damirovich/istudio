@@ -1,0 +1,149 @@
+﻿
+<MudTable Elevation="25" ServerData="@(new Func<TableState, Task<TableData<TableModel>>>(ServerReload))"
+          Loading="true" Dense="true" Striped="true" Hover="true" Height="650px" HorizontalScrollbar="true" FixedHeader="true"
+          @ref="table">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Магазины</MudText>
+        <MudSpacer />
+
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Фото</MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Id" T="TableModel">№</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Name" T="TableModel">Наименование</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Description" T="TableModel">Описание</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Address" T="TableModel">Адрес</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="PhoneNumber" T="TableModel">Номер телефон</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd> <img src="@GetImageBase64(@context.PhotoLogoURL)" alt="Magazine Photo" style="width: 58px; height: 48px; margin-bottom: 3px; margin-right: 5px;" /> </MudTd>
+        <MudTd DataLabel="Status">@context.Id</MudTd>
+        <MudTd DataLabel="Category">@context.Name</MudTd>
+        <MudTd DataLabel="Discount">@context.Description</MudTd>
+        <MudTd DataLabel="Product">@context.Address</MudTd>
+        <MudTd DataLabel="Product">@context.PhoneNumber</MudTd>
+        <div style="justify-self: end;">
+            <MudTd><MudIconButton Href="@($"magazine/edit/{context.Id}")" Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" /></MudTd>
+            <MudTd> <MudIconButton OnClick="async() => await DeleteMagazines(context.Id)" Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" /></MudTd>
+        </div>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>Здесь никого нет!...</MudText>
+        <MudProgressCircular Color="Color.Primary" Size="Size.Medium" Indeterminate="_processing" />
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>ищем...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] {5, 15, 25,50, 100}" />
+    </PagerContent>
+</MudTable>
+
+
+
+@using ISTUDIO.Web.UI.Features.Magazine.Commands
+@using ISTUDIO.Web.UI.Features.Magazine.Queries;
+@using TableModel = ISTUDIO.Application.Features.Magazines.DTOs.MagazineDTO;
+@code {
+
+    private IEnumerable<TableModel> pagedData;
+    private MudTable<TableModel> table;
+    IEnumerable<TableModel> Elements = new List<TableModel>();
+
+
+    private bool _processing = false;
+    private int totalItems;
+    private string serachText = string.Empty;
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        // table.SetRowsPerPage(5);
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task<TableData<TableModel>> ServerReload(TableState state)
+    {
+        try
+        {
+            var resMagazines = await _mediatr.Send(new UIGetMagazinesQuery());
+            if (resMagazines.Status)
+            {
+                totalItems = resMagazines.Data.Magazines.Count;
+                Elements = (IEnumerable<TableModel>)resMagazines.Data.Magazines;
+                _snackbar.Add($"Успешно!!! Количество найденных объектов: " + Elements.Count(), Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resMagazines.StatusMessage} ", Severity.Warning);
+            }
+            var data = Elements;
+
+            SortTableData(ref data, state);
+
+            return new TableData<TableModel>() { TotalItems = totalItems, Items = data };
+
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message} ", Severity.Error);
+            return new TableData<TableModel>() { TotalItems = totalItems, Items = pagedData };
+        }
+    }
+    public string GetImageBase64(string imageUrl)
+    {
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
+
+        return $"data:image/png;base64,{baseFile64.FileBase64}";
+
+    }
+
+
+    //Сортировка списка
+    private void SortTableData(ref IEnumerable<TableModel> data, TableState state)
+    {
+        switch (state.SortLabel)
+        {
+            case "Name":
+                data = data.OrderByDirection(state.SortDirection, o => o.Name);
+                break;
+        }
+    }
+
+    private async Task DeleteMagazines(int magezineId)
+    {
+        var dialogParameters = new DialogParameters
+            {
+                { "ContentText", $"Вы действительно хотите удалить эти данные? Этот процесс нельзя отменить." },
+                { "ButtonText", "Удалить" },
+                { "ItemName", "Baner" },
+                { "Color", Color.Error }
+            };
+
+        var dialogOptions = new DialogOptions()
+            {
+                Position = DialogPosition.TopCenter,
+                CloseButton = true,
+                DisableBackdropClick = true
+            };
+
+        var dialog = _dialogService.Show<DeleteDialog>("Удалить", dialogParameters, dialogOptions);
+        var resDialog = await dialog.Result;
+
+        if (!resDialog.Canceled)
+        {
+            var resDeleteMagazine = await _mediatr.Send(new UIDeleteMagazinesCommand { MagazineId = magezineId });
+
+            if (resDeleteMagazine.Status)
+            {
+                _snackbar.Add($"Успешно!!! {resDeleteMagazine.Data.Succeeded}", Severity.Success);
+                await table.ReloadServerData();
+            }
+            else
+                _snackbar.Add($"Инфо: Что-то пошло не так {resDeleteMagazine.StatusMessage}", Severity.Warning);
+
+        }
+
+    }
+}

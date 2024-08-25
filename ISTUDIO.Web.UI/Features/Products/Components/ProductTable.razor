@@ -1,34 +1,53 @@
-﻿
-<MudTable Elevation="25" ServerData="@(new Func<TableState, Task<TableData<TableModel>>>(ServerReload))"
-          Loading="true" Dense="true" Striped="true" Hover="true" Height="650px" HorizontalScrollbar="true" FixedHeader="true"
+﻿<MudTable Elevation="25" ServerData="@(new Func<TableState, Task<TableData<TableModel>>>(ServerReload))"
+          Loading="@_processing" Dense="true" Striped="true" Hover="true" Height="650px" HorizontalScrollbar="true" FixedHeader="true"
           @ref="table">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Продукты</MudText>
         <MudSpacer />
-        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Поиск" Adornment="Adornment.Start"
+        <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Placeholder="Поиск" Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>Фото</MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Id" T="TableModel">№</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="Name" T="TableModel">Наименование</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="Model" T="TableModel">Модель</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="ColorProduct" T="TableModel">Цвет продукта</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="Price" T="TableModel">Цена</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="QuantityInStock" T="TableModel">Количество</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="Description" T="TableModel">Описание</MudTableSortLabel></MudTh>
-
+        <MudTh>Действия</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd> <img src="@GetImageBase64(@context.Images.FirstOrDefault()?.Url)" alt="Product Photo" style="width: 28px; height: 28px; margin-bottom: 3px; margin-right: 5px;" /> </MudTd>
+        <MudTd>
+            <img src="@GetImageBase64(@context.Images.FirstOrDefault()?.Url)" alt="Product Photo" style="width: 28px; height: 28px; margin-bottom: 3px; margin-right: 5px;" />
+        </MudTd>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Model">@context.Model</MudTd>
+        <MudTd DataLabel="ColorProduct">@context.Color</MudTd>
         <MudTd DataLabel="Price">@context.Price</MudTd>
-        <MudTd DataLabel="QuantityInStock">@context.QuantityInStock</MudTd>
-        <MudTd DataLabel="Description">@context.Description</MudTd>
-        <div style="justify-self: end;">
-            <MudTd><MudIconButton Href="@($"products/edit/photos/{context.Id}")" Icon="@Icons.Material.Filled.AddAPhoto" Size="Size.Medium" Color="Color.Inherit" /></MudTd>
-            <MudTd><MudIconButton Href="@($"products/edit/{context.Id}")" Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" /></MudTd>
-            <MudTd> <MudIconButton OnClick="async() => await DeleteProducts(context.Id, context.Name)" Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" /></MudTd>
-        </div>
+        <MudTd DataLabel="QuantityInStock">
+            <MudTextField T="int" @bind-Value="@context.QuantityInStock" Immediate="true" OnBlur="@(() => UpdateProductQuantity(context.Id, context.Name, context.QuantityInStock))" />
+        </MudTd>
+        <MudTd DataLabel="Description">
+            <MudText Typo="Typo.body2" Style="@(IsExpanded.ContainsKey(context.Id) && IsExpanded[context.Id] ? null : "display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;")">
+                @context.Description
+            </MudText>
+            @if (!IsExpanded.ContainsKey(context.Id) || !IsExpanded[context.Id])
+            {
+                <MudButton Variant="Variant.Text" OnClick="@(() => ToggleExpand(context.Id))">Показать больше</MudButton>
+            }
+            else
+            {
+                <MudButton Variant="Variant.Text" OnClick="@(() => ToggleExpand(context.Id))">Показать меньше</MudButton>
+            }
+        </MudTd>
+        <MudTd>
+            <MudIconButton Href="@($"products/edit/photos/{context.Id}")" Icon="@Icons.Material.Filled.AddAPhoto" Size="Size.Medium" Color="Color.Inherit" />
+            <MudIconButton Href="@($"products/edit/{context.Id}")" Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" />
+            <MudIconButton OnClick="async() => await DeleteProducts(context.Id, context.Name)" Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" />
+        </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         <MudText>Здесь никого нет!...</MudText>
@@ -38,30 +57,38 @@
         <MudText>ищем...</MudText>
     </LoadingContent>
     <PagerContent>
-        <MudTablePager PageSizeOptions="new int[] {10, 15, 25,50, 100}" />
+        <MudTablePager PageSizeOptions="new int[] {10, 15, 25, 50, 100}" />
     </PagerContent>
 </MudTable>
 
-
+@using ISTUDIO.Application.Features.Products.Commands.UpdateProductQuantity
 @using ISTUDIO.Application.Features.Products.Queries
+@using ISTUDIO.Contracts.Features.Products
 @using ISTUDIO.Web.UI.Features.Products.Commands
 @using ISTUDIO.Web.UI.Features.Products.Queries
 @using TableModel = ISTUDIO.Application.Features.Products.DTOs.ProductsResponseDTO;
-@code {
 
+@code {
     private IEnumerable<TableModel> pagedData;
     private MudTable<TableModel> table;
     IEnumerable<TableModel> Elements = new List<TableModel>();
-
 
     private bool _processing = false;
     private int totalItems;
     private string serachText = string.Empty;
 
+    private Dictionary<int, bool> IsExpanded = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        foreach (var product in Elements)
+        {
+            IsExpanded[product.Id] = false;
+        }
+    }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        // table.SetRowsPerPage(5);
         return base.OnAfterRenderAsync(firstRender);
     }
 
@@ -69,7 +96,6 @@
     {
         try
         {
-
             var resProducts = await _mediatr.Send(new UIGetProductsListQuery { PageNumber = state.Page, PageSize = state.PageSize });
             if (resProducts.Status)
             {
@@ -82,12 +108,9 @@
                 _snackbar.Add($"Инфо: Что-то пошло не так {resProducts.StatusMessage} ", Severity.Warning);
             }
             var data = Elements;
-            // Поиск в таблице
             data = await FilterTableData(data, state);
             SortTableData(ref data, state);
-
             return new TableData<TableModel>() { TotalItems = totalItems, Items = data };
-
         }
         catch (Exception ex)
         {
@@ -95,13 +118,12 @@
             return new TableData<TableModel>() { TotalItems = totalItems, Items = pagedData };
         }
     }
+
     public string GetImageBase64(string imageUrl)
     {
         var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
         var baseFile64 = resHttpReq.Result;
-
         return $"data:image/png;base64,{baseFile64.FileBase64}";
-
     }
 
     private async Task OnSearch(string text)
@@ -109,12 +131,23 @@
         serachText = text;
         await table.ReloadServerData();
     }
-    private async Task<IEnumerable<TableModel>> FilterTableData(IEnumerable<TableModel> data, TableState state)
 
+    private void ToggleExpand(int productId)
+    {
+        if (!IsExpanded.ContainsKey(productId))
+        {
+            IsExpanded[productId] = true;
+        }
+        else
+        {
+            IsExpanded[productId] = !IsExpanded[productId];
+        }
+    }
+
+    private async Task<IEnumerable<TableModel>> FilterTableData(IEnumerable<TableModel> data, TableState state)
     {
         if (string.IsNullOrWhiteSpace(serachText))
         {
-            // Если поисковый термин пуст или состоит только из пробелов, возвращаем исходные данные
             return data;
         }
 
@@ -131,10 +164,9 @@
             _snackbar.Add($"Инфо: Что-то пошло не так {resSearch.StatusMessage} ", Severity.Warning);
         }
 
-        // Возвращаем данные из запроса к базе данных или пустой набор данных, если запрос не удался
         return Elements ?? Enumerable.Empty<TableModel>();
     }
-    //Сортировка списка
+
     private void SortTableData(ref IEnumerable<TableModel> data, TableState state)
     {
         switch (state.SortLabel)
@@ -145,18 +177,41 @@
         }
     }
 
-   
+    private async Task UpdateProductQuantity(int productId, string productName, int newQuantity)
+    {
+        var command = new UIUpdateProductQuantityCommand
+            {
+                ProductQuantityUpdate = new UpdateProductQuantityVM
+                {
+                    ProductId = productId,
+                    ProductQuantity = newQuantity
+                }
+            };
+
+        var result = await _mediatr.Send(command);
+
+        if (result.Status)
+        {
+            _snackbar.Add($"Количество успешно обновлено! Продукт {productName} на {newQuantity}", Severity.Success);
+            await table.ReloadServerData();
+        }
+        else
+        {
+            _snackbar.Add($"Ошибка: Не удалось обновить количество Продукта {productName} {string.Join(", ", result.StatusMessage)}", Severity.Error);
+        }
+    }
+
     private async Task DeleteProducts(int productsId, string Name)
     {
         var dialogParameters = new DialogParameters
-            {
-                { "ContentText", $"Вы действительно хотите удалить эти данные? Этот процесс нельзя отменить. Продукт {Name}" },
-                { "ButtonText", "Удалить" },
-                { "ItemName", Name },
-                { "Color", Color.Error }
-            };
+        {
+            { "ContentText", $"Вы действительно хотите удалить эти данные? Этот процесс нельзя отменить. Продукт {Name}" },
+            { "ButtonText", "Удалить" },
+            { "ItemName", Name },
+            { "Color", Color.Error }
+        };
 
-        var dialogOptions = new DialogOptions()
+        var dialogOptions = new DialogOptions
             {
                 Position = DialogPosition.TopCenter,
                 CloseButton = true,
@@ -176,9 +231,10 @@
                 await table.ReloadServerData();
             }
             else
+            {
                 _snackbar.Add($"Инфо: Что-то пошло не так {resDelProducts.StatusMessage}", Severity.Warning);
-
+            }
         }
-
     }
+  
 }

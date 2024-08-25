@@ -143,7 +143,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 17, 12, 20, 31, 443, DateTimeKind.Utc).AddTicks(3556));
+                        .HasDefaultValue(new DateTime(2024, 8, 22, 12, 22, 34, 870, DateTimeKind.Utc).AddTicks(7907));
 
                     b.Property<int?>("CustomerId")
                         .IsRequired()
@@ -410,6 +410,51 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("InvoiceEntity");
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.MagazineEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PhotoLogoURL")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Magazines", (string)null);
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderAddressEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -499,9 +544,12 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 17, 12, 20, 31, 445, DateTimeKind.Utc).AddTicks(8097));
+                        .HasDefaultValue(new DateTime(2024, 8, 22, 12, 22, 34, 873, DateTimeKind.Utc).AddTicks(2200));
 
                     b.Property<int?>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MagazineId")
                         .HasColumnType("int");
 
                     b.Property<string>("PaymentMethod")
@@ -534,7 +582,38 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
+                    b.HasIndex("MagazineId");
+
                     b.ToTable("Orders", (string)null);
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderNotificationRecipientEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FullName", "PhoneNumber")
+                        .IsUnique();
+
+                    b.ToTable("OrderNotificationRecipients", (string)null);
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderStatusHistoryEntity", b =>
@@ -548,7 +627,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("ChangeDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 17, 12, 20, 31, 455, DateTimeKind.Utc).AddTicks(4271));
+                        .HasDefaultValue(new DateTime(2024, 8, 22, 12, 22, 34, 882, DateTimeKind.Utc).AddTicks(8968));
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -671,13 +750,16 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 17, 12, 20, 31, 451, DateTimeKind.Utc).AddTicks(4609));
+                        .HasDefaultValue(new DateTime(2024, 8, 22, 12, 22, 34, 878, DateTimeKind.Utc).AddTicks(4616));
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MagazineId")
                         .HasColumnType("int");
 
                     b.Property<string>("Model")
@@ -705,6 +787,8 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
+                    b.HasIndex("MagazineId");
+
                     b.ToTable("Products", (string)null);
                 });
 
@@ -716,6 +800,9 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("MagazineId")
+                        .HasColumnType("int");
+
                     b.Property<int>("QuantyProduct")
                         .HasColumnType("int");
 
@@ -724,6 +811,8 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MagazineId");
 
                     b.ToTable("ShoppingCarts", (string)null);
                 });
@@ -835,7 +924,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 6, 17, 12, 20, 31, 443, DateTimeKind.Utc).AddTicks(890));
+                        .HasDefaultValue(new DateTime(2024, 8, 22, 12, 22, 34, 870, DateTimeKind.Utc).AddTicks(5154));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)
@@ -1221,6 +1310,15 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.MagazineEntity", "Magazine")
+                        .WithMany("Orders")
+                        .HasForeignKey("MagazineId");
+
+                    b.Navigation("Magazine");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderStatusHistoryEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.OrderEntity", "Order")
@@ -1246,7 +1344,7 @@ namespace ISTUDIO.Infrastructure.Migrations
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductImagesEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", "Products")
-                        .WithMany("Photo")
+                        .WithMany("Images")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1266,9 +1364,24 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasForeignKey("DiscountId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("ISTUDIO.Domain.EntityModel.MagazineEntity", "Magazine")
+                        .WithMany("Products")
+                        .HasForeignKey("MagazineId");
+
                     b.Navigation("Category");
 
                     b.Navigation("Discount");
+
+                    b.Navigation("Magazine");
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ShoppingCartEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.MagazineEntity", "Magazine")
+                        .WithMany("ShoppingCarts")
+                        .HasForeignKey("MagazineId");
+
+                    b.Navigation("Magazine");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaResponse", b =>
@@ -1399,6 +1512,15 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("InvoiceDetails");
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.MagazineEntity", b =>
+                {
+                    b.Navigation("Orders");
+
+                    b.Navigation("Products");
+
+                    b.Navigation("ShoppingCarts");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderEntity", b =>
                 {
                     b.Navigation("Details");
@@ -1420,7 +1542,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                 {
                     b.Navigation("Baners");
 
-                    b.Navigation("Photo");
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaRequest", b =>

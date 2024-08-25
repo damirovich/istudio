@@ -10,6 +10,8 @@ public class ShoppingCartEntity
 
     public int QuantyProduct {  get; set; }
 
+    public int? MagazineId { get; set; }
+    public MagazineEntity Magazine { get; set; }
     // Список Продуктов
     public ICollection<ProductsEntity> Products { get; set; } = new List<ProductsEntity>();
 }

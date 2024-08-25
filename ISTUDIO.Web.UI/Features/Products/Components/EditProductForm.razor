@@ -85,7 +85,7 @@
                                       OnAdornmentClick="@(() => multilineReference.SelectRangeAsync(2,10))" />
                     </MudItem>
                     <MudItem xs="12" sm="12" md="6">
-                        <EditProductFileUpload UploadFiles="UploadFile"  />
+                        @* <EditProductFileUpload UploadFiles="UploadFile"  /> *@
                     </MudItem>
 
                 </MudGrid>
@@ -244,23 +244,5 @@
         return null; // Категория не найдена
     }
 
-    private async void UploadFile(IReadOnlyList<IBrowserFile> files)
-    {
-        foreach (var item in files)
-        {
-            var fileBase64 = await ConvertFileToBase64(item);
-           // Product.ProductPhotos.Add(fileBase64);
-        }
-    }
-
-    private async Task<string> ConvertFileToBase64(IBrowserFile file)
-    {
-        using (var stream = file.OpenReadStream(maxAllowedSize: 512 * 5120))
-        using (var memoryStream = new MemoryStream())
-        {
-            await stream.CopyToAsync(memoryStream);
-            var bytes = memoryStream.ToArray();
-            return Convert.ToBase64String(bytes);
-        }
-    }
+   
 }

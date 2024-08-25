@@ -1,5 +1,4 @@
-﻿
-<table class="table table-bordered">
+﻿<table class="table table-bordered">
     <thead>
         <tr>
             @foreach (var image in ProductImages)
@@ -13,7 +12,7 @@
             @foreach (var image in ProductImages)
             {
                 <td>
-                    <img src="@GetImageBase64(image.Url)" class="img-fluid" alt="Product Image" style="max-width: 200px; max-height: 200px;">
+                    <img src="@GetImageBase64(image.Url)" class="img-fluid" alt="Product Image" style="max-width: 400px; max-height: 300px;">
                 </td>
             }
         </tr>
@@ -21,24 +20,41 @@
             @foreach (var image in ProductImages)
             {
                 <td>
-                    <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="@(async(files) => await Upload(files, image.Id))">
-                        <ButtonTemplate>
-                            <MudButton HtmlTag="label"
-                                       Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.CloudUpload"
-                                       for="@fileInput">
-                                Загрузить фото
-                            </MudButton>
-                        </ButtonTemplate>
-                    </MudFileUpload>
-
-
+                    <div style="display: flex; gap: 10px;">
+                        <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="@(async(files) => await Upload(files, image.Id))">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                                           for="@fileInput">
+                                    Изменить фото
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                        <MudIconButton OnClick="async() => await DeletePhotos(image.Id)" Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Error" />
+                    </div>
                 </td>
             }
         </tr>
+        <tr>
+            <div style="display: flex; gap: 10px;">
+                <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="@(async(files) => await UploadNewPhotoProduct(files))">
+                    <ButtonTemplate>
+                        <MudButton HtmlTag="label"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload"
+                                   for="@fileInput">
+                            Добавить новую фото
+                        </MudButton>
+                    </ButtonTemplate>
+                </MudFileUpload>
+            </div>
+        </tr>
     </tbody>
 </table>
+
 
 
 <MudItem xs="12" sm="12" md="6">
@@ -51,24 +67,30 @@
 @using ISTUDIO.Web.UI.Features.Products.Models
 @code {
     [Parameter] public List<ProductImagesDTO> ProductImages { get; set; }
-   // [Parameter] public int ProductId { get; set; }
+    //[Parameter] public int ProductId { get; set; }
     [Parameter] public EventCallback<PhotoUploadEventArgs> UploadPhoto { get; set; }
     [Parameter] public EventCallback<IReadOnlyList<IBrowserFile>> UploadAllPhotos { get; set; }
+    [Parameter] public EventCallback<IBrowserFile> UploadNewPhoto { get; set; }
+    [Parameter] public EventCallback<int> DeletePhotosProduct { get; set; }
 
-    private async void UploadFile(IReadOnlyList<IBrowserFile> files)
+    private async Task UploadFile(IReadOnlyList<IBrowserFile> files)
     {
         await UploadAllPhotos.InvokeAsync(files);
     }
 
-   
-    public string GetImageBase64(string imageUrl)
+    private async Task UploadNewPhotoProduct(IBrowserFile photo)
     {
-        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
-        var baseFile64 = resHttpReq.Result;
+        await UploadNewPhoto.InvokeAsync(photo);
 
-        return "data:image/jpeg;base64," + baseFile64.FileBase64;
-
+        _snackbar.Add($"Успешно!!! Фотография загружена", MudBlazor.Severity.Success);
     }
+
+    public async Task DeletePhotos(int? id)
+    {
+        await DeletePhotosProduct.InvokeAsync((int)id);    
+    }
+
+  
     private async Task Upload(IBrowserFile file, int? Id)
     {
         var photoProduct = new PhotoUploadEventArgs() { PhotoProduct = file, ProductId = Id!.Value };
@@ -76,5 +98,11 @@
         _snackbar.Add($"Успешно!!! Фотография загружена", MudBlazor.Severity.Success);
     }
 
+    public string GetImageBase64(string imageUrl)
+    {
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
 
+        return "data:image/jpeg;base64," + baseFile64.FileBase64;
+    }
 }

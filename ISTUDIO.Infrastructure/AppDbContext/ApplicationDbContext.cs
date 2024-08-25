@@ -29,6 +29,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<OrderAddressEntity> OrderAddresses { get; set; }
     public DbSet<BannerEntity> Banners { get; set; }
     public DbSet<OrderStatusHistoryEntity> OrderStatusHistories { get; set; }
+    public DbSet<MagazineEntity> Magazines { get; set; }
+    public DbSet<OrderNotificationRecipientEntity> OrderNotificationRecipients { get; set; }
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
     protected override void OnModelCreating(ModelBuilder builder)
@@ -65,5 +67,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new OrderAddressConfiguration());
         builder.ApplyConfiguration(new BannerEntityConfiguration());
         builder.ApplyConfiguration(new OrderStatusHistoryConfiguration());
+        builder.ApplyConfiguration(new MagazineEntityConfiguration());
+        builder.ApplyConfiguration(new OrderNotificationRecipientConfiguration());
     }   
 }

@@ -25,8 +25,9 @@ public class OrderEntity
     // Идентификатор пользователя, сделавшего этот заказ
     public string UserId { get; set; }
     public int? InvoiceId { get; set; }
+    public int? MagazineId { get; set; }
     public InvoiceEntity Invoice { get; set; }
-
+    public MagazineEntity Magazine { get; set; }
     public ICollection<ProductsEntity> Products { get; set; } = new List<ProductsEntity>();
     public ICollection<OrderDetailEntity> Details { get; set; } = new HashSet<OrderDetailEntity>();
     public ICollection<CustomersEntity> Customers { get; set; } = new List<CustomersEntity>();

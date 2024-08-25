@@ -2,17 +2,23 @@
 using ISTUDIO.Application.Features.Orders.Commands.DeleteOrders;
 using ISTUDIO.Application.Features.Orders.Commands.EditOrders.AddReceoptPhoto;
 using ISTUDIO.Application.Features.Orders.Commands.EditOrders.UpdateStatusOrders;
+using ISTUDIO.Application.Features.Orders.DTOs;
 using ISTUDIO.Application.Features.Orders.Queries;
 using ISTUDIO.Contracts.Features.Orders;
+using ISTUDIO.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using StackExchange.Redis;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Globalization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
-public class OrdersController :BaseController
+public class OrdersController : BaseController
 {
     private readonly IMapper _mapper;
-
-    public OrdersController(IMapper mapper) =>
-            _mapper = mapper;
+    private readonly UserManager<AppUser> _userManager;
+    public OrdersController(IMapper mapper, UserManager<AppUser> userManager) =>
+            (_mapper, _userManager) = (mapper, userManager);
 
 
     /// <summary>
@@ -84,14 +90,113 @@ public class OrdersController :BaseController
     {
         try
         {
-            return new CsmActionResult(await Mediator.Send(new GetOrdersListQuery
+            var order = await Mediator.Send(new GetOrdersListQuery
             {
                 Parameters = new PaginatedParameters
                 {
                     PageNumber = page.PageNumber,
                     PageSize = page.PageSize
                 }
-            }));
+            });
+
+            foreach (var item in order.Items)
+            {
+                var user = await _userManager.FindByIdAsync(item.UserId);
+                item.UserPhoneNumber = user?.PhoneNumber;
+            }
+
+            return new CsmActionResult(order);
+
+
+        }
+        catch (NotFoundException ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Поиск в заказа
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetSearchOrders([FromQuery] PaginatedListVM page, string searchTerm)
+    {
+        try
+        {
+            var orders = await Mediator.Send(new GetSearchOrdersQuery
+            {
+                Parameters = new PaginationWithSearchParameters
+                {
+                    PageNumber = page.PageNumber,
+                    PageSize = page.PageSize,
+                    SearchTerm = searchTerm
+                }
+            });
+            bool isDateSearch = false;
+            DateTime searchDate;
+
+            // Список поддерживаемых форматов дат
+            string[] dateFormats = new[]
+            {
+                "dd-MM-yyyy",  "dd.MM.yyyy",    // День Месяц Год
+                "yyyy-MM-dd",  "yyyy.MM.dd",    // Год Месяц День
+                "MM-dd-yyyy",  "MM.dd.yyyy"     // Месяц День Год
+            };
+            // Массив статусов для проверки
+            var statusMapping = new Dictionary<string, string>
+            {
+                { "Новый", "OrderProcessing" },     { "новый", "OrderProcessing" },
+                { "Оплачен", "OrderPaid" },         { "оплачен", "OrderPaid" },
+                { "Отправлено", "OrderShipped" },   { "отправлено", "OrderShipped" },
+                { "Доставлено", "OrderDelivered" }, { "доставлено", "OrderDelivered" },
+                { "Завершен", "OrderCompleted" },   { "завершен", "OrderCompleted" },
+                { "Возврат", "OrderReturned" },     { "возврат", "OrderReturned" },
+                { "Отменен", "OrderCanceled" },     { "отменен", "OrderCanceled" }
+            };
+
+            // Пытаемся распознать дату в любом из указанных форматов
+            isDateSearch = DateTime.TryParseExact(searchTerm, dateFormats,
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out searchDate);
+
+            // Получение номеров телефонов пользователей для каждого заказа
+            foreach (var item in orders)
+            {
+                var user = await _userManager.FindByIdAsync(item.UserId);
+                item.UserPhoneNumber = user?.PhoneNumber;
+            }
+
+            // Фильтрация заказов по номеру телефона
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                // Проверка, является ли searchTerm пользовательским представлением статуса
+                var internalStatus = statusMapping.ContainsKey(searchTerm) ? statusMapping[searchTerm] : null;
+
+                var filteredItems = orders
+                 .Where(o => o.Id.ToString().Contains(searchTerm) ||
+                             (isDateSearch && o.CreateDate.Date == searchDate.Date) || // Поиск по точной дате
+                             (internalStatus != null && o.Status == internalStatus) || // Поиск по статусу
+                             o.TotalAmount.ToString().Contains(searchTerm) ||
+                             (!string.IsNullOrEmpty(o.UserPhoneNumber) && o.UserPhoneNumber.Contains(searchTerm))
+                            ).ToList();
+
+                // Создание нового PaginatedList с отфильтрованными элементами
+               var paginatedList = new PaginatedList<OrderResponseDTO>(
+                    filteredItems,
+                    filteredItems.Count,
+                    page.PageNumber,
+                    page.PageSize
+                );
+
+                return new CsmActionResult(paginatedList);
+            }
+            return new CsmActionResult();
         }
         catch (NotFoundException ex)
         {

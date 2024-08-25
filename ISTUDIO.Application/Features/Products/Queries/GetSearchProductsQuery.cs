@@ -24,6 +24,7 @@ public class GetSearchProductsQuery : IRequest<ResModel>
             var products = _appDbContext.Products.Include(d => d.Discount)
                .AsNoTracking()
                   .Where(a => a.Name.Contains(query.Parameters.SearchTerm) ||
+                         a.Id.ToString().Contains(query.Parameters.SearchTerm) ||
                          a.Model.Contains(query.Parameters.SearchTerm) ||
                          a.Description.StartsWith(query.Parameters.SearchTerm) 
                          )

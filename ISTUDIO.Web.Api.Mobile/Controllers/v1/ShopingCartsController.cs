@@ -25,7 +25,7 @@ public class ShopingCartsController : BaseController
     {
         try
         {
-            var result = await Mediator.Send(new GetShoppingCartsByUserId
+            var result = await Mediator.Send(new GetShoppingCartsByUserIdQuery
             {
                 UserId = userId
             });

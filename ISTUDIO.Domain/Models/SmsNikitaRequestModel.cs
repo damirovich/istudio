@@ -6,10 +6,10 @@ namespace ISTUDIO.Domain.Models;
 public class SmsNikitaRequestModel
 {
     [XmlElement(ElementName = "login")]
-    public string Login { get; set; }
+    public string? Login { get; set; }
 
     [XmlElement(ElementName = "pwd")]
-    public string Password { get; set; }
+    public string? Password { get; set; }
 
     [XmlElement(ElementName = "id")]
     public string Id { get; set; }
