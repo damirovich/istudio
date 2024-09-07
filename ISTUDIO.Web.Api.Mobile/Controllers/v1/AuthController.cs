@@ -1,4 +1,5 @@
 ﻿using ISTUDIO.Application.Features.SmsNikita.Commands.SendSms;
+using ISTUDIO.Application.Features.SmsNikita.DTOs;
 using ISTUDIO.Application.Features.UserManagement.Commands.RegistrUserMobile;
 using ISTUDIO.Contracts.Features.UserManagement;
 
@@ -17,6 +18,10 @@ public class AuthController : BaseController
     {
         try
         {
+            //Проверка для AppStore 
+            if (phonesNumber == "996700123456")
+                return Ok(new SmsSendResponseDTO() { OTP = 123456, MessageStatus = "Сообщения успешно приняты к отправке" });
+                
             var result = await Mediator.Send(new SendSmsCommand { PhonesNumber = phonesNumber });
 
             return Ok(result);

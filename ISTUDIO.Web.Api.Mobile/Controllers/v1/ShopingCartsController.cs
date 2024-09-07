@@ -36,6 +36,24 @@ public class ShopingCartsController : BaseController
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
+    [HttpGet]
+    public async Task<IActionResult> GetCheckProductCarts([FromQuery] CheckProductsCartsVM checkProducts)
+    {
+        try
+        {
+            var result = await Mediator.Send(new GetCartProductCheckerQuery
+            {
+                UserId = checkProducts.UserId,
+                ProductId = checkProducts.ProductId
+            });
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

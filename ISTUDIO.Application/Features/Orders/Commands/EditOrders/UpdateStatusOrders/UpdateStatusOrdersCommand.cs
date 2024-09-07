@@ -51,6 +51,16 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
                         _appDbContext.Products.Update(product);
                     }
                 }
+                else if(command.OrderStatus == "OrderCanceled" || command.OrderStatus== "OrderReturned")
+                {
+                    foreach (var detail in existingOrder.Details)
+                    {
+                        var product = detail.Product;
+                        
+                        product.QuantityInStock += detail.Quantity;
+                        _appDbContext.Products.Update(product);
+                    }
+                }
 
                 // Обновление статуса заказа
                 existingOrder.Status = command.OrderStatus;
