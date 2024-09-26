@@ -40,7 +40,7 @@ public class OrdersController :BaseController
                 Text = $"Новый заказ в marketkg\n" +
                        $"Номер заказа {result.OrderId}\n" +
                        $"Клиент {user.UserPhoneNumber} Товары: {productList}\n" +
-                       $"Общее количество про заказа {orders.TotalQuantyProduct}\n" +
+                       $"Общее количество продуктов заказа {orders.TotalQuantyProduct}\n" +
                        $"Дата заказа {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}",
                 Time = DateTime.Now.ToString("yyyyMMddHHmmss"),
                 Phones = orderNotification.Select(o => o.PhoneNumber).ToArray()

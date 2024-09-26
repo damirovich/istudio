@@ -5,10 +5,10 @@ using ISTUDIO.Application.Features.Orders.Commands.EditOrders.UpdateStatusOrders
 using ISTUDIO.Application.Features.Orders.DTOs;
 using ISTUDIO.Application.Features.Orders.Queries;
 using ISTUDIO.Contracts.Features.Orders;
+using ISTUDIO.Domain.Models;
 using ISTUDIO.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
-using StackExchange.Redis;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
@@ -17,8 +17,10 @@ public class OrdersController : BaseController
 {
     private readonly IMapper _mapper;
     private readonly UserManager<AppUser> _userManager;
-    public OrdersController(IMapper mapper, UserManager<AppUser> userManager) =>
-            (_mapper, _userManager) = (mapper, userManager);
+    private readonly ISmsNikitaService _smsNikitaService;
+    private readonly IAppDbContext _appDbContext;
+    public OrdersController(IMapper mapper, UserManager<AppUser> userManager, ISmsNikitaService smsNikitaService, IAppDbContext appDbContext) =>
+            (_mapper, _userManager, _smsNikitaService, _appDbContext) = (mapper, userManager, smsNikitaService, appDbContext);
 
 
     /// <summary>
@@ -187,12 +189,12 @@ public class OrdersController : BaseController
                             ).ToList();
 
                 // Создание нового PaginatedList с отфильтрованными элементами
-               var paginatedList = new PaginatedList<OrderResponseDTO>(
-                    filteredItems,
-                    filteredItems.Count,
-                    page.PageNumber,
-                    page.PageSize
-                );
+                var paginatedList = new PaginatedList<OrderResponseDTO>(
+                     filteredItems,
+                     filteredItems.Count,
+                     page.PageNumber,
+                     page.PageSize
+                 );
 
                 return new CsmActionResult(paginatedList);
             }
@@ -276,8 +278,81 @@ public class OrdersController : BaseController
             var command = _mapper.Map<UpdateStatusOrdersCommand>(orders);
 
             var result = await Mediator.Send(command);
+
             if (result.Succeeded)
+            {
+                // Маппинг статусов
+                var statusMapping = new Dictionary<string, string>
+                    {
+                        { "OrderProcessing", "Новый" },
+                        { "OrderPaid", "Оплачен" },
+                        { "OrderShipped", "Отправлено" },
+                        { "OrderDelivered", "Доставлено" },
+                        { "OrderCompleted", "Завершен" },
+                        { "OrderReturned", "Возврат" },
+                        { "OrderCanceled", "Отменен" }
+                    };
+
+                // Получаем список для уведомления
+                var orderNotification = await _appDbContext.OrderNotificationRecipients.ToListAsync();
+
+                // Загружаем информацию о заказе
+                var orderData = await _appDbContext.Orders
+                    .Include(d => d.Details)
+                    .ThenInclude(d => d.Product)
+                    .FirstOrDefaultAsync(x => x.Id == orders.OrderId);
+
+                // Определяем новый статус на основании полученного в заказе
+                string newStatus;
+                if (!statusMapping.TryGetValue(orderData.Status, out newStatus))
+                {
+                    newStatus = "Unknown"; // Если статус не найден в маппинге
+                }
+
+                // Получаем данные о пользователе
+                var user = await _userManager.FindByIdAsync(orderData.UserId?.ToString());
+
+                // Формируем список товаров
+                var productList = string.Join("\n", orderData.Details.Select(d =>
+                         $"Название: {d.Product.Name}, Количество: {d.Quantity}, Модель: {d.Product.Model} сом"));
+
+                //Отправляем клиенту смс о изменение статуса только при Оплачен, Отправлено, Доставлено
+                var smsStatuses = new[] { "OrderPaid", "OrderShipped", "OrderDelivered" };
+                if (smsStatuses.Contains(orders.OrderStatus))
+                {
+                    //Формируем сообщение для клиента
+                    var clientSmsRequest = new SmsNikitaRequestModel
+                    {
+                        Id = Guid.NewGuid().ToString("N"),
+                        Text = $"Изменен статус вашего заказа № {orderData.Id}.\n" +
+                               $"Статус заказа: {newStatus}\n" +
+                               $"Общее количество товаров в заказе: {orderData.TotalQuantyProduct}",
+                        Time = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                        Phones = [user.PhoneNumber]
+                    };
+                    // Отправляем SMS
+                    await _smsNikitaService.SendSms(clientSmsRequest);
+
+                }
+                // Формируем сообщение для администраторов
+                var adminSmsRequest = new SmsNikitaRequestModel
+                {
+                    Id = Guid.NewGuid().ToString("N"),
+                    Text = $"Статус Заказа № {orderData.Id} был изменен.\n" +
+                           $"Новый статус: {newStatus}\n" +
+                           $"Клиент: {user.PhoneNumber}\n" +
+                           $"Товары:\n{productList}\n" +
+                           $"Общее количество товаров: {orderData.TotalQuantyProduct}",
+                    Time = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                    Phones = orderNotification.Select(p => p.PhoneNumber).ToArray() // Отправляем администраторам
+                };
+
+                // Отправляем SMS
+                await _smsNikitaService.SendSms(adminSmsRequest);
+
+
                 return new CsmActionResult(result);
+            }
 
             return new CsmActionResult(result.Errors);
         }

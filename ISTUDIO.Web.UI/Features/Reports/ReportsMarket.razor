@@ -1,0 +1,63 @@
+﻿@page "/reports"
+
+
+<MudText Typo="Typo.h5" Align="Align.Left">Отчеты</MudText>
+
+<MudItem xs="12" sm="6" md="4">
+    <MudSelect T="string" Label="Выберите отчет" @bind-Value="selectedReport" AdornmentIcon="@Icons.Material.Filled.Category">
+        @foreach (var report in reports)
+        {
+            <MudSelectItem T="string" Value="@report.ReportNameEN">
+                <div style="display: flex; align-items: center;">
+                    <MudIcon Icon="@report.IconReports" Size="Size.Medium" />
+                    <span style="margin-left: 8px;">@report.ReportNameRu</span>
+                </div>
+            </MudSelectItem>
+        }
+    </MudSelect>
+</MudItem>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Style="margin-top: 16px;" OnClick="FetchReport">
+    ПОЛУЧИТЬ ОТЧЕТ
+</MudButton>
+
+
+@if (string.IsNullOrEmpty(reportContent))
+{
+    <MudText Typo="Typo.subtitle1" Align="Align.Center">Отчет не загружен</MudText>
+}
+else
+{
+    <MudText Typo="Typo.subtitle1" Align="Align.Center">Отчет загружен. Откроется в новой вкладке...</MudText>
+}
+
+@using ISTUDIO.Web.UI.Features.Reports.Queries
+@using ISTUDIO.Web.UI.Features.Reports.Models
+@code {
+    // Инициализация списка отчетов из модели
+    private List<RepotsMarketKg> reports = RepotsMarketKg.GetReportsList();
+
+    // Свойство для выбранного отчета
+    private string selectedReport;
+    private string reportContent;
+    
+    private async Task FetchReport()
+    {
+        if (!string.IsNullOrEmpty(selectedReport))
+        {
+            // Отправляем запрос на получение отчета через MediatR
+            var query = new GetReportMarketQuery { reportName = selectedReport };
+            reportContent = await _mediatr.Send(query);
+
+            // Открываем URL в новой вкладке через JavaScript
+            if (!string.IsNullOrEmpty(reportContent))
+            {
+                await _js.InvokeVoidAsync("open", reportContent, "_blank");
+            }
+        }
+        else
+        {
+            reportContent = "Пожалуйста, введите название отчета.";
+        }
+    }
+}

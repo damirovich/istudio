@@ -26,6 +26,11 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
                 if (existingOrder == null)
                     return ResModel.Failure(new[] { "Order не найдена" });
 
+                // Проверка: был ли такой статус уже присвоен в истории
+                if (existingOrder.StatusHistories.Any(sh => sh.Status == command.OrderStatus))
+                {
+                    return ResModel.Failure(new[] { $"Статус '{command.OrderStatus}' уже был присвоен заказу ранее." });
+                }
                 // Сохраните предыдущий статус в истории
                 var statusHistory = new OrderStatusHistoryEntity
                 {
