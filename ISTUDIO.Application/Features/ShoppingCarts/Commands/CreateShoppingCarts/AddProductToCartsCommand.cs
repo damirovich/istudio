@@ -42,7 +42,7 @@ public class AddProductToCartsCommand : IRequest<ResModel>
                     }
                     // Если продукт уже есть в текущей корзине, увеличиваем количество
                     cart.QuantyProduct++;
-
+                    cart.CreateDate = DateTime.Now;
                     await _appDbContext.SaveChangesAsync(cancellationToken);
                     return ResModel.Success();
                 }
@@ -52,7 +52,8 @@ public class AddProductToCartsCommand : IRequest<ResModel>
             {
                 UserId = command.UserId,
                 Products = new List<ProductsEntity> { product },
-                QuantyProduct = 1
+                QuantyProduct = 1,
+                CreateDate = DateTime.Now
             };
 
             _appDbContext.ShoppingCarts.Add(shoppingCart);

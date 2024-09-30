@@ -1,0 +1,55 @@
+﻿@page "/magazines/create"
+
+<CreateMagazineForm OnSave="CreateMagazine" />
+
+@using ISTUDIO.Application.Features.Magazines.DTOs;
+@using ISTUDIO.Contracts.Features.Magazines;
+@using ISTUDIO.Domain.Models
+@using ISTUDIO.Web.UI.Components;
+@using ISTUDIO.Web.UI.Features.Magazine.Commands;
+@using ISTUDIO.Web.UI.Features.Magazine.Components;
+
+@code {
+    private async Task CreateMagazine(CreateMagazineVM newMagazine)
+    {
+        // Получаем данные сессии
+        var sessionResult = await _sessionStorage.GetAsync<UserSessions>("UserSession");
+        var userSession = sessionResult.Success ? sessionResult.Value : null;
+
+        if (userSession != null && !string.IsNullOrEmpty(userSession.UserId))
+        {
+            // Передаем userId в объект CreateMagazineVM
+            newMagazine.UserId = userSession.UserId;
+
+            var res = await _mediatr.Send(new UICreateMagazinesCommand { Magazine = newMagazine });
+
+            if (res.Status)
+            {
+                _snackbar.Add($"Успешно!!! Данные нового магазина успешно добавлены {res.Data.Succeeded}", Severity.Success);
+                _navManager.NavigateTo("/magazines");
+            }
+            else
+            {
+                var parameters = new DialogParameters()
+                {
+                   { "ContentText", $"Ошибка при добавлении нового магазина! {res.Data?.Errors} {res.StatusMessage} "},
+                   { "ItemName", $"{newMagazine.Name}"},
+                };
+
+                var dialogOptions = new DialogOptions()
+                    {
+                        Position = DialogPosition.TopCenter,
+                        CloseButton = true,
+                        DisableBackdropClick = true
+                    };
+
+                _dialogService.Show<DialogShow>("Ошибка", parameters, dialogOptions);
+            }
+        }
+        else
+        {
+            _snackbar.Add("Ошибка: невозможно получить идентификатор пользователя.", Severity.Error);
+        }
+    }
+}
+

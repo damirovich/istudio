@@ -12,11 +12,11 @@ public class CreateProductsCommandValidator : AbstractValidator<CreateProductsCo
 
         RuleFor(v => v.Model)
             .NotEmpty().WithMessage("Модель продукта не может быть пустой.")
-            .MaximumLength(50).WithMessage("Модель продукта должна быть не длиннее 50 символов.");
+            .MaximumLength(100).WithMessage("Модель продукта должна быть не длиннее 50 символов.");
 
         RuleFor(v => v.Color)
             .NotEmpty().WithMessage("Цвет продукта не может быть пустым.")
-            .MaximumLength(20).WithMessage("Цвет продукта должен быть не длиннее 20 символов.");
+            .MaximumLength(50).WithMessage("Цвет продукта должен быть не длиннее 20 символов.");
 
         RuleFor(v => v.Price)
             .GreaterThan(0).WithMessage("Цена продукта должна быть больше нуля.");

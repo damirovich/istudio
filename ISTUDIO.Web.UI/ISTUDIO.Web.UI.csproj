@@ -25,7 +25,6 @@
     <Folder Include="Features\Discounts\Components\" />
     <Folder Include="Features\Discounts\Pages\" />
     <Folder Include="Features\ShoppingCarts\Commands\" />
-    <Folder Include="Features\ShoppingCarts\Queries\" />
   </ItemGroup>
 
 </Project>

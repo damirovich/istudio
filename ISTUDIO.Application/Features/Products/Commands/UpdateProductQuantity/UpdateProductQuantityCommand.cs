@@ -8,10 +8,9 @@ public class UpdateProductQuantityCommand : IRequest<ResModel>
     public class Handler : IRequestHandler<UpdateProductQuantityCommand, ResModel>
     {
         private readonly IAppDbContext _appDbContext;
-        private readonly IMapper _mapper;
 
-        public Handler(IAppDbContext appDbContext, IMapper mapper)=>
-            (_appDbContext, _mapper) = (appDbContext, mapper);
+        public Handler(IAppDbContext appDbContext)=>
+            (_appDbContext) = (appDbContext);
 
         public async Task<ResModel> Handle(UpdateProductQuantityCommand command, CancellationToken cancellationToken)
         {
@@ -25,7 +24,8 @@ public class UpdateProductQuantityCommand : IRequest<ResModel>
                 }
 
                 product.QuantityInStock = command.ProductQuantity;
-
+                product.CreateDate = DateTime.Now;
+                
                 _appDbContext.Products.Update(product);
                 await _appDbContext.SaveChangesAsync(cancellationToken);
 

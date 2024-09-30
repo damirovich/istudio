@@ -17,7 +17,7 @@ public class EditProductsCommandHandler : IRequestHandler<EditProductsCommand, R
                 return ResModel.Failure(new[] { "Product не найдена" });
 
             _mapper.Map(command, existingProduct);
-            existingProduct.CreateDate = DateTime.UtcNow;
+
             _appDbContext.Products.Update(existingProduct);
 
             await _appDbContext.SaveChangesAsync(cancellationToken);

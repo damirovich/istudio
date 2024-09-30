@@ -1,0 +1,83 @@
+﻿<EditForm Model="@Magazine" OnValidSubmit="SaveAsync">
+    <MudGrid>
+        <MudItem xs="12" md="12">
+            <MudPaper Class="pa-3 ma-1">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Success">Добавить магазин</MudButton>
+                <MudButton Href="magazines" Variant="Variant.Text">Отмена</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid>
+        <MudItem xs="12" md="12">
+            <MudPaper Class="pa-16 ma-1">
+                <MudGrid>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="string" Label="Название магазина" Variant="@variant" @bind-Text="@Magazine.Name" For="@(() => Magazine.Name)" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="string" Label="Описание" Variant="@variant" @bind-Text="@Magazine.Description" For="@(() => Magazine.Description)" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="string" Label="Адрес" Variant="@variant" @bind-Text="@Magazine.Address" For="@(() => Magazine.Address)" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="string" Label="Номер телефона" Variant="@variant" @bind-Text="@Magazine.PhoneNumber" For="@(() => Magazine.PhoneNumber)" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudFileUpload T="IBrowserFile" Context="fileInput" FilesChanged="UploadPhotoLogo">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CloudUpload" for="@fileInput">
+                                    Загрузить логотип магазина
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="6">
+                        @if (LogoFile != null)
+                        {
+                            <h3>@LogoFile.Name</h3>
+                            <img src="data:image/png;base64, @Magazine.PhotoLogoBase64" alt="Magazine Logo" style="width: 100px; height: 100px; margin-bottom: 3px; margin-right: 5px;" />
+                        }
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using ISTUDIO.Application.Features.ModelsDTO
+@using ISTUDIO.Contracts.Features.Magazines;
+@using ISTUDIO.Application.Features.Magazines.DTOs;
+
+@code {
+    public CreateMagazineVM Magazine { get; set; } = new();
+    [Parameter] public EventCallback<CreateMagazineVM> OnSave { get; set; }
+    private Variant variant = Variant.Text;
+    private IBrowserFile LogoFile { get; set; }
+
+    private async Task UploadPhotoLogo(IBrowserFile file)
+    {
+        LogoFile = file;
+        Magazine.PhotoLogoBase64 = await ConvertFileToBase64(LogoFile);
+        StateHasChanged();
+    }
+
+    private async Task SaveAsync()
+    {
+        await OnSave.InvokeAsync(Magazine);
+    }
+
+    private async Task<string> ConvertFileToBase64(IBrowserFile file)
+    {
+        using (var stream = file.OpenReadStream(maxAllowedSize: 512 * 5120))
+        using (var memoryStream = new MemoryStream())
+        {
+            await stream.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
+            return Convert.ToBase64String(bytes);
+        }
+    }
+}

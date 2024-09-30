@@ -1,0 +1,82 @@
+﻿@page "/magazines/edit/{Id:int}"
+
+<EditMagazineForm Magazine="Magazine" OnSave="SaveMagazine"></EditMagazineForm>
+
+@using ISTUDIO.Contracts.Features.Magazines;
+@using ISTUDIO.Web.UI.Features.Magazine.Commands;
+@using ISTUDIO.Web.UI.Features.Magazine.Components;
+@using ISTUDIO.Web.UI.Features.Magazine.Queries;
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private EditMagazineVM Magazine { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetMagazineEdit(Id);
+    }
+
+    private async Task GetMagazineEdit(int Id)
+    {
+        try
+        {
+            // Получаем данные магазина по ID
+            var resMagazine = await _mediatr.Send(new UIGetMagazineByIdQuery { MagazineId = Id });
+            if (resMagazine.Status)
+            {
+                // Преобразуем полученные данные в EditMagazineVM
+                Magazine = _mapper.Map<EditMagazineVM>(resMagazine.Data);
+
+                // Преобразуем URL изображения в Base64
+                Magazine.PhotoLogoBase64 = GetImageBase64(Magazine.PhotoLogoBase64 ?? "");
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resMagazine.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+
+    public string GetImageBase64(string imageUrl)
+    {
+        // Выполняем запрос для получения Base64 изображения по URL
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
+
+        return baseFile64.FileBase64;
+    }
+
+    private async Task SaveMagazine(EditMagazineVM editMagazine)
+    {
+        // Сохраняем изменения в магазине
+        var res = await _mediatr.Send(new UIEditMagazinesCommand { EditMagazine = editMagazine });
+
+        if (res.Status)
+        {
+            _snackbar.Add($"Успешно!!! Данные магазина успешно изменены {res.Data.Succeeded}", Severity.Success);
+            _navManager.NavigateTo("/magazines");
+        }
+        else
+        {
+            var parameters = new DialogParameters()
+            {
+               { "ContentText", $"Ошибка при сохранении данных магазина! {res.Data?.Errors} {res.StatusMessage} "},
+               { "ItemName", $"{editMagazine.Name}"},
+            };
+
+            var dialogOptions = new DialogOptions()
+                {
+                    Position = DialogPosition.TopCenter,
+                    CloseButton = true,
+                    DisableBackdropClick = true
+                };
+
+            _dialogService.Show<DialogShow>("Ошибка", parameters, dialogOptions);
+        }
+    }
+}

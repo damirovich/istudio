@@ -25,17 +25,53 @@ public class MagazinesController : BaseController
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> GetMagazinesList()
+    public async Task<ICsmActionResult> GetMagazinesList([FromQuery] PaginatedListVM page)
     {
         try
         {
-            return new CsmActionResult(await Mediator.Send(new GetMagazineListQuery()));
+            return new CsmActionResult(await Mediator.Send(new GetMagazineListQuery
+            {
+                Parameters = new PaginatedParameters
+                {
+                    PageNumber = page.PageNumber,
+                    PageSize = page.PageSize,
+                }
+            }));
         }
         catch (Exception ex)
         {
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
+
+    /// <summary>
+    /// Получение информации о магазине по ID
+    /// </summary>
+    /// <param name="id">Идентификатор магазина</param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetMagazineById([FromQuery] int id)
+    {
+        try
+        {
+            var result = await Mediator.Send(new GetMagazineByIdQuery { MagazineId = id });
+
+            if (result == null)
+            {
+                return new CsmActionResult(new CsmReturnStatus(-1, "Магазин не найден"));
+            }
+
+            return new CsmActionResult(result);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
 
     /// <summary>
     /// Добавление магазина

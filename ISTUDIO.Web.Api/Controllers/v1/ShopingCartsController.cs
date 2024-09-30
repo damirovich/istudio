@@ -40,16 +40,21 @@ public class ShopingCartsController : BaseController
     /// <summary>
     /// Получение список продуктов в актуальном корзине
     /// </summary>
-    /// <param name="userId"></param>
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> GetShoppingCarts()
+    public async Task<ICsmActionResult> GetShoppingCarts([FromQuery] PaginatedListVM page)
     {
         try
         {
-            return new CsmActionResult(await Mediator.Send(new GetActualShopCartsQuery()));
+            return new CsmActionResult(await Mediator.Send(new GetActualShopCartsQuery { 
+                Parameters = new PaginatedParameters
+                {
+                    PageNumber = page.PageNumber,
+                    PageSize = page.PageSize
+                }
+            }));
         }
         catch (Exception ex)
         {

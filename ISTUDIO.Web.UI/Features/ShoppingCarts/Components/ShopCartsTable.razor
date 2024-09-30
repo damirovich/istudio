@@ -1,4 +1,107 @@
-﻿
-@code {
+﻿<MudTable Elevation="25" ServerData="@(new Func<TableState, Task<TableData<TableModel>>>(ServerReload))"
+          Loading="true" Dense="true" Striped="true" Hover="true" Height="650px" HorizontalScrollbar="true" FixedHeader="true"
+          @ref="table">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Корзина</MudText>
+        <MudSpacer />
+    </ToolBarContent>
 
+    <HeaderContent>
+     @*    <MudTh>Фото</MudTh> *@
+        <MudTh><MudTableSortLabel SortLabel="ProductId" T="TableModel">№ Продукта</MudTableSortLabel></MudTh>
+      @*   <MudTh><MudTableSortLabel SortLabel="Name" T="TableModel">Наименование</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Model" T="TableModel">Модель</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Price" T="TableModel">Цена</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Quantity" T="TableModel">Количество</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="TotalAmount" T="TableModel">Итоговая сумма</MudTableSortLabel></MudTh> *@
+    </HeaderContent>
+
+    <RowTemplate>
+    
+        <MudTd DataLabel="Итоговая сумма">@context.TotalAmount</MudTd>
+    </RowTemplate>
+
+    <NoRecordsContent>
+        <MudText>Здесь никого нет!</MudText>
+        <MudProgressCircular Color="Color.Primary" Size="Size.Medium" Indeterminate="_processing" />
+    </NoRecordsContent>
+
+    <LoadingContent>
+        <MudText>Загружаем...</MudText>
+    </LoadingContent>
+
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] {5, 15, 25, 50, 100}" />
+    </PagerContent>
+</MudTable>
+
+
+@using ISTUDIO.Web.UI.Features.ShoppingCarts.Queries
+@using TableModel = ISTUDIO.Application.Features.ShoppingCarts.DTOs.ActualShopCartsResponseDTO;
+@code {
+    private IEnumerable<TableModel> pagedData;
+    private MudTable<TableModel> table;
+    private IEnumerable<TableModel> Elements = new List<TableModel>();
+    private bool _processing = false;
+    private int totalItems;
+    private string searchText = string.Empty;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task<TableData<TableModel>> ServerReload(TableState state)
+    {
+        try
+        {
+            var resShoppingCarts = await _mediatr.Send(new UIGetShoppingCartsQuery { PageNumber = state.Page, PageSize = state.PageSize });
+            if (resShoppingCarts != null)
+            {
+                totalItems = resShoppingCarts.Data.TotalCount;
+                Elements =(IEnumerable<TableModel>) resShoppingCarts.Data.Items;
+
+                _snackbar.Add($"Успешно загружены данные для корзины: {Elements.Count()}", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add("Не удалось загрузить корзину", Severity.Warning);
+            }
+
+            var data = Elements;
+            SortTableData(ref data, state);
+
+            return new TableData<TableModel> { TotalItems = totalItems, Items = data };
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка при загрузке данных: {ex.Message}", Severity.Error);
+            return new TableData<TableModel> { TotalItems = totalItems, Items = pagedData };
+        }
+    }
+
+    public string GetImageBase64(string imageUrl)
+    {
+        // Загружаем изображение с сервера и конвертируем в base64
+        var resHttpReq = Task.Run(async () => await _mediatr.Send(new GetFilesQuery { imageUrl = imageUrl }));
+        var baseFile64 = resHttpReq.Result;
+
+        return $"data:image/png;base64,{baseFile64.FileBase64}";
+    }
+
+    private void SortTableData(ref IEnumerable<TableModel> data, TableState state)
+    {
+        switch (state.SortLabel)
+        {
+            case "ProductId":
+                data = data.OrderByDirection(state.SortDirection, o => o.Products.Select(p=>p.Id));
+                break;
+            case "Name":
+                data = data.OrderByDirection(state.SortDirection, o => o.UserPhoneNumber);
+                break;
+            case "Price":
+                data = data.OrderByDirection(state.SortDirection, o => o.Products.Select(p=>p.Price));
+                break;
+        }
+    }
 }

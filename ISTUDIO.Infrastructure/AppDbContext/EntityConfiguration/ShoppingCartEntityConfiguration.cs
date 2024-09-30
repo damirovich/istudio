@@ -10,9 +10,9 @@ public class ShoppingCartEntityConfiguration : IEntityTypeConfiguration<Shopping
 
         builder.HasKey(e => e.Id);
 
-
         builder.Property(e => e.UserId).IsRequired();
         builder.Property(e => e.QuantyProduct).IsRequired();
+        builder.Property(e => e.CreateDate).IsRequired(false);
 
         // Определяем связь многие ко многим с сущностью ProductsEntity
         builder.HasMany(e => e.Products)

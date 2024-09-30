@@ -1,4 +1,5 @@
 ﻿using ISTUDIO.Application.Features.Magazines.Commands.EditMagazines;
+using ISTUDIO.Application.Features.Magazines.DTOs;
 
 namespace ISTUDIO.Contracts.Features.Magazines;
 
@@ -27,5 +28,14 @@ public class EditMagazineVM : IMapWith<EditMagazinesCommand>
                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                .ForMember(dest => dest.PhotoLogoURL, opt => opt.MapFrom(src => Convert.FromBase64String(src.PhotoLogoBase64)));
+
+        // Маппинг из MagazineDTO в EditMagazineVM
+        profile.CreateMap<MagazineDTO, EditMagazineVM>()
+               .ForMember(dest => dest.MagazineId, opt => opt.MapFrom(src => src.Id))
+               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+               .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+               .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+               .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+               .ForMember(dest => dest.PhotoLogoBase64, opt => opt.MapFrom(src => src.PhotoLogoURL));
     }
 }

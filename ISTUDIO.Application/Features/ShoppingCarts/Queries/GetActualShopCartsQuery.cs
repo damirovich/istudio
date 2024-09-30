@@ -2,11 +2,13 @@
 using ISTUDIO.Application.Features.ShoppingCarts.DTOs;
 
 namespace ISTUDIO.Application.Features.ShoppingCarts.Queries;
-using ResModel =  ActualShopCartsResponseDTO;
+using ResModel = PaginatedList<ActualShopCartsResponseDTO>;
 
-public class GetActualShopCartsQuery : IRequest<List<ResModel>>
+public class GetActualShopCartsQuery : IRequest<ResModel>
 {
-    public class Handler : IRequestHandler<GetActualShopCartsQuery, List<ResModel>>
+    public PaginatedParameters Parameters { get; set; }
+
+    public class Handler : IRequestHandler<GetActualShopCartsQuery, ResModel>
     {
         private readonly IAppDbContext _appDbContext;
         private readonly IMapper _mapper;
@@ -19,24 +21,31 @@ public class GetActualShopCartsQuery : IRequest<List<ResModel>>
             _appUserService = appUserService;
         }
 
-        public async Task<List<ResModel>> Handle(GetActualShopCartsQuery query, CancellationToken cancellationToken)
+        public async Task<ResModel> Handle(GetActualShopCartsQuery query, CancellationToken cancellationToken)
         {
-            var shoppingCarts = await _appDbContext.ShoppingCarts
+            // Получение всех корзин с продуктами
+            var shoppingCartsQuery = _appDbContext.ShoppingCarts
                 .Include(sc => sc.Products)
                     .ThenInclude(p => p.Discount)
-                .Include(sc => sc.Products) 
+                .Include(sc => sc.Products)
                     .ThenInclude(p => p.Images)
                 .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                .OrderBy(sc => sc.Id); // Сортировка по ID или другому критерию
 
-            if (!shoppingCarts.Any())
+            // Применяем пагинацию
+            var paginatedCarts = await shoppingCartsQuery
+                .PaginatedListAsync(query.Parameters.PageNumber, query.Parameters.PageSize);
+
+            if (!paginatedCarts.Items.Any())
             {
-                return new List<ResModel>(); // Возвращаем пустой список вместо одного объекта
+                return new ResModel( new List<ActualShopCartsResponseDTO>().AsReadOnly(), 0, 0, 0);
+
             }
 
-            var responseList = new List<ResModel>();
+            // Формирование списка для возврата
+            var responseList = new List<ActualShopCartsResponseDTO>();
 
-            foreach (var groupedCarts in shoppingCarts.GroupBy(cart => cart.UserId))
+            foreach (var groupedCarts in paginatedCarts.Items.GroupBy(cart => cart.UserId))
             {
                 var products = groupedCarts.SelectMany(cart => cart.Products)
                     .GroupBy(p => new { p.Id, p.Name, p.Model, p.Price })
@@ -55,7 +64,7 @@ public class GetActualShopCartsQuery : IRequest<List<ResModel>>
 
                 var user = await _appUserService.GetUserDetailsByUserIdAsync(groupedCarts.Key);
 
-                var resModel = new ResModel
+                var resModel = new ActualShopCartsResponseDTO
                 {
                     UserPhoneNumber = user.UserPhoneNumber ?? "",
                     TotalAmount = products.Sum(p => p.SumProductCart),
@@ -66,7 +75,7 @@ public class GetActualShopCartsQuery : IRequest<List<ResModel>>
                 responseList.Add(resModel);
             }
 
-            return responseList;
+            return new ResModel(responseList, paginatedCarts.TotalCount, query.Parameters.PageNumber, query.Parameters.PageSize);
         }
 
 

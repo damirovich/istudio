@@ -12,12 +12,13 @@
 @using ISTUDIO.Web.UI
 @using ISTUDIO.Web.UI.Shared
 @using ISTUDIO.Web.UI.Components;
-
+@using System.Security.Claims;
 
 
 @using MudBlazor
 
 @inject NavigationManager _navManager
+@inject AuthenticationStateProvider AuthProvider
 @inject ISender _mediatr
 @inject IJSRuntime _js
 @inject ISnackbar _snackbar

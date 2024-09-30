@@ -1,19 +1,17 @@
 ﻿using ISTUDIO.Application.Features.Magazines.DTOs;
 
-
 namespace ISTUDIO.Web.UI.Features.Magazine.Queries;
-using ResModel = PaginatedList<MagazineDTO>;
-public class UIGetMagazinesQuery : IRequest<ResponseAPI<ResModel>>
+using ResModel = MagazineDTO;
+public class UIGetMagazineByIdQuery : IRequest<ResponseAPI<ResModel>>
 {
-    public int PageNumber { get; set; }
-    public int PageSize { get; set; }
-    public class Handler : IRequestHandler<UIGetMagazinesQuery, ResponseAPI<ResModel>>
+    public int MagazineId { get; set; }
+    public class Handler : IRequestHandler<UIGetMagazineByIdQuery, ResponseAPI<ResModel>>
     {
         private readonly APIHttpClient _apiClient;
         public Handler(APIHttpClient httpClient) => _apiClient = httpClient;
-        public async Task<ResponseAPI<ResModel>> Handle(UIGetMagazinesQuery request, CancellationToken cancellationToken)
+        public async Task<ResponseAPI<ResModel>> Handle(UIGetMagazineByIdQuery request, CancellationToken cancellationToken)
         {
-            var res = await _apiClient.GetJsonAsync<ResModel>($"Magazines/GetMagazinesList?pageNumber={request.PageNumber}&pageSize={request.PageSize}");
+            var res = await _apiClient.GetJsonAsync<ResModel>($"Magazines/GetMagazineById?id={request.MagazineId}");
             return res.IsSuccess() ?
             new()
             {
