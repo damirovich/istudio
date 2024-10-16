@@ -13,26 +13,22 @@
     <MudGrid>
         <MudItem xs="12" md="12">
             <MudPaper Class="pa-16 ma-1">
-
                 <MudGrid>
-
                     <MudItem xs="12" sm="6" md="4">
-
-                    
-                            <MudSelect @bind-Value="_categoryType" ToStringFunc="@converter" Label="Категория" Margin="Margin.Dense" T="CategoryDTO" Variant="Variant.Outlined">
-                                @foreach (var item in ParentCategory)
-                                {
-                                    <MudSelectItem Value="item">
-                                        <MudText>@item.Name</MudText>
-                                    </MudSelectItem>
-                                }
-                            </MudSelect>
-                       @*  <MudSelect T="int?" Label="Категория" @bind-Value="Product.CategoryId" AdornmentIcon="@Icons.Material.Filled.Category">
+                        <MudSelect T="int?" Label="Категория" @bind-Value="Product.CategoryId" AdornmentIcon="@Icons.Material.Filled.Category">
                             @foreach (var item in ParentCategory)
                             {
-                                <MudSelectItem T="int" Value="@item.Id">@item.Name</MudSelectItem>
+                                <MudSelectItem T="int?" Value="@item.Id">@item.Name</MudSelectItem>
                             }
-                        </MudSelect> *@
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect T="int?" Label="Магазины" @bind-Value="Product.MagazineId" AdornmentIcon="@Icons.Material.Filled.Shop2">
+                            @foreach (var item in Magazines)
+                            {
+                                <MudSelectItem T="int?" Value="@item.Id">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="6" md="4">
                         <MudTextField T="string" Label="Наименование продукта"
@@ -85,7 +81,6 @@
                                       OnAdornmentClick="@(() => multilineReference.SelectRangeAsync(2,10))" />
                     </MudItem>
                     <MudItem xs="12" sm="12" md="6">
-                        @* <EditProductFileUpload UploadFiles="UploadFile"  /> *@
                     </MudItem>
 
                 </MudGrid>
@@ -109,22 +104,29 @@
 @using ISTUDIO.Contracts.Features.Products
 @using ISTUDIO.Web.UI.Features.Categories.Queries
 @using ISTUDIO.Web.UI.Features.Discounts.Queries
+@using ISTUDIO.Web.UI.Features.Products.Queries
+@using ISTUDIO.Application.Features.Magazines.DTOs;
 
 @code {
     [Parameter] public EditProductsVM Product { get; set; }
     [Parameter] public EventCallback<EditProductsVM> OnSave { get; set; }
     private CategoryDTO _categoryType = new();
-    private List<CategoryDTO> ParentCategory { get; set; } = new ();
+    private MagazinesDTO _magazine = new();
+    private List<CategoryDTO> ParentCategory { get; set; } = new();
+    private IEnumerable<MagazinesDTO> Magazines { get; set; } = new List<MagazinesDTO>();
+
     private IEnumerable<DiscountResponseListDTO> Discounts { get; set; } = new List<DiscountResponseListDTO>();
 
     private Variant variant = Variant.Text;
     private MudTextField<string> multilineReference;
     private Func<CategoryDTO, string> converter = p => p?.Name;
+    private Func<MagazinesDTO, string> converterMagazine = m => m?.Name;
 
     protected override async Task OnInitializedAsync()
     {
         await GetCategories();
         await GetDiscounts();
+        await GetMagazines();
     }
     private async Task SaveAsync()
     {
@@ -180,7 +182,7 @@
                     await GetSubCategoriesRecursively(subCategories);
                 }
                 ParentCategory = allCategories;
-               
+
             }
             else
             {
@@ -225,6 +227,30 @@
         }
         return subCategoryList;
     }
+    private async Task GetMagazines()
+    {
+        try
+        {
+            var resMagazines = await _mediatr.Send(new UIGetMagazineListQuery { PageNumber = 0, PageSize = 200 });
+
+            if (resMagazines.Status)
+            {
+                Magazines = resMagazines.Data.Items;
+
+                _magazine = Magazines.FirstOrDefault(m => m.Id == Product.MagazineId);
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resMagazines.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+
     private async Task<CategoryDTO> FindCategoryById(int? categoryId, List<CategoryDTO> categories)
     {
         foreach (var category in categories)
@@ -244,5 +270,5 @@
         return null; // Категория не найдена
     }
 
-   
+
 }

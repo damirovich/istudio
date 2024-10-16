@@ -3,7 +3,7 @@ using ISTUDIO.Application.Features.Magazines.DTOs;
 
 namespace ISTUDIO.Application.Features.Magazines.Queries;
 
-using ResModel = PaginatedList<MagazineDTO>;
+using ResModel = PaginatedList<MagazinesDTO>;
 public class GetMagazineListQuery : IRequest<ResModel>
 {    
     public PaginatedParameters Parameters { get; set; }
@@ -23,7 +23,7 @@ public class GetMagazineListQuery : IRequest<ResModel>
             var magazine = await _appDbContext.Magazines
                 .AsNoTracking()
                 .OrderByDescending(x => x.Id)
-                .ProjectTo<MagazineDTO>(_mapper.ConfigurationProvider)
+                .ProjectTo<MagazinesDTO>(_mapper.ConfigurationProvider)
                 .PaginatedListAsync(query.Parameters.PageNumber, query.Parameters.PageSize);
 
             return magazine;

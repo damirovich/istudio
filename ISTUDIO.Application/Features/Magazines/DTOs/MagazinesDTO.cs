@@ -2,7 +2,7 @@
 
 namespace ISTUDIO.Application.Features.Magazines.DTOs;
 
-public class MagazineDTO : IMapWith<MagazineEntity>
+public class MagazinesDTO : IMapWith<MagazineEntity>
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -14,6 +14,6 @@ public class MagazineDTO : IMapWith<MagazineEntity>
 
     public void Mapping(Profile profile)
     {
-        profile.CreateMap<MagazineEntity, MagazineDTO>();
+        profile.CreateMap<MagazineEntity, MagazinesDTO>();
     }
 }

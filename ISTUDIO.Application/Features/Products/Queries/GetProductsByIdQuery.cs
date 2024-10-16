@@ -18,7 +18,9 @@ public class GetProductsByIdQuery : IRequest<ResModel>
 
         public async Task<ResModel> Handle(GetProductsByIdQuery query, CancellationToken cancellationToken)
         {
-            var products = await _appDbContext.Products.Include(d => d.Discount)
+            var products = await _appDbContext.Products
+              .Include(d => d.Discount)
+              .Include(m => m.Magazine)
               .AsNoTracking()
               .Where(c => c.Id == query.ProductId)
               .OrderByDescending(c => c.Id)

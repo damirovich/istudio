@@ -32,6 +32,7 @@ public class GetWeeklyNewProductsQuery : IRequest<ResModel>
 
             var products = await _appDbContext.Products
                 .Include(d => d.Discount)
+                .Include(m => m.Magazine)
                 .AsNoTracking()
                 .Where(p => p.CreateDate >= oneWeekAgo)
                 .ProjectTo<ProductsResponseDTO>(_mapper.ConfigurationProvider)

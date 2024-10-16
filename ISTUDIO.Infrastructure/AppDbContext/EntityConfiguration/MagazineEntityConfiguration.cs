@@ -23,15 +23,15 @@ public class MagazineEntityConfiguration : IEntityTypeConfiguration<MagazineEnti
                .WithOne(p => p.Magazine)
                .HasForeignKey(p => p.MagazineId);
 
-        // Связь с заказами
-        builder.HasMany(e => e.Orders)
-               .WithOne(o => o.Magazine)
-               .HasForeignKey(o => o.MagazineId);
+        builder.HasMany(e => e.OrderDetails)
+               .WithOne(od => od.Magazine)
+               .HasForeignKey(od => od.MagazineId);
 
-        // Связь с корзинами покупок
-        builder.HasMany(e => e.ShoppingCarts)
-               .WithOne(s => s.Magazine)
-               .HasForeignKey(s => s.MagazineId);
+
+        //// Связь с корзинами покупок
+        //builder.HasMany(e => e.ShoppingCarts)
+        //       .WithOne(s => s.Magazine)
+        //       .HasForeignKey(s => s.MagazineId);
 
         // Устанавливаем уникальный индекс для свойства Name
         builder.HasIndex(e => e.Name).IsUnique();

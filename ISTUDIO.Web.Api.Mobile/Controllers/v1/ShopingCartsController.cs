@@ -4,7 +4,6 @@ using ISTUDIO.Application.Features.ShoppingCarts.Commands.EditShoppinCarts;
 using ISTUDIO.Application.Features.ShoppingCarts.Queries;
 using ISTUDIO.Contracts.Features.ShoppingsCarts;
 
-
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 
 [ApiVersion("1.0")]

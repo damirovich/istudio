@@ -18,7 +18,9 @@ public class GetProductsBySubCategoryId : IRequest<ResModel>
 
         public async Task<ResModel> Handle(GetProductsBySubCategoryId query, CancellationToken cancellationToken)
         {
-            var products = _appDbContext.Products.Include(d => d.Discount)
+            var products = _appDbContext.Products
+              .Include(d => d.Discount)
+              .Include(m => m.Magazine)
               .AsNoTracking()
               .Where(c => c.CategoryId == query.CategoryId)
               .OrderByDescending(c => c.Id)

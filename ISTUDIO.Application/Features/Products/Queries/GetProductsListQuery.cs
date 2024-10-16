@@ -22,6 +22,7 @@ public class GetProductsListQuery  : IRequest<ResModel>
             var random = new Random();
             var products = await _appDbContext.Products
                 .Include(d => d.Discount)
+                .Include(m => m.Magazine)
                 .AsNoTracking()
                 .OrderByDescending(c => c.Id)
                 .ProjectTo<ProductsResponseDTO>(_mapper.ConfigurationProvider)

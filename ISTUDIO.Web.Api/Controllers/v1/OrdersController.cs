@@ -4,6 +4,7 @@ using ISTUDIO.Application.Features.Orders.Commands.EditOrders.AddReceoptPhoto;
 using ISTUDIO.Application.Features.Orders.Commands.EditOrders.UpdateStatusOrders;
 using ISTUDIO.Application.Features.Orders.DTOs;
 using ISTUDIO.Application.Features.Orders.Queries;
+using ISTUDIO.Application.Features.SmsNikita.Commands.CreateSmsNikitaRequest;
 using ISTUDIO.Contracts.Features.Orders;
 using ISTUDIO.Domain.Models;
 using ISTUDIO.Infrastructure.Identity;
@@ -321,34 +322,56 @@ public class OrdersController : BaseController
                 if (smsStatuses.Contains(orders.OrderStatus))
                 {
                     //Формируем сообщение для клиента
-                    var clientSmsRequest = new SmsNikitaRequestModel
+                    //var clientSmsRequest = new SmsNikitaRequestModel
+                    //{
+                    //    Id = Guid.NewGuid().ToString("N"),
+                    //    Text = $"Изменен статус вашего заказа № {orderData.Id}.\n" +
+                    //           $"Статус заказа: {newStatus}\n" +
+                    //           $"Общее количество товаров в заказе: {orderData.TotalQuantyProduct}",
+                    //    Time = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                    //    Phones = [user.PhoneNumber]
+                    //};
+
+                    //Формируем сообщение для клиента
+                    await Mediator.Send(new CreateSmsNikitaReqCommand
                     {
-                        Id = Guid.NewGuid().ToString("N"),
-                        Text = $"Изменен статус вашего заказа № {orderData.Id}.\n" +
-                               $"Статус заказа: {newStatus}\n" +
-                               $"Общее количество товаров в заказе: {orderData.TotalQuantyProduct}",
-                        Time = DateTime.Now.ToString("yyyyMMddHHmmss"),
-                        Phones = [user.PhoneNumber]
-                    };
+                        PhonesNumber = orderNotification.Select(o => o.PhoneNumber).ToList(),
+                        Message = $"Изменен статус вашего заказа № {orderData.Id}.\n" +
+                                  $"Статус заказа: {newStatus}\n" +
+                                  $"Общее количество товаров в заказе: {orderData.TotalQuantyProduct}",
+                    });
+
                     // Отправляем SMS
-                    await _smsNikitaService.SendSms(clientSmsRequest);
+                   // await _smsNikitaService.SendSms(clientSmsRequest);
 
                 }
+
                 // Формируем сообщение для администраторов
-                var adminSmsRequest = new SmsNikitaRequestModel
+                //var adminSmsRequest = new SmsNikitaRequestModel
+                //{
+                //    Id = Guid.NewGuid().ToString("N"),
+                //    Text = $"Статус Заказа № {orderData.Id} был изменен.\n" +
+                //           $"Новый статус: {newStatus}\n" +
+                //           $"Клиент: {user.PhoneNumber}\n" +
+                //           $"Товары:\n{productList}\n" +
+                //           $"Общее количество товаров: {orderData.TotalQuantyProduct}",
+                //    Time = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                //    Phones = orderNotification.Select(p => p.PhoneNumber).ToArray() // Отправляем администраторам
+                //};
+
+                // Формируем сообщение для администраторов
+                await Mediator.Send(new CreateSmsNikitaReqCommand
                 {
-                    Id = Guid.NewGuid().ToString("N"),
-                    Text = $"Статус Заказа № {orderData.Id} был изменен.\n" +
-                           $"Новый статус: {newStatus}\n" +
-                           $"Клиент: {user.PhoneNumber}\n" +
-                           $"Товары:\n{productList}\n" +
-                           $"Общее количество товаров: {orderData.TotalQuantyProduct}",
-                    Time = DateTime.Now.ToString("yyyyMMddHHmmss"),
-                    Phones = orderNotification.Select(p => p.PhoneNumber).ToArray() // Отправляем администраторам
-                };
+                    PhonesNumber = orderNotification.Select(o => o.PhoneNumber).ToList(),
+                    Message = $"Статус Заказа № {orderData.Id} был изменен.\n" +
+                              $"Новый статус: {newStatus}\n" +
+                              $"Клиент: {user.PhoneNumber}\n" +
+                              $"Товары:\n{productList}\n" +
+                              $"Общее количество товаров: {orderData.TotalQuantyProduct}",
+                });
 
                 // Отправляем SMS
-                await _smsNikitaService.SendSms(adminSmsRequest);
+                //await _smsNikitaService.SendSms(adminSmsRequest);
 
 
                 return new CsmActionResult(result);

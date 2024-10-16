@@ -1,4 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
+using ISTUDIO.Application.Features.ModelsDTO;
 using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Application.Features.ShoppingCarts.DTOs;
 using System.ComponentModel.DataAnnotations;
@@ -27,13 +28,15 @@ public class GetShoppingCartsByUserIdQuery : IRequest<ResModel>
         {
 
             var shoppingCarts = await _appDbContext.ShoppingCarts
-                 .Include(sc => sc.Products)
-                     .ThenInclude(p => p.Discount)
-                 .Include(sc => sc.Products)
-                     .ThenInclude(p => p.Images)
-                 .Where(cart => cart.UserId == query.UserId)
-                 .AsNoTracking()
-                 .ToListAsync(cancellationToken);
+                .Include(sc => sc.Products)
+                    .ThenInclude(p => p.Discount)
+                .Include(sc => sc.Products)
+                    .ThenInclude(p => p.Images)
+                .Include(sc => sc.Products)
+                    .ThenInclude(p => p.Magazine)
+                .Where(cart => cart.UserId == query.UserId)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
 
             if (!shoppingCarts.Any())
             {
@@ -47,31 +50,24 @@ public class GetShoppingCartsByUserIdQuery : IRequest<ResModel>
                 return null;
             }
 
-            var products = groupedCarts.SelectMany(cart => cart.Products)
-                .GroupBy(p => new { p.Id, p.Name, p.Model, p.Price, p.QuantityInStock })
-                .Select(g => new ProductsShoppinDTO
+            var magazineProducts = groupedCarts.SelectMany(cart => cart.Products)
+                .GroupBy(p => p.Magazine.Id)
+                .Select(g => new ShoppingMagazineDTO
                 {
-                    CartId = g.FirstOrDefault().ShoppingCarts.FirstOrDefault()?.Id ?? 0,
-                    Id = g.Key.Id,
-                    Name = g.Key.Name,
-                    Model = g.Key.Model,
-                    Price = g.Key.Price,
-                    QuantyProductStock = g.Key.QuantityInStock,
-                    QuantyProductCart = g.Sum(p => p.ShoppingCarts.FirstOrDefault()?.QuantyProduct ?? 0),
-                    SumProductCart = g.Key.Price * g.Sum(p => p.ShoppingCarts.FirstOrDefault()?.QuantyProduct ?? 0),
-                    Images = _mapper.Map<ICollection<ProductImagesDTO>>(g.FirstOrDefault()?.Images),
-                    ProductDiscount = _mapper.Map<ProductDiscountDTO>(g.FirstOrDefault()?.Discount)
+                    Magazine = _mapper.Map<MagazineDTO>(g.First().Magazine),
+                    Products = g.Select(p => _mapper.Map<ProductsShoppinDTO>(p)).ToList()
                 }).ToList();
 
             var response = new ResModel
             {
                 UserId = groupedCarts.Key,
-                TotalAmount = products.Sum(p => p.SumProductCart),
-                TotalQuantyProduct = products.Sum(p => p.QuantyProductCart),
-                Products = products
+                TotalAmount = magazineProducts.SelectMany(mp => mp.Products).Sum(p => p.SumProductCart),
+                TotalQuantyProduct = magazineProducts.SelectMany(mp => mp.Products).Sum(p => p.QuantyProductCart),
+                MagazineProducts = magazineProducts
             };
 
             return response;
         }
+
     }
 }

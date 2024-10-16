@@ -1,0 +1,6 @@
+@ISTUDIO.Web.Api.Shop_HostAddress = http://localhost:5172
+
+GET {{ISTUDIO.Web.Api.Shop_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

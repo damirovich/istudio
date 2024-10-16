@@ -2,6 +2,7 @@
 
 namespace ISTUDIO.Application.Features.Orders.Queries;
 using ResModel = List<OrderDetailsResponseDTO>;
+
 public class GetOrderDetailsByIdQuery : IRequest<ResModel>
 {
     public int OrderId { get; set; }
@@ -20,14 +21,17 @@ public class GetOrderDetailsByIdQuery : IRequest<ResModel>
         public async Task<ResModel> Handle(GetOrderDetailsByIdQuery query, CancellationToken cancellationToken)
         {
             var orderDetails = await _appDbContext.OrderDetails
+                .Include(o => o.Product) // Включаем продукт
+                     .ThenInclude(pi => pi.Images) // Включаем изображения продукта
                 .Include(o => o.Product)
-                     .ThenInclude(pi => pi.Images)
+                     .ThenInclude(pd => pd.Discount) // Включаем скидки на продукт
                 .Include(o => o.Product)
-                     .ThenInclude(pd => pd.Discount)
-                .Where(s => s.OrderId == query.OrderId)
+                     .ThenInclude(o => o.Images)
+                .Include(o => o.Magazine) // Включаем магазин через детали заказа
+                .Where(s => s.OrderId == query.OrderId) // Фильтр по OrderId
                 .ToListAsync(cancellationToken);
 
-            if (orderDetails == null && orderDetails.Count == 0)
+            if (!orderDetails.Any())
                 throw new NotFoundException("Заказ не найден");
 
             var responseDto = _mapper.Map<ResModel>(orderDetails);

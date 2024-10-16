@@ -13,7 +13,7 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<OrderEntity>
         builder.Property(e => e.ShippingAddress).IsRequired();
         builder.Property(e => e.TotalPrice).HasColumnType("decimal(18, 2)").IsRequired();
         builder.Property(e => e.TotalQuantyProduct).IsRequired();
-        builder.Property(e=>e.CreateDate)
+        builder.Property(e => e.CreateDate)
               .HasDefaultValue(DateTime.UtcNow)
               .ValueGeneratedOnAdd();
         builder.Property(e => e.Status).IsRequired();
@@ -26,10 +26,6 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<OrderEntity>
             .WithOne(d => d.Order)
             .HasForeignKey(d => d.OrderId)
             .IsRequired();
-
-        builder.HasMany(o => o.Products)
-             .WithMany(p => p.Orders)
-             .UsingEntity(j => j.ToTable("CustomerOrders"));
 
         builder.HasOne(e => e.Invoice)
             .WithOne()

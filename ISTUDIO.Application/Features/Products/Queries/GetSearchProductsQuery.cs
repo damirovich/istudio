@@ -21,7 +21,9 @@ public class GetSearchProductsQuery : IRequest<ResModel>
 
         public async Task<ResModel> Handle(GetSearchProductsQuery query, CancellationToken cancellationToken)
         {
-            var products = _appDbContext.Products.Include(d => d.Discount)
+            var products = _appDbContext.Products
+               .Include(d => d.Discount)
+               .Include(m => m.Magazine)
                .AsNoTracking()
                   .Where(a => a.Name.Contains(query.Parameters.SearchTerm) ||
                          a.Id.ToString().Contains(query.Parameters.SearchTerm) ||

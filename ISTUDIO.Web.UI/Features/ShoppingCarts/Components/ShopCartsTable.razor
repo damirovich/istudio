@@ -7,18 +7,19 @@
     </ToolBarContent>
 
     <HeaderContent>
-     @*    <MudTh>Фото</MudTh> *@
-        <MudTh><MudTableSortLabel SortLabel="ProductId" T="TableModel">№ Продукта</MudTableSortLabel></MudTh>
-      @*   <MudTh><MudTableSortLabel SortLabel="Name" T="TableModel">Наименование</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="Model" T="TableModel">Модель</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="Price" T="TableModel">Цена</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="Quantity" T="TableModel">Количество</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="TotalAmount" T="TableModel">Итоговая сумма</MudTableSortLabel></MudTh> *@
+        <MudTh><MudTableSortLabel SortLabel="UserPhoneNumber" T="TableModel">Номер клиента</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="TotalProductCount" T="TableModel">Всего продуктов</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="TotalAmount" T="TableModel">Общая сумма</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="DateCreated" T="TableModel">Дата</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="MagazineName" T="TableModel">Магазин</MudTableSortLabel></MudTh>
     </HeaderContent>
 
     <RowTemplate>
-    
-        <MudTd DataLabel="Итоговая сумма">@context.TotalAmount</MudTd>
+        <MudTd DataLabel="UserPhoneNumber">@context.UserPhoneNumber</MudTd>
+        <MudTd DataLabel="TotalProductCount">@context.TotalQuantyProduct</MudTd>
+        <MudTd DataLabel="TotalAmount">@context.TotalAmount</MudTd>
+        <MudTd DataLabel="DateCreated">@context.DateCreated</MudTd>
+        <MudTd DataLabel="MagazineName">@context.Magazines?.MagazineName</MudTd>
     </RowTemplate>
 
     <NoRecordsContent>
@@ -31,7 +32,7 @@
     </LoadingContent>
 
     <PagerContent>
-        <MudTablePager PageSizeOptions="new int[] {5, 15, 25, 50, 100}" />
+        <MudTablePager PageSizeOptions="new int[] {20, 50, 70, 100}" />
     </PagerContent>
 </MudTable>
 

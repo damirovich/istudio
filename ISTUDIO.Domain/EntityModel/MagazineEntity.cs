@@ -11,7 +11,6 @@ public class MagazineEntity
     public string PhotoLogoURL { get; set; }
     public string UserId { get; set; }
     public ICollection<ProductsEntity> Products { get; set; } = new List<ProductsEntity>();
-    public ICollection<OrderEntity> Orders { get; set; } = new List<OrderEntity>();
-    public ICollection<ShoppingCartEntity> ShoppingCarts { get; set; } = new List<ShoppingCartEntity>();
+    public ICollection<OrderDetailEntity> OrderDetails { get; set; } = new List<OrderDetailEntity>();
 
 }

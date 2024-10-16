@@ -32,5 +32,9 @@ public class EditProductsCommandValidator : AbstractValidator<EditProductsComman
         RuleFor(v => v.CategoryId)
             .NotNull().WithMessage("CategoryId  не может быть пустым.")
             .GreaterThan(0).WithMessage("CategoryId должен быть больше нуля.");
+
+        RuleFor(v => v.MagazineId)
+            .NotNull().WithMessage("MagazineId не должен быть пустым.")
+            .GreaterThan(0).WithMessage("MagazineId должен быть больше нуля.");
     }
 }

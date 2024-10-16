@@ -1,7 +1,9 @@
 ﻿using ISTUDIO.Application.Features.Orders.DTOs;
+using ISTUDIO.Application.Features.Products.DTOs;
 
 namespace ISTUDIO.Application.Features.Orders.Queries;
 using ResModel = OrderResponseDTO;
+
 public class GetOrderByIdQuery : IRequest<ResModel>
 {
     public int OrderId { get; set; }
@@ -18,18 +20,26 @@ public class GetOrderByIdQuery : IRequest<ResModel>
 
         public async Task<ResModel> Handle(GetOrderByIdQuery query, CancellationToken cancellationToken)
         {
-            var orders = await _appDbContext.Orders
-                .Include(o => o.Customers)
+            var order = await _appDbContext.Orders
+                //.Include(o => o.Customers) // Включаем клиентов
+                .Include(o => o.Details)   // Включаем детали заказа
+                    .ThenInclude(d => d.Magazine)  // Включаем магазины через детали заказа
+                .Include(o => o.Details)
+                    .ThenInclude(d => d.Product)   // Включаем продукты через детали заказа
+                .Include(o => o.Products)
+                    .ThenInclude(o => o.Images)
                 .Where(o => o.Id == query.OrderId)
                 .FirstOrDefaultAsync(cancellationToken);
-            if (orders == null)
+
+            if (order == null)
             {
-                return new ResModel();
+                return new ResModel(); // Если заказ не найден, возвращаем пустой DTO
             }
-            var responseDto = _mapper.Map<ResModel>(orders);
+
+            // Маппим заказ в DTO
+            var responseDto = _mapper.Map<ResModel>(order);
 
             return responseDto;
         }
     }
 }
-

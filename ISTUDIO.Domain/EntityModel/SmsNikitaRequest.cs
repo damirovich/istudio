@@ -8,6 +8,6 @@ public class SmsNikitaRequest
     public DateTime? Time { get; set; }
     public string? PhonesNumber { get; set; }
     public byte? Test { get; set; }
-
+    public bool StatusSendSMS { get; set; }
     public IList<SmsNikitaResponse> Responses { get; set; } = new List<SmsNikitaResponse>();
 }

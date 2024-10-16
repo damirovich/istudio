@@ -12,6 +12,7 @@ public class CreateProductsCommand : IRequest<Result>, IMapWith<ProductsEntity>
     public string Description { get; set; }
     public int? CategoryId { get; set; }
     public int? DiscountId { get; set; }
+    public int? MagazineId { get; set; }
     public ICollection<ProductImagesDTO> Images { get; set; } = new List<ProductImagesDTO>();
 
     public void Mapping(Profile profile)
@@ -25,6 +26,7 @@ public class CreateProductsCommand : IRequest<Result>, IMapWith<ProductsEntity>
             .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
             .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId))
             .ForMember(dest => dest.DiscountId, opt => opt.MapFrom(src => src.DiscountId))
+            .ForMember(dest => dest.MagazineId, opt => opt.MapFrom(src => src.MagazineId))
             .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
     }
 }

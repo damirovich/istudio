@@ -4,7 +4,6 @@ namespace ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
 
 using ISTUDIO.Application.Common.Interfaces;
 using ISTUDIO.Domain.EntityModel;
-using ISTUDIO.Domain.Models;
 using System.Threading;
 
 
@@ -80,7 +79,8 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                         Product = productEntity,
                         Quantity = productDto.QuantyProductCart,
                         UnitPrice = productDto.Price,
-                        Order = orderEntity
+                        Order = orderEntity,
+                        MagazineId = (int)productEntity.MagazineId // Связь с магазином через продукт
                     };
 
                     orderEntity.Details.Add(orderDetail);

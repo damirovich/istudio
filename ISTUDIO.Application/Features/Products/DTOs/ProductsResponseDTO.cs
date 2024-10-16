@@ -1,4 +1,5 @@
-﻿using ISTUDIO.Domain.EntityModel;
+﻿using ISTUDIO.Application.Features.ModelsDTO;
+using ISTUDIO.Domain.EntityModel;
 
 namespace ISTUDIO.Application.Features.Products.DTOs;
 
@@ -14,6 +15,7 @@ public class ProductsResponseDTO : IMapWith<ProductsEntity>
     public ICollection<ProductImagesDTO> Images { get; set; }
     public ProductDiscountDTO ProductDiscount { get; set; }
     public int ProductCategory { get; set; }
+    public MagazineDTO?  ProductMagazine { get; set; }
 
     public void Mapping(Profile profile)
     {
@@ -27,7 +29,8 @@ public class ProductsResponseDTO : IMapWith<ProductsEntity>
              .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
              .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
              .ForMember(dest => dest.ProductDiscount, opt => opt.MapFrom(src => src.Discount))
-             .ForMember(dest => dest.ProductCategory, opt => opt.MapFrom(src => src.CategoryId));
+             .ForMember(dest => dest.ProductCategory, opt => opt.MapFrom(src => src.CategoryId))
+             .ForMember(dest => dest.ProductMagazine, opt => opt.MapFrom(src => src.Magazine));
 
     }
 }

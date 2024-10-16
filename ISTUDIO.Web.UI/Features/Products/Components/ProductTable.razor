@@ -9,6 +9,7 @@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>Фото</MudTh>
+        <MudTh><MudTableSortLabel SortLabel="MagazineName" T="TableModel">Магазин</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="Id" T="TableModel">№</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="Name" T="TableModel">Наименование</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="Model" T="TableModel">Модель</MudTableSortLabel></MudTh>
@@ -22,6 +23,7 @@
         <MudTd>
             <img src="@GetImageBase64(@context.Images.FirstOrDefault()?.Url)" alt="Product Photo" style="width: 28px; height: 28px; margin-bottom: 3px; margin-right: 5px;" />
         </MudTd>
+        <MudTd DataLabel="MagazineName">@context.ProductMagazine?.MagazineName</MudTd>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Model">@context.Model</MudTd>

@@ -26,6 +26,11 @@ public class OrderDetailEntityConfiguration : IEntityTypeConfiguration<OrderDeta
             .HasForeignKey(e => e.ProductId)
             .IsRequired();
 
+        builder.HasOne(e => e.Magazine)
+            .WithMany(e=>e.OrderDetails)
+            .HasForeignKey(e => e.MagazineId)
+            .IsRequired(false);
+
         builder.Ignore(e => e.Subtotal); // Игнорируем вычисляемое свойство Subtotal
         builder.Ignore(e => e.TotalPrice); // Игнорируем вычисляемое свойство TotalPrice
 

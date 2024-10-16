@@ -15,7 +15,6 @@
             <MudPaper Class="pa-16 ma-1">
 
                 <MudGrid>
-
                     <MudItem xs="12" sm="6" md="4">
                         <MudSelect T="int" Label="Категория" @bind-Value="Product.CategoryId" AdornmentIcon="@Icons.Material.Filled.Category">
                             @foreach (var item in ParentCategory)
@@ -23,7 +22,14 @@
                                 <MudSelectItem T="int" Value="@item.Id">@item.Name</MudSelectItem>
                             }
                         </MudSelect>
-
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect T="int?" Label="Магазины" @bind-Value="Product.MagazineId" AdornmentIcon="@Icons.Material.Filled.Shop2">
+                            @foreach (var item in Magazines)
+                            {
+                                <MudSelectItem T="int?" Value="@item.Id">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="6" md="4">
                         <MudTextField T="string" Label="Наименование продукта"
@@ -98,13 +104,13 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using ISTUDIO.Application.Features.Discounts.DTOs
-@using ISTUDIO.Application.Features.ModelsDTO
 @using ISTUDIO.Contracts.Features.Categories;
 @using ISTUDIO.Application.Features.Categories.DTOs;
 @using ISTUDIO.Contracts.Features.Products
 @using ISTUDIO.Contracts.Features.SubCategories
 @using ISTUDIO.Web.UI.Features.Categories.Queries
 @using ISTUDIO.Web.UI.Features.Discounts.Queries
+@using ISTUDIO.Web.UI.Features.Products.Queries
 
 
 @code {
@@ -116,11 +122,13 @@
 
     private IEnumerable<CategoryDTO> ParentCategory { get; set; } = new List<CategoryDTO>();
     private IEnumerable<DiscountResponseListDTO> Discounts { get; set; } = new List<DiscountResponseListDTO>();
+    private IEnumerable<ISTUDIO.Application.Features.Magazines.DTOs.MagazinesDTO> Magazines { get; set; } = new List<ISTUDIO.Application.Features.Magazines.DTOs.MagazinesDTO>();
 
     protected override async Task OnInitializedAsync()
     {
         await GetCategories();
         await GetDiscounts();
+        await GetMagazines();
     }
 
     private async Task SaveAsync()
@@ -208,6 +216,28 @@
             else
             {
                 _snackbar.Add($"Инфо: Что-то пошло не так {resDiscounts.StatusMessage}", Severity.Warning);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Ошибка: Что-то пошло не так {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task GetMagazines()
+    {
+        try
+        {
+            var resMagazines = await _mediatr.Send(new UIGetMagazineListQuery { PageNumber = 0, PageSize = 200 });
+
+            if (resMagazines.Status)
+            {
+                Magazines = resMagazines.Data.Items;
+            }
+            else
+            {
+                _snackbar.Add($"Инфо: Что-то пошло не так {resMagazines.StatusMessage}", Severity.Warning);
             }
             StateHasChanged();
         }

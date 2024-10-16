@@ -1,6 +1,8 @@
 ﻿
+using ISTUDIO.Application.Features.ModelsDTO;
 using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Domain.EntityModel;
+using System.Text.Json.Serialization;
 
 namespace ISTUDIO.Application.Features.ShoppingCarts.DTOs;
 
@@ -15,8 +17,11 @@ public class ProductsShoppinDTO : IMapWith<ProductsEntity>
     public int QuantyProductStock { get; set; }
     public int QuantyProductCart { get; set; } // Количество продукта в корзине
     public decimal SumProductCart { get; set; } // Сумма продукта в корзине
+    public string? Description { get; set; }
     public ICollection<ProductImagesDTO> Images { get; set; }
     public ProductDiscountDTO ProductDiscount { get; set; }
+    [JsonIgnore]
+    public MagazineDTO? Magazines { get; set; }
 
     public void Mapping(Profile profile)
     {
@@ -30,6 +35,8 @@ public class ProductsShoppinDTO : IMapWith<ProductsEntity>
             .ForMember(dest => dest.QuantyProductStock, opt => opt.MapFrom(src => src.QuantityInStock))
             .ForMember(dest => dest.QuantyProductCart, opt => opt.MapFrom(src => src.ShoppingCarts.FirstOrDefault() != null ? src.ShoppingCarts.FirstOrDefault().QuantyProduct : 0))
             .ForMember(dest => dest.SumProductCart, opt => opt.MapFrom(src => src.Price * (src.ShoppingCarts.FirstOrDefault() != null ? src.ShoppingCarts.FirstOrDefault().QuantyProduct : 0)))
-            .ForMember(dest => dest.ProductDiscount, opt => opt.MapFrom(src => src.Discount));
+            .ForMember(dest => dest.ProductDiscount, opt => opt.MapFrom(src => src.Discount))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+            .ForMember(dest => dest.Magazines, opt => opt.MapFrom(src => src.Magazine));
     }
 }

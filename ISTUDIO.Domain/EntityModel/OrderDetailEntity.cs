@@ -25,11 +25,16 @@ public class OrderDetailEntity
 
     // Идентификатор продукта, связанного с данной деталью заказа
     public int ProductId { get; set; }
+    public int? MagazineId { get; set; }
 
     // Заказ, к которому относится данная деталь
     public OrderEntity Order { get; set; }
 
     // Продукт, связанный с данной деталью заказа
     public ProductsEntity Product { get; set; }
+
+    //Магазин, связанный с данной деталью заказа
+    public MagazineEntity Magazine { get; set; }
+
 
 }

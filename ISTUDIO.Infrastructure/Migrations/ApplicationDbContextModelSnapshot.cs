@@ -143,7 +143,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 9, 29, 13, 30, 54, 499, DateTimeKind.Utc).AddTicks(3083));
+                        .HasDefaultValue(new DateTime(2024, 10, 16, 14, 42, 47, 113, DateTimeKind.Utc).AddTicks(6957));
 
                     b.Property<int?>("CustomerId")
                         .IsRequired()
@@ -509,6 +509,9 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<decimal>("Discount")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<int?>("MagazineId")
+                        .HasColumnType("int");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
@@ -525,6 +528,8 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     b.HasIndex("Id")
                         .IsUnique();
+
+                    b.HasIndex("MagazineId");
 
                     b.HasIndex("OrderId");
 
@@ -544,12 +549,9 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 9, 29, 13, 30, 54, 506, DateTimeKind.Utc).AddTicks(1185));
+                        .HasDefaultValue(new DateTime(2024, 10, 16, 14, 42, 47, 119, DateTimeKind.Utc).AddTicks(23));
 
                     b.Property<int?>("InvoiceId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MagazineId")
                         .HasColumnType("int");
 
                     b.Property<string>("PaymentMethod")
@@ -581,8 +583,6 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     b.HasIndex("Id")
                         .IsUnique();
-
-                    b.HasIndex("MagazineId");
 
                     b.ToTable("Orders", (string)null);
                 });
@@ -627,7 +627,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("ChangeDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 9, 29, 13, 30, 54, 549, DateTimeKind.Utc).AddTicks(6127));
+                        .HasDefaultValue(new DateTime(2024, 10, 16, 14, 42, 47, 137, DateTimeKind.Utc).AddTicks(5018));
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -750,7 +750,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 9, 29, 13, 30, 54, 531, DateTimeKind.Utc).AddTicks(2322));
+                        .HasDefaultValue(new DateTime(2024, 10, 16, 14, 42, 47, 129, DateTimeKind.Utc).AddTicks(7776));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -803,9 +803,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("MagazineId")
-                        .HasColumnType("int");
-
                     b.Property<int>("QuantyProduct")
                         .HasColumnType("int");
 
@@ -814,8 +811,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MagazineId");
 
                     b.ToTable("ShoppingCarts", (string)null);
                 });
@@ -834,6 +829,9 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<string>("SenderCompany")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("StatusSendSMS")
+                        .HasColumnType("bit");
 
                     b.Property<byte?>("Test")
                         .HasColumnType("tinyint");
@@ -927,7 +925,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 9, 29, 13, 30, 54, 498, DateTimeKind.Utc).AddTicks(7344));
+                        .HasDefaultValue(new DateTime(2024, 10, 16, 14, 42, 47, 113, DateTimeKind.Utc).AddTicks(1441));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)
@@ -1296,6 +1294,10 @@ namespace ISTUDIO.Infrastructure.Migrations
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderDetailEntity", b =>
                 {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.MagazineEntity", "Magazine")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("MagazineId");
+
                     b.HasOne("ISTUDIO.Domain.EntityModel.OrderEntity", "Order")
                         .WithMany("Details")
                         .HasForeignKey("OrderId")
@@ -1308,18 +1310,11 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Magazine");
+
                     b.Navigation("Order");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderEntity", b =>
-                {
-                    b.HasOne("ISTUDIO.Domain.EntityModel.MagazineEntity", "Magazine")
-                        .WithMany("Orders")
-                        .HasForeignKey("MagazineId");
-
-                    b.Navigation("Magazine");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderStatusHistoryEntity", b =>
@@ -1374,15 +1369,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Discount");
-
-                    b.Navigation("Magazine");
-                });
-
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ShoppingCartEntity", b =>
-                {
-                    b.HasOne("ISTUDIO.Domain.EntityModel.MagazineEntity", "Magazine")
-                        .WithMany("ShoppingCarts")
-                        .HasForeignKey("MagazineId");
 
                     b.Navigation("Magazine");
                 });
@@ -1517,11 +1503,9 @@ namespace ISTUDIO.Infrastructure.Migrations
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.MagazineEntity", b =>
                 {
-                    b.Navigation("Orders");
+                    b.Navigation("OrderDetails");
 
                     b.Navigation("Products");
-
-                    b.Navigation("ShoppingCarts");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderEntity", b =>

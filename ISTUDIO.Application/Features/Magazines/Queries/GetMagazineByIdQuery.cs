@@ -1,7 +1,7 @@
 ﻿using ISTUDIO.Application.Features.Magazines.DTOs;
 
 namespace ISTUDIO.Application.Features.Magazines.Queries;
-using ResModel = MagazineDTO;
+using ResModel = MagazinesDTO;
 public class GetMagazineByIdQuery : IRequest<ResModel>
 {
     public int MagazineId { get; set; }

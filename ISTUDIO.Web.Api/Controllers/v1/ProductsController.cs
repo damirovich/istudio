@@ -1,6 +1,5 @@
 ﻿using ISTUDIO.Application.Features.Products.Commands.CreateProducts;
 using ISTUDIO.Application.Features.Products.Commands.DeleteProducts;
-using ISTUDIO.Application.Features.Products.Commands.EditPhotosProducts;
 using ISTUDIO.Application.Features.Products.Commands.EditProducts;
 using ISTUDIO.Application.Features.Products.Commands.UpdateProductQuantity;
 using ISTUDIO.Application.Features.Products.DTOs;

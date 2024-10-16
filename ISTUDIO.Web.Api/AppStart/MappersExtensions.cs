@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using ISTUDIO.Application.Common.Interfaces;
-using ISTUDIO.Application.Common.Mappings;
+﻿using ISTUDIO.Application.Common.Mappings;
 using System.Reflection;
 
 namespace ISTUDIO.Web.Api.AppStart;

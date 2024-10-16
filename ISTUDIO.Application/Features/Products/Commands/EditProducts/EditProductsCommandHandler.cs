@@ -11,7 +11,9 @@ public class EditProductsCommandHandler : IRequestHandler<EditProductsCommand, R
     {
         try
         {
-            var existingProduct = await _appDbContext.Products.Include(c => c.Images)
+            var existingProduct = await _appDbContext.Products
+                      .Include(c => c.Images)
+                      .Include(m => m.Magazine)
                       .FirstOrDefaultAsync(c => c.Id == command.Id);
             if (existingProduct == null)
                 return ResModel.Failure(new[] { "Product не найдена" });

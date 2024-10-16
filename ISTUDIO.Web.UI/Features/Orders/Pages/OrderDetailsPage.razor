@@ -27,6 +27,7 @@
         <MudItem xs="12">
             <MudTable Items="Elements" Loading="@_processing" Dense="true" Striped="true" Hover="true" >
                 <HeaderContent>
+                    <MudTh>Магазин</MudTh>
                     <MudTh>Название товара</MudTh>
                     <MudTh>Модель</MudTh>
                     <MudTh>Количество</MudTh>
@@ -34,6 +35,7 @@
                     <MudTh>Всего</MudTh>
                 </HeaderContent>
                 <RowTemplate>
+                    <MudTd DataLabel="Магазин">@context.OrdersMagazines.MagazineName</MudTd> 
                     <MudTd DataLabel="Название товара">@context.ProductOrders.Name</MudTd>
                     <MudTd DataLabel="Модель">@context.ProductOrders.Model</MudTd>
                     <MudTd DataLabel="Количество">@context.QuentyProduct</MudTd>

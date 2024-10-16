@@ -1,4 +1,5 @@
-﻿using ISTUDIO.Domain.EntityModel;
+﻿using ISTUDIO.Application.Features.ModelsDTO;
+using ISTUDIO.Domain.EntityModel;
 
 namespace ISTUDIO.Application.Features.Orders.DTOs;
 
@@ -10,6 +11,7 @@ public class OrderDetailsResponseDTO : IMapWith<OrderDetailEntity>
     public decimal ProductPrice { get; set; }
     public decimal Subtotal { get; set; }
     public decimal TotalPrice { get; set; }
+    public MagazineDTO OrdersMagazines { get; set; }
     public ProductOrderResDTO ProductOrders { get; set; }
     public void Mapping(Profile profile)
     {
@@ -20,6 +22,7 @@ public class OrderDetailsResponseDTO : IMapWith<OrderDetailEntity>
             .ForMember(dest => dest.ProductPrice, opt => opt.MapFrom(src => src.UnitPrice))
             .ForMember(dest => dest.Subtotal, opt => opt.MapFrom(src => src.Subtotal))
             .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.TotalPrice))
-            .ForMember(dest => dest.ProductOrders, opt => opt.MapFrom(src => src.Product));
+            .ForMember(dest => dest.ProductOrders, opt => opt.MapFrom(src => src.Product))
+            .ForMember(dest => dest.OrdersMagazines, opt => opt.MapFrom(src => src.Magazine));
     }
 }

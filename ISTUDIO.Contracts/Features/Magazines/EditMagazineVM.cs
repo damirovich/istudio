@@ -30,7 +30,7 @@ public class EditMagazineVM : IMapWith<EditMagazinesCommand>
                .ForMember(dest => dest.PhotoLogoURL, opt => opt.MapFrom(src => Convert.FromBase64String(src.PhotoLogoBase64)));
 
         // Маппинг из MagazineDTO в EditMagazineVM
-        profile.CreateMap<MagazineDTO, EditMagazineVM>()
+        profile.CreateMap<MagazinesDTO, EditMagazineVM>()
                .ForMember(dest => dest.MagazineId, opt => opt.MapFrom(src => src.Id))
                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))

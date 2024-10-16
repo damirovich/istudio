@@ -29,6 +29,9 @@ public class CreateProductsCommandValidator : AbstractValidator<CreateProductsCo
 
      
         RuleFor(v => v.CategoryId)
-            .NotNull().WithMessage("Категория продукта не может быть пустой.");   
+            .NotNull().WithMessage("Категория продукта не может быть пустой.");
+
+        RuleFor(v => v.MagazineId)
+            .NotNull().WithMessage("Магазин не должен быть пустым.");
     }
 }

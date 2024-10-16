@@ -1,11 +1,11 @@
-﻿using ISTUDIO.Application.Features.CustomerImages.Commands;
-using ISTUDIO.Application.Features.UserManagement.Commands.DeleteUser;
+﻿using ISTUDIO.Application.Features.UserManagement.Commands.DeleteUser;
 using ISTUDIO.Application.Features.UserManagement.Commands.UpdateUserPhotoProfile;
 using ISTUDIO.Application.Features.UserManagement.Queries;
 using ISTUDIO.Application.Helpers;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 
+[ApiVersion("1.0")]
 public class UsersController : BaseController
 {
     private readonly IFileStoreService _fileStoreService;

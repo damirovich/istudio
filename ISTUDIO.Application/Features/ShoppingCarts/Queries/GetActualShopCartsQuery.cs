@@ -1,4 +1,5 @@
-﻿using ISTUDIO.Application.Features.Products.DTOs;
+﻿using ISTUDIO.Application.Features.ModelsDTO;
+using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Application.Features.ShoppingCarts.DTOs;
 
 namespace ISTUDIO.Application.Features.ShoppingCarts.Queries;
@@ -26,17 +27,13 @@ public class GetActualShopCartsQuery : IRequest<ResModel>
             // Получение всех корзин с продуктами
             var shoppingCartsQuery = _appDbContext.ShoppingCarts
                 .Include(sc => sc.Products)
-                    .ThenInclude(p => p.Discount)
                 .Include(sc => sc.Products)
                     .ThenInclude(p => p.Images)
+               // .Include(sc => sc.Magazine)
                 .AsNoTracking()
-                .OrderBy(sc => sc.Id); // Сортировка по ID или другому критерию
+                .OrderByDescending(sc => sc.Id); 
 
-            // Применяем пагинацию
-            var paginatedCarts = await shoppingCartsQuery
-                .PaginatedListAsync(query.Parameters.PageNumber, query.Parameters.PageSize);
-
-            if (!paginatedCarts.Items.Any())
+            if (!shoppingCartsQuery.Any())
             {
                 return new ResModel( new List<ActualShopCartsResponseDTO>().AsReadOnly(), 0, 0, 0);
 
@@ -45,7 +42,7 @@ public class GetActualShopCartsQuery : IRequest<ResModel>
             // Формирование списка для возврата
             var responseList = new List<ActualShopCartsResponseDTO>();
 
-            foreach (var groupedCarts in paginatedCarts.Items.GroupBy(cart => cart.UserId))
+            foreach (var groupedCarts in shoppingCartsQuery.GroupBy(cart => cart.UserId))
             {
                 var products = groupedCarts.SelectMany(cart => cart.Products)
                     .GroupBy(p => new { p.Id, p.Name, p.Model, p.Price })
@@ -59,7 +56,8 @@ public class GetActualShopCartsQuery : IRequest<ResModel>
                         QuantyProductCart = g.Sum(p => p.ShoppingCarts.FirstOrDefault()?.QuantyProduct ?? 0),
                         SumProductCart = g.Key.Price * g.Sum(p => p.ShoppingCarts.FirstOrDefault()?.QuantyProduct ?? 0),
                         Images = _mapper.Map<ICollection<ProductImagesDTO>>(g.FirstOrDefault()?.Images),
-                        ProductDiscount = _mapper.Map<ProductDiscountDTO>(g.FirstOrDefault()?.Discount)
+                        ProductDiscount = _mapper.Map<ProductDiscountDTO>(g.FirstOrDefault()?.Discount),
+                        Description = g.FirstOrDefault()?.Description,
                     }).ToList();
 
                 var user = await _appUserService.GetUserDetailsByUserIdAsync(groupedCarts.Key);
@@ -69,13 +67,27 @@ public class GetActualShopCartsQuery : IRequest<ResModel>
                     UserPhoneNumber = user.UserPhoneNumber ?? "",
                     TotalAmount = products.Sum(p => p.SumProductCart),
                     TotalQuantyProduct = products.Sum(p => p.QuantyProductCart),
+                    DateCreated = groupedCarts.FirstOrDefault()?.CreateDate ?? null, 
                     Products = products
                 };
 
                 responseList.Add(resModel);
             }
 
-            return new ResModel(responseList, paginatedCarts.TotalCount, query.Parameters.PageNumber, query.Parameters.PageSize);
+            // Применяем пагинацию к уже случайно упорядоченному списку
+            var paginatedList = responseList
+                .Skip((query.Parameters.PageNumber - 1) * query.Parameters.PageSize)
+                .Take(query.Parameters.PageSize)
+                .ToList();
+
+            // Возвращаем новый PaginatedList
+            return new ResModel(
+                paginatedList,
+                query.Parameters.PageNumber,
+                (int)Math.Ceiling(responseList.Count / (double)query.Parameters.PageSize),
+                responseList.Count
+            );
+
         }
 
 

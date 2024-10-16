@@ -2,5 +2,5 @@
 
 public class MagazineResListDTO
 {
-    public IList<MagazineDTO> Magazines { get; set; } = new List<MagazineDTO>();
+    public IList<MagazinesDTO> Magazines { get; set; } = new List<MagazinesDTO>();
 }

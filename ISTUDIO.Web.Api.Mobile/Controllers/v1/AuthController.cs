@@ -1,4 +1,5 @@
-﻿using ISTUDIO.Application.Features.SmsNikita.Commands.SendSms;
+﻿using ISTUDIO.Application.Features.SmsNikita.Commands.CreateSmsNikitaRequest;
+using ISTUDIO.Application.Features.SmsNikita.Commands.SendSms;
 using ISTUDIO.Application.Features.SmsNikita.DTOs;
 using ISTUDIO.Application.Features.UserManagement.Commands.RegistrUserMobile;
 using ISTUDIO.Contracts.Features.UserManagement;
@@ -21,9 +22,20 @@ public class AuthController : BaseController
             //Проверка для AppStore 
             if (phonesNumber == "996700123456")
                 return Ok(new SmsSendResponseDTO() { OTP = 123456, MessageStatus = "Сообщения успешно приняты к отправке" });
-                
-            var result = await Mediator.Send(new SendSmsCommand { PhonesNumber = phonesNumber });
+            //Отправка смс внутри MarketKG
+            //  var result = await Mediator.Send(new SendSmsCommand { PhonesNumber = phonesNumber });
+            //Добавление записи в таблицу SmsNikitaRequests с статусом StatusSendSMS = 0
+            var otp = new Random().Next(100000, 1000000);
 
+            var result = await Mediator.Send(new CreateSmsNikitaReqCommand 
+            { 
+                PhonesNumber = new List<string> { phonesNumber },
+                Message = $"Код авторизации {otp}",
+            });
+            if (result.Succeeded)
+            {
+                return Ok(new SmsSendResponseDTO() { OTP = otp, MessageStatus = "Сообщения успешно приняты к отправке" });
+            }
             return Ok(result);
         }
         catch (Exception ex)

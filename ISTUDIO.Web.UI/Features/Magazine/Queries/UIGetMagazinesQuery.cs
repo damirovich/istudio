@@ -2,7 +2,7 @@
 
 
 namespace ISTUDIO.Web.UI.Features.Magazine.Queries;
-using ResModel = PaginatedList<MagazineDTO>;
+using ResModel = PaginatedList<MagazinesDTO>;
 public class UIGetMagazinesQuery : IRequest<ResponseAPI<ResModel>>
 {
     public int PageNumber { get; set; }
