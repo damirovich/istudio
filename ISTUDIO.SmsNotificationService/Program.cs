@@ -20,5 +20,13 @@ var logger = new LoggerConfiguration()
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
+builder.Services.AddWindowsService(options =>
+{
+    options.ServiceName = "SmsNotificationService";
+});
+
+builder.Services.AddHostedService<SendSmsNikitaService>();
+
+
 var host = builder.Build();
 host.Run();

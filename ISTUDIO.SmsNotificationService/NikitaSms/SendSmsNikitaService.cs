@@ -59,6 +59,7 @@ public class SendSmsNikitaService : BackgroundService
                             request.StatusSendSMS = true;
                             dbContext.SmsNikitaRequests.Update(request);
                             await dbContext.SaveChangesAsync(stoppingToken); // Сохраняем изменения в базе данных
+                            _logger.LogInformation("SMS успешно отправлено: {Id}", request.Id);
                         }
                     }
                 }
@@ -66,7 +67,7 @@ public class SendSmsNikitaService : BackgroundService
             catch (Exception ex)
             {
                 // Логируем исключение, если что-то пошло не так
-                Console.WriteLine($"Произошла ошибка при отправке СМС: {ex.Message}");
+                _logger.LogError(ex, "Произошла ошибка при отправке СМС: {Message}", ex.Message);
             }
 
             // Задержка перед следующей итерацией, чтобы избежать высокой нагрузки на процессор
