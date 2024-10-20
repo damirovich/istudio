@@ -22,7 +22,7 @@ public class GetProductsByIdQuery : IRequest<ResModel>
               .Include(d => d.Discount)
               .Include(m => m.Magazine)
               .AsNoTracking()
-              .Where(c => c.Id == query.ProductId)
+              .Where(c => c.Id == query.ProductId && c.IsActive == true)
               .OrderByDescending(c => c.Id)
               .ProjectTo<ResModel>(_mapper.ConfigurationProvider)
               .FirstOrDefaultAsync();

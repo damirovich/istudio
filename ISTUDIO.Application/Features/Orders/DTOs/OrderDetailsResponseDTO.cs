@@ -23,6 +23,6 @@ public class OrderDetailsResponseDTO : IMapWith<OrderDetailEntity>
             .ForMember(dest => dest.Subtotal, opt => opt.MapFrom(src => src.Subtotal))
             .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.TotalPrice))
             .ForMember(dest => dest.ProductOrders, opt => opt.MapFrom(src => src.Product))
-            .ForMember(dest => dest.OrdersMagazines, opt => opt.MapFrom(src => src.Magazine));
+            .ForMember(dest => dest.OrdersMagazines, opt => opt.MapFrom(src => src.Magazines));
     }
 }

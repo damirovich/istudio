@@ -27,7 +27,12 @@ public class ClearShoppingCartsCommand : IRequest<ResModel>
                 if (existingProductCarts == null || existingProductCarts.Count == 0)
                     return ResModel.Failure(new[] { "Shopping carts not found for the user" });
 
-                _appDbContext.ShoppingCarts.RemoveRange(existingProductCarts);
+                foreach (var cart in existingProductCarts)
+                {
+                    cart.IsDeleted = true; // Устанавливаем флаг IsDeleted в true
+                }
+
+                //_appDbContext.ShoppingCarts.RemoveRange(existingProductCarts);
 
                 await _appDbContext.SaveChangesAsync(cancellationToken);
 

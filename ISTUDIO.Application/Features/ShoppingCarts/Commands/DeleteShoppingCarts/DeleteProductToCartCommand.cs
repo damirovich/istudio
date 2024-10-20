@@ -26,8 +26,8 @@ public class DeleteProductToCartCommand : IRequest<ResModel>
                 if (shoppingCart == null)
                     return ResModel.Failure(new[] { "Shopping cart not found for the Id" });
 
-
-                _appDbContext.ShoppingCarts.Remove(shoppingCart);
+                shoppingCart.IsDeleted = true;
+                //_appDbContext.ShoppingCarts.Remove(shoppingCart);
 
                 await _appDbContext.SaveChangesAsync(cancellationToken);
 

@@ -8,5 +8,6 @@ public class ShoppingCartEntity
     public string UserId { get; set; }
     public int QuantyProduct {  get; set; }
     public DateTime? CreateDate { get; set; }
+    public bool IsDeleted { get; set; } 
     public ICollection<ProductsEntity> Products { get; set; } = new List<ProductsEntity>();
 }

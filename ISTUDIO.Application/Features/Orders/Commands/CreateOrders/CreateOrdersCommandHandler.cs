@@ -40,6 +40,8 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                 }
             }
 
+            
+
             string photoFilePath = string.Empty;
             if (command.ReceiptPhoto != null && command.ReceiptPhoto.Length > 0)
             {
@@ -67,7 +69,7 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                 UserId = orderEntity.UserId,
                 Orders = orderEntity
             };
-
+            var orderDetails = new List<OrderDetailEntity>();
             // Добавляем продукты к заказу
             foreach (var productDto in command.ProductOrders)
             {
@@ -86,7 +88,8 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                     orderEntity.Details.Add(orderDetail);
                     orderEntity.Products.Add(productEntity);
 
-                    await _appDbContext.OrderDetails.AddAsync(orderDetail, cancellationToken);
+                    orderDetails.Add(orderDetail);
+                    //await _appDbContext.OrderDetails.AddAsync(orderDetail, cancellationToken);
                 }
                 else
                 {
@@ -96,6 +99,7 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
          
             await _appDbContext.OrderAddresses.AddAsync(orderAddress, cancellationToken);
             await _appDbContext.Orders.AddAsync(orderEntity, cancellationToken);
+            await _appDbContext.OrderDetails.AddRangeAsync(orderDetails, cancellationToken);
             await _appDbContext.SaveChangesAsync(cancellationToken);
 
             // Добавляем запись в историю статусов

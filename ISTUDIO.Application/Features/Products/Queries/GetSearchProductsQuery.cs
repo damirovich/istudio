@@ -29,7 +29,7 @@ public class GetSearchProductsQuery : IRequest<ResModel>
                          a.Id.ToString().Contains(query.Parameters.SearchTerm) ||
                          a.Model.Contains(query.Parameters.SearchTerm) ||
                          a.Description.StartsWith(query.Parameters.SearchTerm) 
-                         )
+                         && a.IsActive == true)
                .OrderByDescending(c => c.Id)
                .ProjectTo<ProductsResponseDTO>(_mapper.ConfigurationProvider)
                .PaginatedListAsync(query.Parameters.PageNumber, query.Parameters.PageSize);

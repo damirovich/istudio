@@ -4,6 +4,7 @@ using ISTUDIO.Infrastructure.AppDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISTUDIO.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241019123057_AddColIsActivePM")]
+    partial class AddColIsActivePM
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,7 +146,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 10, 20, 7, 49, 36, 273, DateTimeKind.Utc).AddTicks(7465));
+                        .HasDefaultValue(new DateTime(2024, 10, 19, 12, 30, 56, 289, DateTimeKind.Utc).AddTicks(7943));
 
                     b.Property<int?>("CustomerId")
                         .IsRequired()
@@ -552,7 +555,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 10, 20, 7, 49, 36, 279, DateTimeKind.Utc).AddTicks(4915));
+                        .HasDefaultValue(new DateTime(2024, 10, 19, 12, 30, 56, 292, DateTimeKind.Utc).AddTicks(4851));
 
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
@@ -630,7 +633,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("ChangeDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 10, 20, 7, 49, 36, 298, DateTimeKind.Utc).AddTicks(2676));
+                        .HasDefaultValue(new DateTime(2024, 10, 19, 12, 30, 56, 301, DateTimeKind.Utc).AddTicks(3336));
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -753,7 +756,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 10, 20, 7, 49, 36, 290, DateTimeKind.Utc).AddTicks(2774));
+                        .HasDefaultValue(new DateTime(2024, 10, 19, 12, 30, 56, 297, DateTimeKind.Utc).AddTicks(7235));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -808,9 +811,6 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<int>("QuantyProduct")
                         .HasColumnType("int");
@@ -934,7 +934,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 10, 20, 7, 49, 36, 272, DateTimeKind.Utc).AddTicks(7442));
+                        .HasDefaultValue(new DateTime(2024, 10, 19, 12, 30, 56, 289, DateTimeKind.Utc).AddTicks(5438));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)

@@ -17,6 +17,7 @@ public class MagazineEntityConfiguration : IEntityTypeConfiguration<MagazineEnti
         builder.Property(e => e.PhoneNumber).HasMaxLength(20).IsRequired();
         builder.Property(e => e.PhotoLogoURL).HasMaxLength(500);
         builder.Property(e => e.UserId).IsRequired();
+        builder.Property(e => e.IsActive).IsRequired();
 
         // Связь с продуктами
         builder.HasMany(e => e.Products)
@@ -24,7 +25,7 @@ public class MagazineEntityConfiguration : IEntityTypeConfiguration<MagazineEnti
                .HasForeignKey(p => p.MagazineId);
 
         builder.HasMany(e => e.OrderDetails)
-               .WithOne(od => od.Magazine)
+               .WithOne(od => od.Magazines)
                .HasForeignKey(od => od.MagazineId);
 
 

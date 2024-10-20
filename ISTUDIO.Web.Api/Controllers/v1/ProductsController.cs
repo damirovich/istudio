@@ -1,7 +1,9 @@
 ﻿using ISTUDIO.Application.Features.Products.Commands.CreateProducts;
 using ISTUDIO.Application.Features.Products.Commands.DeleteProducts;
 using ISTUDIO.Application.Features.Products.Commands.EditProducts;
+using ISTUDIO.Application.Features.Products.Commands.UpdateProductIsActive;
 using ISTUDIO.Application.Features.Products.Commands.UpdateProductQuantity;
+using ISTUDIO.Application.Features.Products.Commands.UpdateProductSum;
 using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Application.Features.Products.Queries;
 using ISTUDIO.Contracts.Features.Products;
@@ -233,6 +235,59 @@ public class ProductsController : BaseController
         try
         {
             var command = _mapper.Map<UpdateProductQuantityCommand>(updateProductQuantityVM);
+
+            var result = await Mediator.Send(command);
+            if (result.Succeeded)
+                return new CsmActionResult(result);
+
+            return new CsmActionResult(result.Errors);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Обновление сумму продукта
+    /// </summary>
+    /// <param name="updateProductSummVM"></param>
+    /// <returns></returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> UpdateProductSumm([FromBody] UpdateProductSummVM updateProductSummVM)
+    {
+        try
+        {
+            var command = _mapper.Map<UpdateProductSummaCommand>(updateProductSummVM);
+
+            var result = await Mediator.Send(command);
+            if (result.Succeeded)
+                return new CsmActionResult(result);
+
+            return new CsmActionResult(result.Errors);
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
+
+
+    /// <summary>
+    /// Обновление статус продукта
+    /// </summary>
+    /// <param name="updateProductActiveVM"></param>
+    /// <returns></returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> UpdateProductStatus([FromBody] UpdateProductActiveVM updateProductActiveVM)
+    {
+        try
+        {
+            var command = _mapper.Map<UpdateProductActiveCommand>(updateProductActiveVM);
 
             var result = await Mediator.Send(command);
             if (result.Succeeded)

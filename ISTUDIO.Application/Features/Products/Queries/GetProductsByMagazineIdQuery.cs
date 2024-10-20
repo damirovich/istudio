@@ -24,7 +24,7 @@ public class GetProductsByMagazineIdQuery : IRequest<ResModel>
               .Include(d => d.Discount)
               .Include(m => m.Magazine)
               .AsNoTracking()
-              .Where(m => m.MagazineId == query.MagazineId)
+              .Where(m => m.MagazineId == query.MagazineId && m.IsActive == true)
               .OrderByDescending(c => c.Id)
               .ProjectTo<ProductsResponseDTO>(_mapper.ConfigurationProvider)
               .PaginatedListAsync(query.Parameters.PageNumber, query.Parameters.PageSize);

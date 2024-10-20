@@ -8,8 +8,8 @@ public class EditOrderUserAddressCommandValidator : AbstractValidator<EditOrderU
              .GreaterThan(0).WithMessage("Id должен быть больше 0.");
 
         RuleFor(x => x.Region)
-            .NotEmpty().WithMessage("Регион обязателен для заполнения.")
-            .Matches(@"^[а-яА-ЯёЁa-zA-Z\s]+$").WithMessage("Регион должен содержать только буквы.");
+            .NotEmpty().WithMessage("Регион обязателен для заполнения.");
+           // .Matches(@"^[а-яА-ЯёЁa-zA-Z\s]+$").WithMessage("Регион должен содержать только буквы.");
 
         RuleFor(x => x.City)
             .NotEmpty().WithMessage("Город обязателен для заполнения.")

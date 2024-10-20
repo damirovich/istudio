@@ -16,6 +16,7 @@ public class CreateProductsCommandHandler : IRequestHandler<CreateProductsComman
             // Маппинг команды на сущность
             var productEntity = _mapper.Map<ProductsEntity>(command);
             productEntity.CreateDate = DateTime.UtcNow;
+            productEntity.IsActive = true;
 
             // Добавление сущности в контекст базы данных
             _appDbContext.Products.Add(productEntity);

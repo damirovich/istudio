@@ -29,8 +29,9 @@ public class GetActualShopCartsQuery : IRequest<ResModel>
                 .Include(sc => sc.Products)
                 .Include(sc => sc.Products)
                     .ThenInclude(p => p.Images)
-               // .Include(sc => sc.Magazine)
+                // .Include(sc => sc.Magazine)
                 .AsNoTracking()
+                .Where(sc => sc.IsDeleted == false)
                 .OrderByDescending(sc => sc.Id); 
 
             if (!shoppingCartsQuery.Any())

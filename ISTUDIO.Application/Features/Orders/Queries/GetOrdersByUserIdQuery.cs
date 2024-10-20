@@ -28,7 +28,7 @@ public class GetOrdersByUserIdQuery : IRequest<ResModel>
                     .ThenInclude(d => d.Product)
                     .ThenInclude(pd => pd.Discount) // Включаем скидки на продукты
                 .Include(o => o.Details)
-                    .ThenInclude(d => d.Magazine)  // Включаем магазины через детали заказа
+                    .ThenInclude(d => d.Magazines)  // Включаем магазины через детали заказа
                 .Include(o => o.Products)
                     .ThenInclude(o => o.Images)
                 .Where(o => o.UserId == query.UserId)

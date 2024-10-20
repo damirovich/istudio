@@ -34,7 +34,7 @@ public class GetWeeklyNewProductsQuery : IRequest<ResModel>
                 .Include(d => d.Discount)
                 .Include(m => m.Magazine)
                 .AsNoTracking()
-                .Where(p => p.CreateDate >= oneWeekAgo)
+                .Where(p => p.CreateDate >= oneWeekAgo && p.IsActive == true)
                 .ProjectTo<ProductsResponseDTO>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
 

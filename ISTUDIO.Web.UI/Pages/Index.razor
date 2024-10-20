@@ -1,5 +1,7 @@
 ﻿@page "/"
 
+@using Microsoft.Extensions.Options
+@inject IOptions<EnvironmentSettings> EnvironmentSettingsOptions
 <PageTitle>Index</PageTitle>
 
 
@@ -17,7 +19,7 @@
     }
 </style>
 
-<h1>ТЕСТ</h1>
+<h1>@EnvironmentSettingsOptions.Value.EnvironmentName</h1>
 <div class="container">
     <MudImage Class="centered-image ml-1" ObjectFit="ObjectFit.ScaleDown" Src="photos/Ресурс 24.png" Alt="Logo" />
 

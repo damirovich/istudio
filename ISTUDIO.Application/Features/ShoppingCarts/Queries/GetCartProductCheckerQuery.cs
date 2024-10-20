@@ -16,7 +16,7 @@ public class GetCartProductCheckerQuery : IRequest<bool>
         {
             // Ищем корзину пользователя с указанным ProductId
             var productExists = await _appDbContext.ShoppingCarts
-                .Where(cart => cart.UserId == query.UserId)
+                .Where(cart => cart.UserId == query.UserId && cart.IsDeleted == false)
                 .AnyAsync(cart => cart.Products.Any(product => product.Id == query.ProductId), cancellationToken);
 
             return productExists;

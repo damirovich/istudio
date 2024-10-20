@@ -15,6 +15,7 @@ public class ProductsResponseDTO : IMapWith<ProductsEntity>
     public ICollection<ProductImagesDTO> Images { get; set; }
     public ProductDiscountDTO ProductDiscount { get; set; }
     public int ProductCategory { get; set; }
+    public bool IsActive { get; set; }
     public MagazineDTO?  ProductMagazine { get; set; }
 
     public void Mapping(Profile profile)
@@ -30,6 +31,7 @@ public class ProductsResponseDTO : IMapWith<ProductsEntity>
              .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
              .ForMember(dest => dest.ProductDiscount, opt => opt.MapFrom(src => src.Discount))
              .ForMember(dest => dest.ProductCategory, opt => opt.MapFrom(src => src.CategoryId))
+             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
              .ForMember(dest => dest.ProductMagazine, opt => opt.MapFrom(src => src.Magazine));
 
     }

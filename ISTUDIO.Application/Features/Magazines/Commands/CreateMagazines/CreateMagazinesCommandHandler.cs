@@ -29,6 +29,7 @@ public class CreateMagazinesCommandHandler : IRequestHandler<CreateMagazinesComm
             var magazine = _mapper.Map<MagazineEntity>(command);
 
             magazine.PhotoLogoURL = photoFilePath;
+            magazine.IsActive = true;
 
             // Добавление сущности в контекст базы данных
             _appDbContext.Magazines.Add(magazine);

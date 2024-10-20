@@ -1,6 +1,7 @@
 
 using ISTUDIO.Application;
 using ISTUDIO.Web.UI.AppStart;
+using ISTUDIO.Web.UI.Features.Models;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,7 @@ builder.Services.AddMediatR(cfg => cfg.AddCustomMediatR());
 builder.Services.AddMudServices(x => x.AddCustomMud());
 builder.Services.AddCustomAutoMapper();
 builder.Services.AddCustomDI(builder.Configuration);
-
+builder.Services.Configure<EnvironmentSettings>(builder.Configuration.GetSection("EnvironmentSettings"));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

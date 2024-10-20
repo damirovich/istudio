@@ -34,7 +34,7 @@ public class GetShoppingCartsByUserIdQuery : IRequest<ResModel>
                     .ThenInclude(p => p.Images)
                 .Include(sc => sc.Products)
                     .ThenInclude(p => p.Magazine)
-                .Where(cart => cart.UserId == query.UserId)
+                .Where(cart => cart.UserId == query.UserId && cart.IsDeleted == false)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 

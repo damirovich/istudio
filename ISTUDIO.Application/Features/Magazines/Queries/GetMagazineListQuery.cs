@@ -23,6 +23,7 @@ public class GetMagazineListQuery : IRequest<ResModel>
             var magazine = await _appDbContext.Magazines
                 .AsNoTracking()
                 .OrderByDescending(x => x.Id)
+                .Where(m => m.IsActive == true)
                 .ProjectTo<MagazinesDTO>(_mapper.ConfigurationProvider)
                 .PaginatedListAsync(query.Parameters.PageNumber, query.Parameters.PageSize);
 

@@ -25,7 +25,7 @@ public class GetOrdersListQuery : IRequest<ResModel>
             var orders = await _appDbContext.Orders
                 .Include(o => o.Customers) // Включаем информацию о клиентах
                 .Include(o => o.Details)   // Включаем детали заказа
-                    .ThenInclude(d => d.Magazine) // Включаем магазины через детали заказа
+                    .ThenInclude(d => d.Magazines) // Включаем магазины через детали заказа
                 .Include(o => o.Details)
                     .ThenInclude(d => d.Product)  // Включаем продукты через детали заказа
                     .ThenInclude(pi => pi.Images)

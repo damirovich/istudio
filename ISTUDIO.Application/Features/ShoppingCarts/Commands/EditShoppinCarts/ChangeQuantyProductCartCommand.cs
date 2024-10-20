@@ -40,6 +40,7 @@ public class ChangeQuantyProductCartCommand : IRequest<ResModel>
                 throw new BadRequestException($"Недостаточно количество продукта. {product.Name} Доступный количество продуктов: {product.QuantityInStock}");
 
             shoppingCart.QuantyProduct = command.QuantyProduct;
+            shoppingCart.IsDeleted = false;
 
             _appDbContext.ShoppingCarts.Update(shoppingCart);
 

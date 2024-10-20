@@ -17,6 +17,7 @@
         <MudTh><MudTableSortLabel SortLabel="Price" T="TableModel">Цена</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="QuantityInStock" T="TableModel">Количество</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="Description" T="TableModel">Описание</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Status" T="TableModel">Статус Продукта</MudTableSortLabel></MudTh>
         <MudTh>Действия</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -28,7 +29,9 @@
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Model">@context.Model</MudTd>
         <MudTd DataLabel="ColorProduct">@context.Color</MudTd>
-        <MudTd DataLabel="Price">@context.Price</MudTd>
+        <MudTd DataLabel="Price">
+            <MudTextField T="decimal" @bind-Value="@context.Price" Immediate="true" OnBlur="@(() => UpdateProductSumm(context.Id, context.Name, context.Price))" />
+        </MudTd>
         <MudTd DataLabel="QuantityInStock">
             <MudTextField T="int" @bind-Value="@context.QuantityInStock" Immediate="true" OnBlur="@(() => UpdateProductQuantity(context.Id, context.Name, context.QuantityInStock))" />
         </MudTd>
@@ -45,6 +48,13 @@
                 <MudButton Variant="Variant.Text" OnClick="@(() => ToggleExpand(context.Id))">Показать меньше</MudButton>
             }
         </MudTd>
+        <MudTd DataLabel="Status">
+            <MudSelect T="bool" Value="@context.IsActive" ValueChanged="@(async (newValue) => await UpdateProductStatus(context.Id, context.Name, newValue))" Immediate="true">
+                <MudSelectItem T="bool" Value="true">Активировать</MudSelectItem>
+                <MudSelectItem T="bool" Value="false">Деактивировать</MudSelectItem>
+            </MudSelect>
+        </MudTd>
+
         <MudTd>
             <MudIconButton Href="@($"products/edit/photos/{context.Id}")" Icon="@Icons.Material.Filled.AddAPhoto" Size="Size.Medium" Color="Color.Inherit" />
             <MudIconButton Href="@($"products/edit/{context.Id}")" Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" />
@@ -200,6 +210,54 @@
         else
         {
             _snackbar.Add($"Ошибка: Не удалось обновить количество Продукта {productName} {string.Join(", ", result.StatusMessage)}", Severity.Error);
+        }
+    }
+
+    private async Task UpdateProductSumm(int productId, string productName, decimal newSumm)
+    {
+        var command = new UIUpdateProductSummaCommand
+            {
+                ProductSummaUpdate = new UpdateProductSummVM
+                {
+                    ProductId = productId,
+                    ProductSumma = newSumm
+                }
+            };
+
+        var result = await _mediatr.Send(command);
+
+        if (result.Status)
+        {
+            _snackbar.Add($"Сумма успешно обновлено! Продукт {productName} на {newSumm}", Severity.Success);
+            await table.ReloadServerData();
+        }
+        else
+        {
+            _snackbar.Add($"Ошибка: Не удалось обновить сумму Продукта {productName} {string.Join(", ", result.StatusMessage)}", Severity.Error);
+        }
+    }
+
+    private async Task UpdateProductStatus(int productId, string productName, bool newStatus)
+    {
+        var command = new UIUpdateProductActiveCommand
+            {
+                ProductStatusUpdate = new UpdateProductActiveVM
+                {
+                    ProductId = productId,
+                    ProductActive = newStatus
+                }
+            };
+
+        var result = await _mediatr.Send(command);
+
+        if (result.Status)
+        {
+            _snackbar.Add($"Статус успешно обновлено! Продукт {productName} на {newStatus}", Severity.Success);
+            await table.ReloadServerData();
+        }
+        else
+        {
+            _snackbar.Add($"Ошибка: Не удалось обновить статус Продукта {productName} {string.Join(", ", result.StatusMessage)}", Severity.Error);
         }
     }
 

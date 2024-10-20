@@ -26,7 +26,7 @@ public class OrderDetailEntityConfiguration : IEntityTypeConfiguration<OrderDeta
             .HasForeignKey(e => e.ProductId)
             .IsRequired();
 
-        builder.HasOne(e => e.Magazine)
+        builder.HasOne(e => e.Magazines)
             .WithMany(e=>e.OrderDetails)
             .HasForeignKey(e => e.MagazineId)
             .IsRequired(false);

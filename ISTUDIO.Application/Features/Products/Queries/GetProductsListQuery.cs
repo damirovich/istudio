@@ -24,6 +24,7 @@ public class GetProductsListQuery  : IRequest<ResModel>
                 .Include(d => d.Discount)
                 .Include(m => m.Magazine)
                 .AsNoTracking()
+                .Where(p => p.IsActive == true)
                 .OrderByDescending(c => c.Id)
                 .ProjectTo<ProductsResponseDTO>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);

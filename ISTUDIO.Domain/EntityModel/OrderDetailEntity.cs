@@ -34,7 +34,7 @@ public class OrderDetailEntity
     public ProductsEntity Product { get; set; }
 
     //Магазин, связанный с данной деталью заказа
-    public MagazineEntity Magazine { get; set; }
+    public MagazineEntity Magazines { get; set; }
 
 
 }

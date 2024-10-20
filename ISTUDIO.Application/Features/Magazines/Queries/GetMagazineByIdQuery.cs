@@ -21,7 +21,7 @@ public class GetMagazineByIdQuery : IRequest<ResModel>
             // Поиск магазина по его ID
             var magazine = await _appDbContext.Magazines
                 .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == query.MagazineId, cancellationToken);
+                .FirstOrDefaultAsync(m => m.Id == query.MagazineId && m.IsActive == true, cancellationToken);
 
             // Проверка, найден ли магазин
             if (magazine == null)

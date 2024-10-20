@@ -24,6 +24,7 @@ public class ProductsEntity
     public string Description { get; set; }
     //Дата добавление продукта
     public DateTime CreateDate { get; set; }
+    public bool IsActive { get; set; }
 
     // Идентификатор категории, к которой относится продукт
     public int? CategoryId { get; set; }

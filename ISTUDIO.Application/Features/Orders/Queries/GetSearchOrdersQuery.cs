@@ -25,7 +25,7 @@ public class GetSearchOrdersQuery : IRequest<ResModel>
             // Формируем запрос с учетом поиска
             var ordersQuery = _appDbContext.Orders
                 .Include(o => o.Details)   // Включаем детали заказа
-                    .ThenInclude(d => d.Magazine)  // Включаем магазины через детали заказа
+                    .ThenInclude(d => d.Magazines)  // Включаем магазины через детали заказа
                 .Include(o => o.Details)
                     .ThenInclude(d => d.Product)   // Включаем продукты через детали заказа
                     .ThenInclude(pi => pi.Images)

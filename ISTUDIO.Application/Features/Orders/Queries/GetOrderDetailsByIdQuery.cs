@@ -27,7 +27,7 @@ public class GetOrderDetailsByIdQuery : IRequest<ResModel>
                      .ThenInclude(pd => pd.Discount) // Включаем скидки на продукт
                 .Include(o => o.Product)
                      .ThenInclude(o => o.Images)
-                .Include(o => o.Magazine) // Включаем магазин через детали заказа
+                .Include(o => o.Magazines) // Включаем магазин через детали заказа
                 .Where(s => s.OrderId == query.OrderId) // Фильтр по OrderId
                 .ToListAsync(cancellationToken);
 

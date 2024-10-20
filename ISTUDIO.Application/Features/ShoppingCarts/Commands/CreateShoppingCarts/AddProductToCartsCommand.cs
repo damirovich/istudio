@@ -50,7 +50,8 @@ public class AddProductToCartsCommand : IRequest<ResModel>
                 UserId = command.UserId,
                 Products = new List<ProductsEntity> { product },
                 QuantyProduct = 1,
-                CreateDate = DateTime.Now
+                CreateDate = DateTime.Now,
+                IsDeleted = false
             };
 
             _appDbContext.ShoppingCarts.Add(shoppingCart);

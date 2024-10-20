@@ -71,7 +71,7 @@ public class SendSmsNikitaService : BackgroundService
             }
 
             // Задержка перед следующей итерацией, чтобы избежать высокой нагрузки на процессор
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(20), stoppingToken);
         }
     }
 }

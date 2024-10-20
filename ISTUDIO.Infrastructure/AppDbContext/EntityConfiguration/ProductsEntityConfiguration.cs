@@ -20,6 +20,7 @@ public class ProductsEntityConfiguration : IEntityTypeConfiguration<ProductsEnti
         builder.Property(e => e.CreateDate)
             .HasDefaultValue(DateTime.UtcNow)
             .ValueGeneratedOnAdd();
+        builder.Property(e => e.IsActive).IsRequired();
 
         // Определение связи с категорией
         builder.HasOne(p => p.Category)
