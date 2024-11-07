@@ -10,4 +10,8 @@
     <ProjectReference Include="..\ISTUDIO.Application\ISTUDIO.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\FreedomPay\" />
+  </ItemGroup>
+
 </Project>

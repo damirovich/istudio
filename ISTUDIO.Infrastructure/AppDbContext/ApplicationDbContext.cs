@@ -31,6 +31,10 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<OrderStatusHistoryEntity> OrderStatusHistories { get; set; }
     public DbSet<MagazineEntity> Magazines { get; set; }
     public DbSet<OrderNotificationRecipientEntity> OrderNotificationRecipients { get; set; }
+    public DbSet<FreedomPayInitRequestEntity> FreedomPayInitRequests { get; set; }
+    public DbSet<FreedomPayInitResEntity> FreedomPayInitRespons { get; set; }
+    public DbSet<FreedomPayResultRequestEntity> FreedomPayResultRequests { get; set; }
+    public DbSet<FreedomPayResultResponseEntity> FreedomPayResultResponses { get; set; }
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
     protected override void OnModelCreating(ModelBuilder builder)
@@ -69,5 +73,9 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new OrderStatusHistoryConfiguration());
         builder.ApplyConfiguration(new MagazineEntityConfiguration());
         builder.ApplyConfiguration(new OrderNotificationRecipientConfiguration());
+        builder.ApplyConfiguration(new FreedomPayInitResEntityConfiguration());
+        builder.ApplyConfiguration(new FreedomPayRequestEntityConfiguration());
+        builder.ApplyConfiguration(new FreedomPayResultRequestEntityConfiguration());
+        builder.ApplyConfiguration(new FreedomPayResultResponseEntityConfiguration());
     }   
 }

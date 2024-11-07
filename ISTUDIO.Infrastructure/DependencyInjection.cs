@@ -61,6 +61,10 @@ public static class DependencyInjection
         {
             client.BaseAddress = new Uri("https://smspro.nikita.kg/api/message");
         });
+        services.AddHttpClient<IFreedomPayService, FreedomPayServices>(client =>
+        {
+            client.BaseAddress = new Uri(configuration["FreedomPay:BaseAddresFreedomPay"]);
+        });
         services.AddSingleton<IRedisCacheService>(provider =>
         {
             var redisConnectionString = configuration.GetConnectionString("Redis");
