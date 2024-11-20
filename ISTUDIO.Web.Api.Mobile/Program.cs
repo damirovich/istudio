@@ -4,6 +4,7 @@ using ISTUDIO.Infrastructure;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using ISTUDIO.Web.Api.Mobile.Services.FreedomPayServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,11 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
+builder.Services.AddHttpClient<IFreedomPayApiClient, FreedomPayApiClient>(client =>
+{
+    client.BaseAddress = new Uri("http://api.marketplace.kg:1122/api/v1/FreedomPay/");
+    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+});
 
 
 //Версионность в API

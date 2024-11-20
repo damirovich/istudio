@@ -14,10 +14,16 @@ public static class DependencyInjection
            services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("MsSQLConnectionString");
-        services.AddTransient<IAppDbContext, ApplicationDbContext>();
+        // services.AddTransient<IAppDbContext, ApplicationDbContext>();
+        //services.AddDbContext<ApplicationDbContext>(options =>
+        //        options.UseSqlServer(connectionString, b => b.MigrationsAssembly("ISTUDIO.Infrastructure")));
         services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString, b => b.MigrationsAssembly("ISTUDIO.Infrastructure")));
+     options.UseSqlServer(configuration.GetConnectionString("MsSQLConnectionString")));
 
+        services.AddScoped<IAppDbContext>(provider => provider.GetService<ApplicationDbContext>());
+
+
+        // Регистрация Identity
         services
             .AddIdentity<AppUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()

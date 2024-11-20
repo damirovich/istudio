@@ -4,6 +4,7 @@ using ISTUDIO.Infrastructure.AppDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISTUDIO.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241114134913_AddColJsonInitReqFreedomPay")]
+    partial class AddColJsonInitReqFreedomPay
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -143,7 +146,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 14, 15, 10, 59, 365, DateTimeKind.Utc).AddTicks(3203));
+                        .HasDefaultValue(new DateTime(2024, 11, 14, 13, 49, 12, 386, DateTimeKind.Utc).AddTicks(6414));
 
                     b.Property<int?>("CustomerId")
                         .IsRequired()
@@ -344,7 +347,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("FavoriteProducts", (string)null);
                 });
 
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FreedomPayInitReqEntity", b =>
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FreedomPayInitRequestEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -358,12 +361,11 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("JsonData")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("FreedomPayInitReq", (string)null);
+                    b.ToTable("FreedomInitPayRequests", (string)null);
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FreedomPayInitResEntity", b =>
@@ -687,7 +689,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 14, 15, 10, 59, 372, DateTimeKind.Utc).AddTicks(4713));
+                        .HasDefaultValue(new DateTime(2024, 11, 14, 13, 49, 12, 389, DateTimeKind.Utc).AddTicks(4281));
 
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
@@ -765,7 +767,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("ChangeDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 14, 15, 10, 59, 394, DateTimeKind.Utc).AddTicks(5611));
+                        .HasDefaultValue(new DateTime(2024, 11, 14, 13, 49, 12, 398, DateTimeKind.Utc).AddTicks(671));
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -888,7 +890,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 14, 15, 10, 59, 385, DateTimeKind.Utc).AddTicks(7661));
+                        .HasDefaultValue(new DateTime(2024, 11, 14, 13, 49, 12, 394, DateTimeKind.Utc).AddTicks(4984));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -1069,7 +1071,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 14, 15, 10, 59, 364, DateTimeKind.Utc).AddTicks(8003));
+                        .HasDefaultValue(new DateTime(2024, 11, 14, 13, 49, 12, 386, DateTimeKind.Utc).AddTicks(3406));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)

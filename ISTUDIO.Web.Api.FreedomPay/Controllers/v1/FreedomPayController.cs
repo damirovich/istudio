@@ -1,7 +1,13 @@
 ﻿
+//using ISTUDIO.Application.Features.FreedomPay.InitiPay.Commands.AddRequestInitPay;
+using ISTUDIO.Application.Features.FreedomPay.InitiPay.Commands.AddRequestInitPay;
+using ISTUDIO.Application.Features.FreedomPay.InitiPay.Commands.AddResponseInitPay;
 using ISTUDIO.Application.Features.FreedomPay.ResultPay.Commands.AddResultPayRequest;
+using ISTUDIO.Application.Features.FreedomPay.ResultPay.Commands.AddResultPayResponse;
 using ISTUDIO.Domain.Models;
-using System.Globalization;
+using System.Text;
+using System.Text.Json;
+using System.Xml.Serialization;
 
 namespace ISTUDIO.Web.Api.FreedomPay.Controllers.v1;
 
@@ -29,7 +35,22 @@ public class FreedomPayController : BaseController
         {
             _logger.LogInformation("Processing InitiatePayment for RequestId: {RequestId}", requestModel.PgOrderId);
 
+            var addRequestRes = await Mediator.Send(new CreateFreedomPayInitReqCommand()
+            {
+                JsonData = JsonSerializer.Serialize(requestModel)
+            });
+
             var result = await _freedomPayService.SendFreedomPay(requestModel);
+
+            var resInitPay = await Mediator.Send(new CreateFreedomPayInitResponseCommand()
+            {
+                Status = result.PgStatus,
+                PaymentId = result.PgPaymentId,
+                RedirectUrl = result.PgRedirectUrl,
+                RedirectUrlType = result.PgRedirectUrlType,
+                Salt = result.PgSalt,
+                Sig = result.PgSig
+            });
 
             _logger.LogInformation("InitiatePayment processed successfully for RequestId: {RequestId}", requestModel.PgOrderId);
             return Ok(result);
@@ -42,54 +63,67 @@ public class FreedomPayController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> ResultPayment([FromForm] FreedomPayResultRequestModel requestModel)
+    public async Task<IActionResult> ResultPayment([FromForm] Dictionary<string, string> requestForm)
     {
-        if (requestModel == null)
+        if (requestForm == null || requestForm.Count == 0)
         {
-            _logger.LogWarning("Received null request in ResultPayment");
+            _logger.LogWarning("Received null or empty request in ResultPayment");
             return BadRequest("Invalid result payment request data");
         }
 
-        try 
+        try
         {
-            _logger.LogInformation("Processing ResultPayment for PgOrderId: {PgOrderId}", requestModel.PgOrderId);
+            _logger.LogInformation("Processing ResultPayment for PgOrderId: {PgOrderId}", requestForm.ContainsKey("pg_order_id") ? requestForm["pg_order_id"] : "N/A");
+
+            var requestModel = new FreedomPayResultRequestModel();
+            foreach (var parameter in requestForm)
+            {
+                requestModel.AddParameter(parameter.Key, parameter.Value);
+            }
+
+            requestModel.ValidateRequiredFields();
 
             var result = await _freedomPayService.ReturnReusltFreedomPay(requestModel);
+            var xml = SerializeResponseToXml(result);
 
-            var addTable = await Mediator.Send(new CreateFreedomPayResultRequestCommand()
+            var addRequestRes = await Mediator.Send(new CreateFreedomPayResultRequestCommand()
             {
-                PgOrderId = Convert.ToInt32(requestModel.PgOrderId),
-                PgPaymentId = Convert.ToInt32(requestModel.PgPaymentId),
-                PgAmount = decimal.Parse(requestModel.PgPsAmount, CultureInfo.InvariantCulture),
-                PgCurrency = requestModel.PgCurrency,
-                PgNetAmount = decimal.Parse(requestModel.PgNetAmount, CultureInfo.InvariantCulture),
-                PgPsAmount = decimal.Parse(requestModel.PgPsAmount, CultureInfo.InvariantCulture),
-                PgPsFullAmount = decimal.Parse(requestModel.PgPsFullAmount, CultureInfo.InvariantCulture),
-                PgPsCurrency = requestModel.PgCurrency,
-                PgDescription = requestModel.PgDescription,
-                PgResult = (int)requestModel.PgResult,
-                PgPaymentDate = Convert.ToDateTime(requestModel.PgPaymentDate),
-                PgCanReject = (int)requestModel.PgCanReject,
-                PgUserPhone = requestModel.PgUserPhone,
-                PgNeedPhoneNotification = (short)requestModel.PgNeedPhoneNotification,
-                PgUserContactEmail = requestModel.PgUserContactEmail,
-                PgNeedEmailNotification = (short)requestModel.PgNeedEmailNotification,
-                PgTestingMode = (int)requestModel.PgTestingMode,
-                PgCaptured = (int)requestModel.PgCaptured,
-                PgReference = requestModel.PgReference,
-                PgCardPan = requestModel.PgCardPan,
-                PgAuthCode = requestModel.PgAuthCode,
-                PgSalt = requestModel.PgSalt,
-                PgSig = requestModel.PgSig,
-                PgPaymentMethod = requestModel.PgPaymentMethod
+                JsonData = requestModel.ToJson()
             });
-            _logger.LogInformation("ResultPayment processed successfully for PgOrderId: {PgOrderId}", requestModel.PgOrderId);
-            return Ok(result);
+
+            var addResReqResult = await Mediator.Send(new CreateFreedomPayResultResponseCommand()
+            {
+                Status = result.PgStatus,
+                Description = result.PgDescription,
+                Salt = result.PgSalt,
+                Sig = result.PgSig
+            });
+
+            _logger.LogInformation("ResultPayment processed successfully for PgOrderId: {PgOrderId}", requestModel["pg_order_id"]);
+            return Content(xml, "application/xml");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while processing ResultPayment for PgOrderId: {PgOrderId}", requestModel.PgOrderId);
+            _logger.LogError(ex, "Error occurred while processing ResultPayment for PgOrderId: {PgOrderId}", requestForm.ContainsKey("pg_order_id") ? requestForm["pg_order_id"] : "N/A");
             return StatusCode(500, ex.Message);
         }
     }
+
+
+    private string SerializeResponseToXml(FreedomPayResultResponseModel responseModel)
+    {
+        var xmlSerializer = new XmlSerializer(typeof(FreedomPayResultResponseModel));
+        var namespaces = new XmlSerializerNamespaces();
+        namespaces.Add("", ""); // Убираем лишние неймспейсы
+
+        using var stringWriter = new StringWriter();
+        using var xmlWriter = System.Xml.XmlWriter.Create(stringWriter, new System.Xml.XmlWriterSettings { OmitXmlDeclaration = true, Encoding = Encoding.UTF8 });
+
+        xmlSerializer.Serialize(xmlWriter, responseModel, namespaces);
+
+        return stringWriter.ToString();
+    }
+
 }
+
+  

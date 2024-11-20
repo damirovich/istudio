@@ -1,4 +1,4 @@
-﻿using ISTUDIO.Web.Api.FreedomPay.AppStart;
+﻿using ISTUDIO.Web.Api.BakaiPay.AppStart;
 using ISTUDIO.Application;
 using ISTUDIO.Infrastructure;
 using Microsoft.Extensions.Options;
@@ -36,6 +36,7 @@ var logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
+
 
 var app = builder.Build();
 

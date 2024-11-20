@@ -15,7 +15,7 @@ public class CreateFreedomPayInitResponseCommandHandler : IRequestHandler<Create
         try
         {
             var entity = _mapper.Map<FreedomPayInitResEntity>(command);
-            entity.CreatedDate = DateTime.UtcNow;
+            entity.CreatedDate = DateTime.Now;
 
             _appDbContext.FreedomPayInitRespons.Add(entity);
             await _appDbContext.SaveChangesAsync(cancellationToken);

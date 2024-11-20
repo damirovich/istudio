@@ -68,17 +68,17 @@ public class FreedomPayServices : IFreedomPayService
         //    throw new Exception("Invalid signature");
         //}
 
-        if (requestModel.PgResult == 1)
+        if (requestModel["pg_result"] == "1")
         {
-            return CreateResponseModel("ok", "Заказ оплачен", requestModel.PgSalt);
+            return CreateResponseModel("ok", "Заказ оплачен", requestModel["pg_salt"]);
         }
-        else if (requestModel.PgCanReject == 1)
+        else if (requestModel["pg_can_reject"] == "1")
         {
-            return CreateResponseModel("rejected", "Платеж отменен", requestModel.PgSalt);
+            return CreateResponseModel("rejected", "Платеж отменен", requestModel["pg_salt"]);
         }
         else
         {
-            return CreateResponseModel("error", "Ошибка в интерпретации данных", requestModel.PgSalt);
+            return CreateResponseModel("error", "Ошибка в интерпретации данных", requestModel["pg_salt"]);
         }
     }
 
@@ -88,11 +88,11 @@ public class FreedomPayServices : IFreedomPayService
         return GenerateMd5Hash(data);
     }
 
-    private string GenerateSignatureResRequest(FreedomPayResultRequestModel requestModel)
-    {
-        var data = $"{requestModel.PgOrderId};{requestModel.PgPaymentId};{requestModel.PgAmount};{requestModel.PgCurrency};{requestModel.PgSalt};{_secretKeyResPay}";
-        return GenerateMd5Hash(data);
-    }
+    //private string GenerateSignatureResRequest(FreedomPayResultRequestModel requestModel)
+    //{
+    //    var data = $"{requestModel.PgOrderId};{requestModel.PgPaymentId};{requestModel.PgAmount};{requestModel.PgCurrency};{requestModel.PgSalt};{_secretKeyResPay}";
+    //    return GenerateMd5Hash(data);
+    //}
 
     private string GenerateResponseSignature(string status, string salt)
     {
@@ -117,6 +117,7 @@ public class FreedomPayServices : IFreedomPayService
             PgSig = GenerateResponseSignature(status, salt)
         };
     }
+   
 }
 
 

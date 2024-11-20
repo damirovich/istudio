@@ -4,6 +4,7 @@ using ISTUDIO.Infrastructure.AppDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISTUDIO.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241111145517_AddColInitReqFreedomPay")]
+    partial class AddColInitReqFreedomPay
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -143,7 +146,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 14, 15, 10, 59, 365, DateTimeKind.Utc).AddTicks(3203));
+                        .HasDefaultValue(new DateTime(2024, 11, 11, 14, 55, 15, 842, DateTimeKind.Utc).AddTicks(8745));
 
                     b.Property<int?>("CustomerId")
                         .IsRequired()
@@ -344,7 +347,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("FavoriteProducts", (string)null);
                 });
 
-            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FreedomPayInitReqEntity", b =>
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FreedomPayInitRequestEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -357,13 +360,36 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<string>("JsonData")
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("PgAmount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<string>("PgDescription")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("PgMerchantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PgOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PgSalt")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("PgSig")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("FreedomPayInitReq", (string)null);
+                    b.ToTable("FreedomInitPayRequests", (string)null);
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.FreedomPayInitResEntity", b =>
@@ -427,14 +453,101 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .IsRequired()
+                    b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<string>("JsonData")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("PgAmount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<string>("PgAuthCode")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("PgCanReject")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PgCaptured")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PgCardPan")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PgCurrency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("PgDescription")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<short?>("PgNeedEmailNotification")
+                        .IsRequired()
+                        .HasColumnType("smallint");
+
+                    b.Property<short?>("PgNeedPhoneNotification")
+                        .IsRequired()
+                        .HasColumnType("smallint");
+
+                    b.Property<decimal>("PgNetAmount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<int>("PgOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PgPaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PgPaymentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PgPaymentMethod")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("PgPsAmount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<string>("PgPsCurrency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<decimal>("PgPsFullAmount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<string>("PgReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("PgResult")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PgSalt")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("PgSig")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("PgTestingMode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PgUserContactEmail")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PgUserPhone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -687,7 +800,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 14, 15, 10, 59, 372, DateTimeKind.Utc).AddTicks(4713));
+                        .HasDefaultValue(new DateTime(2024, 11, 11, 14, 55, 15, 845, DateTimeKind.Utc).AddTicks(3580));
 
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
@@ -765,7 +878,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("ChangeDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 14, 15, 10, 59, 394, DateTimeKind.Utc).AddTicks(5611));
+                        .HasDefaultValue(new DateTime(2024, 11, 11, 14, 55, 15, 853, DateTimeKind.Utc).AddTicks(3912));
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -888,7 +1001,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 14, 15, 10, 59, 385, DateTimeKind.Utc).AddTicks(7661));
+                        .HasDefaultValue(new DateTime(2024, 11, 11, 14, 55, 15, 850, DateTimeKind.Utc).AddTicks(320));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -1069,7 +1182,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 14, 15, 10, 59, 364, DateTimeKind.Utc).AddTicks(8003));
+                        .HasDefaultValue(new DateTime(2024, 11, 11, 14, 55, 15, 842, DateTimeKind.Utc).AddTicks(6513));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)

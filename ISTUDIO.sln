@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISTUDIO.Web.Api.Shop", "IST
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISTUDIO.SmsNotificationService", "ISTUDIO.SmsNotificationService\ISTUDIO.SmsNotificationService.csproj", "{F09E2D1E-59F7-4787-8EE0-D8739CA75EAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISTUDIO.Web.Api.FreedomPay", "ISTUDIO.Web.Api.FreedomPay\ISTUDIO.Web.Api.FreedomPay.csproj", "{7C1E599F-5B9F-4A73-9964-9E4F54C03800}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISTUDIO.Web.Api.FreedomPay", "ISTUDIO.Web.Api.FreedomPay\ISTUDIO.Web.Api.FreedomPay.csproj", "{7C1E599F-5B9F-4A73-9964-9E4F54C03800}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISTUDIO.Web.Api.BakaiPay", "ISTUDIO.Web.Api.BakaiPay\ISTUDIO.Web.Api.BakaiPay.csproj", "{430E3856-D1C6-4D79-B375-6870C88A498D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,6 +92,12 @@ Global
 		{7C1E599F-5B9F-4A73-9964-9E4F54C03800}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{7C1E599F-5B9F-4A73-9964-9E4F54C03800}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C1E599F-5B9F-4A73-9964-9E4F54C03800}.Release|Any CPU.Build.0 = Release|Any CPU
+		{430E3856-D1C6-4D79-B375-6870C88A498D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{430E3856-D1C6-4D79-B375-6870C88A498D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{430E3856-D1C6-4D79-B375-6870C88A498D}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{430E3856-D1C6-4D79-B375-6870C88A498D}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{430E3856-D1C6-4D79-B375-6870C88A498D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{430E3856-D1C6-4D79-B375-6870C88A498D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

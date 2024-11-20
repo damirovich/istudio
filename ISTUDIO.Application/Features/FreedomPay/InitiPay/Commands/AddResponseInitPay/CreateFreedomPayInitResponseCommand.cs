@@ -10,7 +10,7 @@ public class CreateFreedomPayInitResponseCommand : IRequest<Result>, IMapWith<Fr
     public string RedirectUrlType { get; set; }
     public string Salt { get; set; }
     public string Sig { get; set; }
-    public string ResultUrl { get; set; }
+    public string? ResultUrl { get; set; }
 
     public void Mapping(Profile profile)
     {

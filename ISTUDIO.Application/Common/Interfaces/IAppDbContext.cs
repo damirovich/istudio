@@ -25,10 +25,10 @@ public interface IAppDbContext
     DbSet<OrderStatusHistoryEntity> OrderStatusHistories { get; set; }
     DbSet<MagazineEntity> Magazines { get; set; }
     DbSet<OrderNotificationRecipientEntity> OrderNotificationRecipients { get; set; }
-    DbSet<FreedomPayInitRequestEntity> FreedomPayInitRequests { get; set; }
     DbSet<FreedomPayInitResEntity> FreedomPayInitRespons { get; set; }
     DbSet<FreedomPayResultRequestEntity> FreedomPayResultRequests { get; set; }
     DbSet<FreedomPayResultResponseEntity> FreedomPayResultResponses { get; set; }
+    DbSet<FreedomPayInitReqEntity> FreedomPayInitReq { get; set; }
     DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

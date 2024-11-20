@@ -6,7 +6,6 @@ using ISTUDIO.Application.Features.Orders.DTOs;
 using ISTUDIO.Application.Features.Orders.Queries;
 using ISTUDIO.Application.Features.SmsNikita.Commands.CreateSmsNikitaRequest;
 using ISTUDIO.Contracts.Features.Orders;
-using ISTUDIO.Domain.Models;
 using ISTUDIO.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
