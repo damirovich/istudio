@@ -6,7 +6,7 @@ public class SendSmsCommandValidator : AbstractValidator<SendSmsCommand>
     {
         RuleFor(v => v.PhonesNumber)
             .Cascade(CascadeMode.Stop)
-            .NotEmpty().WithMessage("Phone number is required.")
+            .NotEmpty().WithMessage("PhoneNumber number is required.")
             .Must(BeValidPhoneNumber).WithMessage("Invalid phone number format.");
 
     }

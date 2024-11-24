@@ -77,5 +77,10 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new FreedomPayResultRequestEntityConfiguration());
         builder.ApplyConfiguration(new FreedomPayResultResponseEntityConfiguration());
         builder.ApplyConfiguration(new FreedomPayInitReqEntityConfiguration());
+        builder.ApplyConfiguration(new BakaiCheckStatusResEntityConfiguration());
+        builder.ApplyConfiguration(new BakaiConfirmTranReqEntityConfiguration());
+        builder.ApplyConfiguration(new BakaiConfirmTranResEntityConfiguration());
+        builder.ApplyConfiguration(new BakaiCreateTranReqEntityConfiguration());
+        builder.ApplyConfiguration(new BakaiCreateTranResEntityConfiguration());
     }   
 }

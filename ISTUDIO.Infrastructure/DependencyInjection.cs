@@ -71,6 +71,10 @@ public static class DependencyInjection
         {
             client.BaseAddress = new Uri(configuration["FreedomPay:BaseAddresFreedomPay"]);
         });
+        services.AddHttpClient<IBakaiPayService, BakaiPayServices>(client =>
+        {
+            client.BaseAddress = new Uri(configuration["BakaiPay:BaseAddresBakaiPay"]);
+        });
         services.AddSingleton<IRedisCacheService>(provider =>
         {
             var redisConnectionString = configuration.GetConnectionString("Redis");

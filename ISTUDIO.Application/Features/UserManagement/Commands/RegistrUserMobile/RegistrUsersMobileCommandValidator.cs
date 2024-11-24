@@ -6,7 +6,7 @@ public class RegistrUsersMobileCommandValidator : AbstractValidator<RegistrUsers
     {
         RuleFor(v => v.PhoneNumber)
             .Cascade(CascadeMode.Stop)
-            .NotEmpty().WithMessage("Phone number is required.")
+            .NotEmpty().WithMessage("PhoneNumber number is required.")
             .Must(BeValidPhoneNumber).WithMessage("Invalid phone number format.");
 
         RuleFor(v => v.OTPCode)
