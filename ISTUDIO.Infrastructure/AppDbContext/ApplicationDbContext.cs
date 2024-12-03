@@ -35,6 +35,11 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<FreedomPayResultRequestEntity> FreedomPayResultRequests { get; set; }
     public DbSet<FreedomPayResultResponseEntity> FreedomPayResultResponses { get; set; }
     public DbSet<FreedomPayInitReqEntity> FreedomPayInitReq { get; set; }
+    public DbSet<BakaiCheckStatusResEntity> BakaiCheckStatusResponse { get; set; }
+    public DbSet<BakaiConfirmTranReqEntity> BakaiConfirmTranRequest { get; set; }
+    public DbSet<BakaiConfirmTranResEntity> BakaiConfirmTranResponse { get; set; }
+    public DbSet<BakaiCreateTranReqEntity> BakaiCreateTranRequest { get; set; }
+    public DbSet<BakaiCreateTranResEntity> BakaiCreateTranResponse { get; set; }
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
     protected override void OnModelCreating(ModelBuilder builder)

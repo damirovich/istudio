@@ -93,7 +93,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                 oldDefaultValue: new DateTime(2024, 11, 14, 15, 10, 59, 364, DateTimeKind.Utc).AddTicks(8003));
 
             migrationBuilder.CreateTable(
-                name: "BakaiCheckStatusRes",
+                name: "BakaiCheckStatusResponse",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -173,7 +173,7 @@ namespace ISTUDIO.Infrastructure.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_BakaiCheckStatusRes_Id",
-                table: "BakaiCheckStatusRes",
+                table: "BakaiCheckStatusResponse",
                 column: "Id",
                 unique: true);
 
@@ -206,7 +206,7 @@ namespace ISTUDIO.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BakaiCheckStatusRes");
+                name: "BakaiCheckStatusResponse");
 
             migrationBuilder.DropTable(
                 name: "BakaiConfirmTranReq");

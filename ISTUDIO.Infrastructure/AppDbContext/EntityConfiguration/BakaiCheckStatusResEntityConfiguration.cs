@@ -6,7 +6,7 @@ public class BakaiCheckStatusResEntityConfiguration : IEntityTypeConfiguration<B
 {
     public void Configure(EntityTypeBuilder<BakaiCheckStatusResEntity> builder)
 {
-    builder.ToTable("BakaiCheckStatusRes");
+    builder.ToTable("BakaiCheckStatusResponse");
 
     builder.HasKey(e => e.Id);
 

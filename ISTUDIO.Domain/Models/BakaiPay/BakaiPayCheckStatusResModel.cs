@@ -17,7 +17,7 @@ public class BakaiPayCheckStatusResModel
     public string OrderId { get; set; }
 
     [JsonPropertyName("confirmed_at")]
-    public DateTime ConfirmedAt { get; set; }
+    public string ConfirmedAt { get; set; }
 
     [JsonPropertyName("err_msg")]
     public string ErrMsg { get; set; }

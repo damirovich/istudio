@@ -5,6 +5,8 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using ISTUDIO.Web.Api.Mobile.Services.FreedomPayServices;
+using ISTUDIO.Web.Api.Mobile.Services.BakaiPayService;
+using ISTUDIO.Web.Api.Mobile.Services.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,13 +26,21 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
-builder.Services.AddHttpClient<IFreedomPayApiClient, FreedomPayApiClient>(client =>
+builder.Services.Configure<ApiClientsSettings>(builder.Configuration.GetSection("ApiClients"));
+
+builder.Services.AddHttpClient<IFreedomPayApiClient, FreedomPayApiClient>((serviceProvider, client) =>
 {
-    client.BaseAddress = new Uri("http://api.marketplace.kg:1122/api/v1/FreedomPay/");
+    var settings = serviceProvider.GetRequiredService<IOptions<ApiClientsSettings>>().Value;
+    client.BaseAddress = new Uri(settings.FreedomPay.BaseAddress);
     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 });
 
-
+builder.Services.AddHttpClient<IBakaiPayApiClient, BakaiPayApiClient>((serviceProvider, client) =>
+{
+    var settings = serviceProvider.GetRequiredService<IOptions<ApiClientsSettings>>().Value;
+    client.BaseAddress = new Uri(settings.BakaiPay.BaseAddress);
+    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+});
 //Версионность в API
 builder.Services.AddCustomApiVersioning();
 //Swagger

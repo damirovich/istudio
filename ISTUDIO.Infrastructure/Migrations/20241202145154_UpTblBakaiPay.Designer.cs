@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISTUDIO.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241124083535_AddTblBakaiPay")]
-    partial class AddTblBakaiPay
+    [Migration("20241202145154_UpTblBakaiPay")]
+    partial class UpTblBakaiPay
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,7 +93,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("BakaiCheckStatusResponse", (string)null);
+                    b.ToTable("BakaiCheckStatusRes", (string)null);
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.BakaiConfirmTranReqEntity", b =>
@@ -305,7 +305,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 24, 8, 35, 31, 543, DateTimeKind.Utc).AddTicks(7737));
+                        .HasDefaultValue(new DateTime(2024, 12, 2, 14, 51, 53, 17, DateTimeKind.Utc).AddTicks(980));
 
                     b.Property<int?>("CustomerId")
                         .IsRequired()
@@ -846,7 +846,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 24, 8, 35, 31, 551, DateTimeKind.Utc).AddTicks(4627));
+                        .HasDefaultValue(new DateTime(2024, 12, 2, 14, 51, 53, 23, DateTimeKind.Utc).AddTicks(5520));
 
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
@@ -924,7 +924,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("ChangeDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 24, 8, 35, 31, 579, DateTimeKind.Utc).AddTicks(6156));
+                        .HasDefaultValue(new DateTime(2024, 12, 2, 14, 51, 53, 66, DateTimeKind.Utc).AddTicks(3073));
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -1047,7 +1047,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 24, 8, 35, 31, 568, DateTimeKind.Utc).AddTicks(5763));
+                        .HasDefaultValue(new DateTime(2024, 12, 2, 14, 51, 53, 55, DateTimeKind.Utc).AddTicks(3592));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -1228,7 +1228,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 11, 24, 8, 35, 31, 543, DateTimeKind.Utc).AddTicks(954));
+                        .HasDefaultValue(new DateTime(2024, 12, 2, 14, 51, 53, 16, DateTimeKind.Utc).AddTicks(1327));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)

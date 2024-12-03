@@ -29,6 +29,11 @@ public interface IAppDbContext
     DbSet<FreedomPayResultRequestEntity> FreedomPayResultRequests { get; set; }
     DbSet<FreedomPayResultResponseEntity> FreedomPayResultResponses { get; set; }
     DbSet<FreedomPayInitReqEntity> FreedomPayInitReq { get; set; }
+    DbSet<BakaiCheckStatusResEntity> BakaiCheckStatusResponse { get; set; }
+    DbSet<BakaiConfirmTranReqEntity> BakaiConfirmTranRequest { get; set; }
+    DbSet<BakaiConfirmTranResEntity> BakaiConfirmTranResponse { get; set; }
+    DbSet<BakaiCreateTranReqEntity> BakaiCreateTranRequest { get; set; }
+    DbSet<BakaiCreateTranResEntity> BakaiCreateTranResponse { get; set; }
     DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

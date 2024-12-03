@@ -18,3 +18,9 @@ public class ValidationErrorDetail
     [JsonPropertyName("type")]
     public string Type { get; set; }
 }
+
+public class ValidBadRequest
+{
+    [JsonPropertyName("detail")]
+    public string Details { get; set; }
+}

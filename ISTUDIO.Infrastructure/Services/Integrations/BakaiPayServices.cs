@@ -87,10 +87,16 @@ public class BakaiPayServices : IBakaiPayService
     {
         AddBasicAuthenticationHeader();
         var response = await _httpClient.PostAsJsonAsync($"{_httpClient.BaseAddress}/payment/confirm", confirmReq);
-        response.EnsureSuccessStatusCode();
-        if(response.StatusCode == HttpStatusCode.Created || response.IsSuccessStatusCode)
+        //response.EnsureSuccessStatusCode();
+        if(response.StatusCode == HttpStatusCode.OK || response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<BakaiPayConfirmOperResModel>();
+        }
+        else if (response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<ValidBadRequest>();
+            
+            throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorResponse?.Details}");
         }
         else if (response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
         {
@@ -116,6 +122,12 @@ public class BakaiPayServices : IBakaiPayService
         if (response.StatusCode == HttpStatusCode.Created || response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<BakaiPayCreateOperationResModel>();
+        }
+        else if (response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<ValidBadRequest>();
+
+            throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorResponse?.Details}");
         }
         else if (response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
         {
