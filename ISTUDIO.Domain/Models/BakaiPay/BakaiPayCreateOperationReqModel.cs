@@ -5,7 +5,7 @@ namespace ISTUDIO.Domain.Models.BakaiPay;
 public class BakaiPayCreateOperationReqModel
 {
     [JsonPropertyName("payment_code")]
-    public string PaymentCode { get; set; }
+    public string? PaymentCode { get; set; }
 
     [JsonPropertyName("phone")]
     public string PhoneNumber { get; set; }

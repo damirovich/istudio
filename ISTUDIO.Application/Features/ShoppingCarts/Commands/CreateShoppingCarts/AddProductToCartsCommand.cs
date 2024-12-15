@@ -20,12 +20,12 @@ public class AddProductToCartsCommand : IRequest<ResModel>
             if (product == null)
                 throw new NotFoundException("Продукт не найден.");
 
-            if (product.QuantityInStock < 1)
+             if (product.QuantityInStock < 1)
                 throw new BadRequestException($"{product.Name} {product.Model}  в наличии не остался.");
 
             var existingCarts = await _appDbContext.ShoppingCarts
                     .Include(cart => cart.Products)
-                    .Where(cart => cart.UserId == command.UserId)
+                    .Where(cart => cart.UserId == command.UserId && cart.IsDeleted == false)
                     .ToListAsync();
 
             foreach (var cart in existingCarts)

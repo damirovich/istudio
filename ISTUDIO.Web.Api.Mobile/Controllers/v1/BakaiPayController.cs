@@ -1,4 +1,5 @@
-﻿using ISTUDIO.Domain.Models.BakaiPay;
+﻿using ISTUDIO.Contracts.Features.BakaiPay;
+using ISTUDIO.Domain.Models.BakaiPay;
 using ISTUDIO.Web.Api.Mobile.Services.BakaiPayService;
 using System.ComponentModel.DataAnnotations;
 
@@ -55,23 +56,37 @@ public class BakaiPayController : BaseController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> CreatePay([FromBody, Required] BakaiPayCreateOperationReqModel request)
+    public Task<IActionResult> CreatePay([FromBody, Required] BakaiCreatePayVM request)
     {
         if (!ModelState.IsValid)
             return Task.FromResult<IActionResult>(BadRequest(ModelState));
 
-        return HandleRequestAsync(() => _apiClient.PayCreate(request));
+        var requestBakaiPay = new BakaiPayCreateOperationReqModel()
+        {
+            PhoneNumber = request.PhoneNumber,
+            Amount = request.SumProducts,
+            PaymentCode = Guid.NewGuid().ToString(),
+            OrderId = request.ToString()
+        };
+
+        return HandleRequestAsync(() => _apiClient.PayCreate(requestBakaiPay));
     }
 
     [HttpPost("confirm")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> PayConfirm([FromBody, Required] BakaiPayConfirmOperReqModel request)
+    public Task<IActionResult> PayConfirm([FromBody, Required] BakaiConfirmPayVMy  request)
     {
         if (!ModelState.IsValid)
             return Task.FromResult<IActionResult>(BadRequest(ModelState));
 
-        return HandleRequestAsync(() => _apiClient.PayConfirm(request));
+        var requestModel = new BakaiPayConfirmOperReqModel()
+        {
+            Id = request.Id,
+            Otp = request.OTP
+        };
+
+        return HandleRequestAsync(() => _apiClient.PayConfirm(requestModel));
     }
 }

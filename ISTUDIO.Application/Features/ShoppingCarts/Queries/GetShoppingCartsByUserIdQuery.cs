@@ -26,7 +26,6 @@ public class GetShoppingCartsByUserIdQuery : IRequest<ResModel>
 
         public async Task<ResModel> Handle(GetShoppingCartsByUserIdQuery query, CancellationToken cancellationToken)
         {
-
             var shoppingCarts = await _appDbContext.ShoppingCarts
                 .Include(sc => sc.Products)
                     .ThenInclude(p => p.Discount)
