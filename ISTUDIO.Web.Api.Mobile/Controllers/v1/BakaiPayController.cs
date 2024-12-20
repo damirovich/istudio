@@ -65,8 +65,8 @@ public class BakaiPayController : BaseController
         {
             PhoneNumber = request.PhoneNumber,
             Amount = request.SumProducts,
-            PaymentCode = Guid.NewGuid().ToString(),
-            OrderId = request.ToString()
+            PaymentCode = request.OrderId.ToString(),
+            OrderId = request.OrderId.ToString()
         };
 
         return HandleRequestAsync(() => _apiClient.PayCreate(requestBakaiPay));

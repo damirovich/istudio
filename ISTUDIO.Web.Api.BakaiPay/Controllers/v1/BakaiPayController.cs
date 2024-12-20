@@ -3,6 +3,7 @@ using ISTUDIO.Application.Features.BakaiPay.CheckStatus;
 using ISTUDIO.Application.Features.BakaiPay.ConfirmTransaction;
 using ISTUDIO.Application.Features.BakaiPay.CreateTransaction;
 using ISTUDIO.Domain.Models.BakaiPay;
+using ISTUDIO.Web.Api.BakaiPay.Models;
 
 namespace ISTUDIO.Web.Api.BakaiPay.Controllers.v1;
 
@@ -53,6 +54,7 @@ public class BakaiPayController : BaseController
 
         try
         {
+
             // Шаг 1: Создать транзакцию через Mediator
             var createResult = await Mediator.Send(new CreateTranBakaiPayReqCommand
             {
@@ -140,7 +142,17 @@ public class BakaiPayController : BaseController
                 return StatusCode(500, "Failed to save confirmation result");
             }
 
-            return Ok(result);
+            // Шаг 4: Ожидание статуса выполнения
+            bool isSuccess = await WaitForPaymentStatusAsync(result.Id);
+
+            if (isSuccess)
+            {
+                return Ok(new { Message = "Платеж успешно подтвержден и выполнен." });
+            }
+            else
+            {
+                return BadRequest(new { Message = "Платеж не был выполнен. Проверьте статус." });
+            }
         }
         catch (Exception ex)
         {
@@ -148,9 +160,8 @@ public class BakaiPayController : BaseController
             return StatusCode(500, ex.Message);
         }
     }
-
-    [HttpGet("check-status")]
-    public async Task<IActionResult> CheckStatusPay([FromQuery] int payId)
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<string> CheckStatusPay(int payId)
     {
         try
         {
@@ -173,15 +184,99 @@ public class BakaiPayController : BaseController
             if (!saveStatusResult.Succeeded)
             {
                 _logger.LogError("Failed to save check status result: {Error}", string.Join(", ", saveStatusResult.Errors));
-                return StatusCode(500, "Failed to save check status result");
+                return result.Status;
             }
 
-            return Ok(result);
+            return result.Status;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while processing CheckStatusPay for PayId: {PayId}", payId);
-            return StatusCode(500, ex.Message);
+            return ex.Message;
         }
     }
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<bool> WaitForPaymentStatusAsync(int payId, int timeoutInSeconds = 60, int pollingInterval = 5)
+    {
+        var startTime = DateTime.Now;
+
+        while ((DateTime.Now - startTime).TotalSeconds < timeoutInSeconds)
+        {
+            var resultCheckStatus = await CheckStatusPay(payId);
+
+            if (Enum.TryParse(resultCheckStatus, true, out PaymentStatus status))
+            {
+                switch (status)
+                {
+                    case PaymentStatus.Executed:
+                        _logger.LogInformation("Платеж успешно выполнен.");
+                        return true;
+
+                    case PaymentStatus.Rejected:
+                        _logger.LogWarning("Платеж отклонен.");
+                        return false;
+
+                    case PaymentStatus.Expired:
+                        _logger.LogWarning("Время ожидания подтверждения истекло.");
+                        return false;
+
+                    case PaymentStatus.Waiting:
+                    case PaymentStatus.Processing:
+                        _logger.LogInformation("Статус платежа: {Status}. Продолжаем ожидание...", status);
+                        break;
+
+                    default:
+                        _logger.LogError("Неизвестный статус: {Status}", status);
+                        return false;
+                }
+            }
+            else
+            {
+                _logger.LogError("Некорректный статус платежа: {Status}", resultCheckStatus);
+                return false;
+            }
+
+            // Ждем перед следующей проверкой статуса
+            await Task.Delay(pollingInterval * 1000);
+        }
+
+        _logger.LogWarning("Таймаут ожидания статуса истек.");
+        return false;
+    }
+
+    //[HttpGet("check-status")]
+    //public async Task<IActionResult> CheckStatusPay([FromQuery] int payId)
+    //{
+    //    try
+    //    {
+    //        // Шаг 1: Проверить статус платежа через сервис BakaiPay
+    //        var result = await _bakaiPayService.CheckStatusPay(payId);
+
+    //        // Шаг 2: Сохранить результат проверки статуса платежа через Mediator
+    //        var saveStatusCommand = new CreateCheckStatusBakaiPayResCommand
+    //        {
+    //            CreateTranId = result.Id,
+    //            PaymentCode = result.PaymentCode,
+    //            Status = result.Status,
+    //            OrderId = result.OrderId,
+    //            ConfirmedAt = Convert.ToDateTime(result.ConfirmedAt),
+    //            ErrMsg = result.ErrMsg
+    //        };
+
+    //        var saveStatusResult = await Mediator.Send(saveStatusCommand);
+
+    //        if (!saveStatusResult.Succeeded)
+    //        {
+    //            _logger.LogError("Failed to save check status result: {Error}", string.Join(", ", saveStatusResult.Errors));
+    //            return StatusCode(500, "Failed to save check status result");
+    //        }
+
+    //        return Ok(result);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Error occurred while processing CheckStatusPay for PayId: {PayId}", payId);
+    //        return StatusCode(500, ex.Message);
+    //    }
+    //}
 }

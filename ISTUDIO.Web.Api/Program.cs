@@ -31,10 +31,10 @@ builder.Services.AddControllers()
 //CORS
 builder.Services.AddCors(c => c.AddPolicy("IstudioCustomAllow", opt =>
 {
-    opt.AllowAnyHeader();
-    opt.AllowCredentials();
-    opt.AllowAnyMethod();
-    opt.WithOrigins(builder.Configuration.GetSection("Cors:Urls").Get<string[]>()!);
+    opt.AllowAnyHeader(); // Разрешены любые заголовки.
+    opt.AllowCredentials(); // Разрешены учетные данные (куки, авторизация).
+    opt.AllowAnyMethod(); // Разрешены любые HTTP-методы (GET, POST, PUT и т.д.).
+    opt.WithOrigins(builder.Configuration.GetSection("Cors:Urls").Get<string[]>()!); // Ограничение запросов только для заданных доменов.
 }));
 //Версионность в API
 builder.Services.AddCustomApiVersioning();
@@ -79,22 +79,22 @@ var app = builder.Build();
 
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        var descriptions = app.DescribeApiVersions();
+    var descriptions = app.DescribeApiVersions();
 
-        foreach (var description in descriptions)
-        {
-            var url = $"/swagger/{description.GroupName}/swagger.json";
-            var name = description.GroupName;
-            options.SwaggerEndpoint(url, name);
-            options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
-        }
-    });
-}
+    foreach (var description in descriptions)
+    {
+        var url = $"/swagger/{description.GroupName}/swagger.json";
+        var name = description.GroupName;
+        options.SwaggerEndpoint(url, name);
+        options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+    }
+});
+//}
 app.UseMiddleware<TokenExpirationMiddleware>();
 app.UseHttpsRedirection();
 

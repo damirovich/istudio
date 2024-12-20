@@ -1,20 +1,30 @@
 ﻿
 using ISTUDIO.Application.Features.Products.Queries;
+using Swashbuckle.Swagger.Annotations;
 
 namespace ISTUDIO.Web.Api.Shop.Controllers.v1;
+
+/// <summary>
+/// Контроллер для работы с продуктами.
+/// </summary>
 
 [ApiVersion("1.0")]
 public class ProductsController : BaseController
 {
-
     /// <summary>
-    /// Получение списка всех продуктов
+    /// Получение списка всех продуктов.
     /// </summary>
-    /// <param name="page"></param>
-    /// <returns></returns>
+    /// <param name="page">Объект пагинации, содержащий номер страницы и размер страницы.</param>
+    /// <returns>
+    /// Возвращает список продуктов, соответствующих переданным параметрам пагинации.
+    /// </returns>
+    /// <response code="200">Список продуктов успешно получен.</response>
+    /// <response code="400">Неверные параметры запроса.</response>
+    /// <response code="500">Ошибка сервера.</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetProducts([FromQuery] PaginatedListVM page)
     {
         try
