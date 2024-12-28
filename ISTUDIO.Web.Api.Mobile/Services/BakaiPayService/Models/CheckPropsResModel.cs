@@ -2,5 +2,5 @@
 
 public class CheckPropsResModel
 {
-    public bool Result { get; set; }
+    public bool Success { get; set; }
 }

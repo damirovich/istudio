@@ -55,6 +55,7 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPathContracts);
 
     options.SchemaFilter<EnumTypesSchemaFilter>(basePath);
+    options.UseInlineDefinitionsForEnums(); // Если есть проблемы с enum
 });
 // Логирование
 var logger = new LoggerConfiguration()

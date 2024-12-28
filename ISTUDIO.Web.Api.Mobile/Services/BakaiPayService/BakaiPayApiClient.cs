@@ -1,5 +1,7 @@
 ﻿using ISTUDIO.Domain.Models.BakaiPay;
 using ISTUDIO.Web.Api.Mobile.Services.BakaiPayService.Models;
+using System.Net;
+using NotFoundException = ISTUDIO.Domain.Models.BakaiPay.NotFoundException;
 
 namespace ISTUDIO.Web.Api.Mobile.Services.BakaiPayService;
 
@@ -16,7 +18,7 @@ public class BakaiPayApiClient : IBakaiPayApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Failed to check payment status: {response.ReasonPhrase}");
+            await HandleErrorResponse(response);
         }
 
         return await response.Content.ReadFromJsonAsync<BakaiPayCheckStatusResModel>();
@@ -28,7 +30,7 @@ public class BakaiPayApiClient : IBakaiPayApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Failed to check payment properties: {response.ReasonPhrase}");
+            await HandleErrorResponse(response);
         }
 
         return await response.Content.ReadFromJsonAsync<CheckPropsResModel>();
@@ -40,7 +42,7 @@ public class BakaiPayApiClient : IBakaiPayApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Failed to confirm payment: {response.ReasonPhrase}");
+            await HandleErrorResponse(response);
         }
 
         return await response.Content.ReadFromJsonAsync<BakaiPayConfirmOperResModel>();
@@ -52,9 +54,42 @@ public class BakaiPayApiClient : IBakaiPayApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Failed to create payment: {response.ReasonPhrase}");
+            await HandleErrorResponse(response);
         }
 
         return await response.Content.ReadFromJsonAsync<BakaiPayCreateOperationResModel>();
+    }
+
+    private async Task HandleErrorResponse(HttpResponseMessage response)
+    {
+        string errorMessage;
+
+        // Проверяем, содержит ли тело ошибки ожидаемую структуру
+        if (response.Content.Headers.ContentType?.MediaType == "application/json")
+        {
+            // Пытаемся десериализовать в разные возможные структуры
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidBadRequestAPI>();
+                errorMessage = errorResponse?.Error ?? "Bad request occurred.";
+                throw new BadRequestException(errorMessage);
+            }
+            else if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<BakaiPayValidationErrorResponse>();
+                errorMessage = errorResponse?.Detail?.FirstOrDefault()?.Msg ?? "Validation error occurred.";
+                throw new UnprocessableEntityException(errorMessage);
+            }
+            else if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidBadRequestAPI>();
+                errorMessage = errorResponse?.Error ?? "Resource not found.";
+                throw new NotFoundException(errorMessage);
+            }
+        }
+
+        // Если структура ответа неизвестна
+        errorMessage = response.ReasonPhrase ?? "An unexpected error occurred.";
+        throw new ApiException(errorMessage, (int)response.StatusCode);
     }
 }

@@ -3,7 +3,6 @@ using ISTUDIO.Application.Features.BakaiPay.CheckStatus;
 using ISTUDIO.Application.Features.BakaiPay.ConfirmTransaction;
 using ISTUDIO.Application.Features.BakaiPay.CreateTransaction;
 using ISTUDIO.Domain.Models.BakaiPay;
-using ISTUDIO.Web.Api.BakaiPay.Models;
 
 namespace ISTUDIO.Web.Api.BakaiPay.Controllers.v1;
 
@@ -26,19 +25,29 @@ public class BakaiPayController : BaseController
     {
         if (phoneNumber == null)
         {
-            _logger.LogWarning("Received null request in PayCheckProps");
-            return BadRequest("Invalid phoneNumber request data");
+            _logger.LogWarning("Получен null запрос в PayCheckProps");
+            return BadRequest("Номер телефона не может быть пустым");
 
         }
 
         try
         {
             var result = await _bakaiPayService.PayCheckProps(phoneNumber);
-            return Ok(new { result });
+            return Ok(new { Success = result });
+        }
+        catch (BadRequestException ex)
+        {
+            _logger.LogError(ex, "Произошла ошибка при обработке реквизитов PayCheckProps для номера телефона: {RequestId}", phoneNumber);
+            return BadRequest (ex.Message);
+        }
+        catch (Domain.Models.BakaiPay.NotFoundException ex)
+        {
+            _logger.LogError(ex, "NotFoundException произошло при обработке реквизитов PayCheckProps для номера телефона: {PhoneNumber}", phoneNumber);
+            return Ok(new { Success = false });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while processing PayCheckProps for PhoneNumber: {RequestId}", phoneNumber);
+            _logger.LogError(ex, "Произошла ошибка при обработке реквизитов PayCheckProps для номера телефона: {RequestId}", phoneNumber);
             return StatusCode(500, ex.Message);
         }
     }
@@ -48,8 +57,8 @@ public class BakaiPayController : BaseController
     {
         if (createReq == null)
         {
-            _logger.LogWarning("Received null request in PayCreate");
-            return BadRequest("Invalid create request data");
+            _logger.LogWarning("Получен null запрос в PayCreate");
+            return BadRequest("Данные запроса не может быть пустым");
         }
 
         try
@@ -66,8 +75,8 @@ public class BakaiPayController : BaseController
 
             if (!createResult.Succeeded)
             {
-                _logger.LogError("Failed to create transaction: {Error}", string.Join(", ", createResult.Errors));
-                return BadRequest("Failed to create transaction");
+                _logger.LogError("Не удалось добавить данные запроса в базу CreateTranBakaiPayReqCommand: {Error}", string.Join(", ", createResult.Errors));
+                return StatusCode(500, "Ошибка при сохранении данных запроса в базу");
             }
 
             // Шаг 2: Выполнить оплату
@@ -86,16 +95,32 @@ public class BakaiPayController : BaseController
 
             if (!saveResult.Succeeded)
             {
-                _logger.LogError("Failed to save transaction result: {Error}", string.Join(", ", saveResult.Errors));
-                return StatusCode(500, "Failed to save transaction result");
+                _logger.LogError("Не удалось добавить данные ответа в базу  CreateTranBakaiPayResCommand: {Error}", string.Join(", ", saveResult.Errors));
+                return StatusCode(500, "Ошибка при сохранении данные ответа в базу");
             }
 
             return Ok(result);
         }
+        catch (BadRequestExceptionBakai ex)
+        {
+            // Возвращаем 400 Bad Request
+            return BadRequest(new { Error = ex.Message });
+        }
+        catch (UnprocessableEntityException ex)
+        {
+            // Возвращаем 422 Unprocessable Entity
+            return UnprocessableEntity(new { Error = ex.Message });
+        }
+        catch (ApiException ex)
+        {
+            // Для других исключений используем код, указанный в ApiException
+            return StatusCode(ex.StatusCode, new { Error = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while processing PayCreate for Request: {Request}", createReq);
-            return StatusCode(500, ex.Message);
+            _logger.LogError(ex, "Произошла ошибка при обработке PayCreate для запроса: {Request}", createReq);
+            // Для неожиданных исключений возвращаем 500
+            return StatusCode(StatusCodes.Status500InternalServerError, new { Error = "Произошла непредвиденная ошибка." });
         }
     }
 
@@ -104,8 +129,8 @@ public class BakaiPayController : BaseController
     {
         if (confirmReq == null)
         {
-            _logger.LogWarning("Received null request in PayConfirm");
-            return BadRequest("Invalid confirm request data");
+            _logger.LogWarning("Получен null запрос в PayConfirm");
+            return BadRequest("Данные запрос в PayConfirm не может быть пустым");
         }
 
         try
@@ -119,8 +144,8 @@ public class BakaiPayController : BaseController
 
             if (!confirmCommandResult.Succeeded)
             {
-                _logger.LogError("Failed to save confirmation transaction: {Error}", string.Join(", ", confirmCommandResult.Errors));
-                return BadRequest("Failed to save confirmation transaction");
+                _logger.LogError("Не удалось добавить данные запроса в базу ConfirmTranBakaiPayReqCommand {Error}", string.Join(", ", confirmCommandResult.Errors));
+                return BadRequest("Не удалось добавить данные запросы в базу");
             }
 
             // Шаг 2: Выполнить подтверждение платежа
@@ -138,30 +163,36 @@ public class BakaiPayController : BaseController
 
             if (!saveResult.Succeeded)
             {
-                _logger.LogError("Failed to save confirmation result: {Error}", string.Join(", ", saveResult.Errors));
-                return StatusCode(500, "Failed to save confirmation result");
+                _logger.LogError("Не удалось добавить данные Ответа в базу ConfirmTranBakaiPayResCommand: {Error}", string.Join(", ", saveResult.Errors));
+                return StatusCode(500, "Ошибка при сохранении данные ответа в базу");
             }
-
-            // Шаг 4: Ожидание статуса выполнения
-            bool isSuccess = await WaitForPaymentStatusAsync(result.Id);
-
-            if (isSuccess)
-            {
-                return Ok(new { Message = "Платеж успешно подтвержден и выполнен." });
-            }
-            else
-            {
-                return BadRequest(new { Message = "Платеж не был выполнен. Проверьте статус." });
-            }
+           return Ok(result);
+        }
+        catch (BadRequestExceptionBakai ex)
+        {
+            // Возвращаем 400 Bad Request
+            return BadRequest(new { Error = ex.Message });
+        }
+        catch (UnprocessableEntityException ex)
+        {
+            // Возвращаем 422 Unprocessable Entity
+            return UnprocessableEntity(new { Error = ex.Message });
+        }
+        catch (ApiException ex)
+        {
+            // Для других исключений используем код, указанный в ApiException
+            return StatusCode(ex.StatusCode, new { Error = ex.Message });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while processing PayConfirm for Request: {Request}", confirmReq);
-            return StatusCode(500, ex.Message);
+            // Для неожиданных исключений возвращаем 500
+            return StatusCode(StatusCodes.Status500InternalServerError, new { Error = "An unexpected error occurred." });
         }
     }
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<string> CheckStatusPay(int payId)
+
+   
+    [HttpGet("check-status")]
+    public async Task<IActionResult> CheckStatusPay([FromQuery] int payId)
     {
         try
         {
@@ -183,100 +214,31 @@ public class BakaiPayController : BaseController
 
             if (!saveStatusResult.Succeeded)
             {
-                _logger.LogError("Failed to save check status result: {Error}", string.Join(", ", saveStatusResult.Errors));
-                return result.Status;
+                _logger.LogError("Не удалось добавить данные Ответа в базу CreateCheckStatusBakaiPayResCommand: {Error}", string.Join(", ", saveStatusResult.Errors));
+                return StatusCode(500, "Ошибка при сохранении ответа в базу");
             }
 
-            return result.Status;
+            return Ok(result);
+        }
+        catch (UnprocessableEntityException ex)
+        {
+            _logger.LogWarning(ex, "Произошла ошибка проверки PayId: {PayId}", payId);
+            return UnprocessableEntity(new { Error = ex.Message });
+        }
+        catch (BadRequestException ex)
+        {
+            _logger.LogWarning(ex, "Произошла ошибка неверного запросаr PayId: {PayId}", payId);
+            return BadRequest(new { Error = ex.Message });
+        }
+        catch (ApiException ex)
+        {
+            _logger.LogError(ex, "API error occurred for PayId: {PayId}", payId);
+            return StatusCode(ex.StatusCode, new { Error = ex.Message });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while processing CheckStatusPay for PayId: {PayId}", payId);
-            return ex.Message;
+            _logger.LogError(ex, "Произошла непредвиденная ошибка PayId: {PayId}", payId);
+            return StatusCode(StatusCodes.Status500InternalServerError, new { Error = "Произошла непредвиденная ошибка. Повторите попытку позже." });
         }
     }
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<bool> WaitForPaymentStatusAsync(int payId, int timeoutInSeconds = 60, int pollingInterval = 5)
-    {
-        var startTime = DateTime.Now;
-
-        while ((DateTime.Now - startTime).TotalSeconds < timeoutInSeconds)
-        {
-            var resultCheckStatus = await CheckStatusPay(payId);
-
-            if (Enum.TryParse(resultCheckStatus, true, out PaymentStatus status))
-            {
-                switch (status)
-                {
-                    case PaymentStatus.Executed:
-                        _logger.LogInformation("Платеж успешно выполнен.");
-                        return true;
-
-                    case PaymentStatus.Rejected:
-                        _logger.LogWarning("Платеж отклонен.");
-                        return false;
-
-                    case PaymentStatus.Expired:
-                        _logger.LogWarning("Время ожидания подтверждения истекло.");
-                        return false;
-
-                    case PaymentStatus.Waiting:
-                    case PaymentStatus.Processing:
-                        _logger.LogInformation("Статус платежа: {Status}. Продолжаем ожидание...", status);
-                        break;
-
-                    default:
-                        _logger.LogError("Неизвестный статус: {Status}", status);
-                        return false;
-                }
-            }
-            else
-            {
-                _logger.LogError("Некорректный статус платежа: {Status}", resultCheckStatus);
-                return false;
-            }
-
-            // Ждем перед следующей проверкой статуса
-            await Task.Delay(pollingInterval * 1000);
-        }
-
-        _logger.LogWarning("Таймаут ожидания статуса истек.");
-        return false;
-    }
-
-    //[HttpGet("check-status")]
-    //public async Task<IActionResult> CheckStatusPay([FromQuery] int payId)
-    //{
-    //    try
-    //    {
-    //        // Шаг 1: Проверить статус платежа через сервис BakaiPay
-    //        var result = await _bakaiPayService.CheckStatusPay(payId);
-
-    //        // Шаг 2: Сохранить результат проверки статуса платежа через Mediator
-    //        var saveStatusCommand = new CreateCheckStatusBakaiPayResCommand
-    //        {
-    //            CreateTranId = result.Id,
-    //            PaymentCode = result.PaymentCode,
-    //            Status = result.Status,
-    //            OrderId = result.OrderId,
-    //            ConfirmedAt = Convert.ToDateTime(result.ConfirmedAt),
-    //            ErrMsg = result.ErrMsg
-    //        };
-
-    //        var saveStatusResult = await Mediator.Send(saveStatusCommand);
-
-    //        if (!saveStatusResult.Succeeded)
-    //        {
-    //            _logger.LogError("Failed to save check status result: {Error}", string.Join(", ", saveStatusResult.Errors));
-    //            return StatusCode(500, "Failed to save check status result");
-    //        }
-
-    //        return Ok(result);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogError(ex, "Error occurred while processing CheckStatusPay for PayId: {PayId}", payId);
-    //        return StatusCode(500, ex.Message);
-    //    }
-    //}
 }

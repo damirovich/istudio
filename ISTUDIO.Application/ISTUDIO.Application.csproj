@@ -22,6 +22,7 @@
     <Folder Include="Features\SmsNikita\Queries\" />
     <Folder Include="Features\SubCategories\DTOs\" />
     <Folder Include="Features\TotalOrdersFavorite\Commands\" />
+    <Folder Include="Features\UpAppInfo\Commands\" />
   </ItemGroup>
 
   <ItemGroup>

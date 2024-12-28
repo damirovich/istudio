@@ -93,7 +93,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("BakaiCheckStatusRes", (string)null);
+                    b.ToTable("BakaiCheckStatusResponse", (string)null);
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.BakaiConfirmTranReqEntity", b =>

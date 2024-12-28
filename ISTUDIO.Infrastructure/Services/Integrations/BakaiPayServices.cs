@@ -35,19 +35,24 @@ public class BakaiPayServices : IBakaiPayService
     {
         AddBasicAuthenticationHeader();
         var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}/payment/status?id={payId}");
-        response.EnsureSuccessStatusCode();
+
         if (response.StatusCode == HttpStatusCode.Created || response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<BakaiPayCheckStatusResModel>();
         }
-        else if (response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
+        else if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
         {
             var errorResponse = await response.Content.ReadFromJsonAsync<BakaiPayValidationErrorResponse>();
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorResponse?.Detail?[0]?.Msg}");
+            throw new UnprocessableEntityException(errorResponse?.Detail?[0]?.Msg ?? "Unprocessable Entity");
+        }
+        else if (response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<ValidBadRequest>();
+            throw new BadRequestExceptionBakai(errorResponse?.Details ?? "Bad Request");
         }
         else
         {
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}");
+            throw new ApiException($"Unexpected status code: {response.StatusCode}", (int)response.StatusCode);
         }
 
     }
@@ -58,55 +63,127 @@ public class BakaiPayServices : IBakaiPayService
     /// <returns></returns>
     public async Task<bool> PayCheckProps(string phoneNumber)
     {
+        // Добавление заголовка авторизации
         AddBasicAuthenticationHeader();
-        var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}/payment/check?phone={phoneNumber}");
-        response.EnsureSuccessStatusCode();
-        if (response.StatusCode == HttpStatusCode.Created || response.IsSuccessStatusCode)
+
+        try
         {
-            var result = await response.Content.ReadFromJsonAsync<BakaiPayCheckPropsResModel>();
-            return result?.Message ?? false;
+            // Выполняем запрос
+            var response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}/payment/check?phone={phoneNumber}");
+
+            // Если запрос успешный или статус 201 Created
+            if (response.StatusCode == HttpStatusCode.Created || response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<BakaiPayCheckPropsResModel>();
+                return result?.Message ?? false;
+            }
+
+            // Если статус 422 Unprocessable Entity
+            if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<BakaiPayValidationErrorResponse>();
+                throw new UnprocessableEntityException(errorResponse?.Detail?[0]?.Msg ?? "Unprocessable Entity");
+            }
+
+            // Если статус 404 Not Found
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidBadRequest>();
+                throw new Domain.Models.BakaiPay.NotFoundException(errorResponse?.Details ?? "Resource not found");
+            }
+
+            // Если другие статусы
+            throw new ApiException($"Unexpected status code: {response.StatusCode}", (int)response.StatusCode);
         }
-        else if (response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
+        catch (UnprocessableEntityException ex)
         {
-            var errorResponse = await response.Content.ReadFromJsonAsync<BakaiPayValidationErrorResponse>();
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorResponse?.Detail?[0]?.Msg}");
+            // Логируем исключение, если необходимо
+            Console.WriteLine($"Validation error: {ex.Message}");
+            throw;
         }
-        else
+        catch (Domain.Models.BakaiPay.NotFoundException ex)
         {
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}");
+            // Логируем исключение, если необходимо
+            Console.WriteLine($"Not Found error: {ex.Message}");
+            throw;
+        }
+        catch (ApiException ex)
+        {
+            // Логируем исключение, если необходимо
+            Console.WriteLine($"API error: {ex.Message}");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // Логируем неожиданные исключения
+            Console.WriteLine($"Unexpected error: {ex.Message}");
+            throw new ApiException("An unexpected error occurred. Please try again later.", 500);
         }
 
     }
 
     /// <summary>
-    /// Подтверждение платеже Confirm Transaction
+    /// Подтверждение платежа Confirm Transaction
     /// </summary>
     /// <param name="confirmReq"></param>
     /// <returns></returns>
     public async Task<BakaiPayConfirmOperResModel> PayConfirm(BakaiPayConfirmOperReqModel confirmReq)
     {
         AddBasicAuthenticationHeader();
-        var response = await _httpClient.PostAsJsonAsync($"{_httpClient.BaseAddress}/payment/confirm", confirmReq);
-        //response.EnsureSuccessStatusCode();
-        if(response.StatusCode == HttpStatusCode.OK || response.IsSuccessStatusCode)
+
+        try
         {
-            return await response.Content.ReadFromJsonAsync<BakaiPayConfirmOperResModel>();
+            // Отправка POST-запроса
+            var response = await _httpClient.PostAsJsonAsync($"{_httpClient.BaseAddress}/payment/confirm", confirmReq);
+
+            // Успешный запрос (200 OK)
+            if (response.StatusCode == HttpStatusCode.OK || response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<BakaiPayConfirmOperResModel>();
+            }
+
+            // Обработка 400 Bad Request
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidBadRequest>();
+                throw new BadRequestExceptionBakai(errorResponse?.Details ?? "Bad request occurred.");
+            }
+
+            // Обработка 422 Unprocessable Entity
+            if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<BakaiPayValidationErrorResponse>();
+                throw new UnprocessableEntityException(errorResponse?.Detail?[0]?.Msg ?? "Unprocessable entity error occurred.");
+            }
+
+            // Обработка других статусов
+            throw new ApiException($"Unexpected status code: {response.StatusCode}", (int)response.StatusCode);
         }
-        else if (response.StatusCode == HttpStatusCode.BadRequest)
+        catch (BadRequestExceptionBakai ex)
         {
-            var errorResponse = await response.Content.ReadFromJsonAsync<ValidBadRequest>();
-            
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorResponse?.Details}");
+            // Логирование для 400 Bad Request
+            Console.WriteLine($"Bad request error: {ex.Message}");
+            throw; // Повторно выбрасываем для обработки в контроллере
         }
-        else if (response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
+        catch (UnprocessableEntityException ex)
         {
-            var errorResponse = await response.Content.ReadFromJsonAsync<BakaiPayValidationErrorResponse>();
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorResponse?.Detail?[0]?.Msg}");
+            // Логирование для 422 Unprocessable Entity
+            Console.WriteLine($"Unprocessable entity error: {ex.Message}");
+            throw; // Повторно выбрасываем для обработки в контроллере
         }
-        else
+        catch (ApiException ex)
         {
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}");
+            // Логирование других API-ошибок
+            Console.WriteLine($"API error: {ex.Message}");
+            throw; // Повторно выбрасываем для обработки в контроллере
         }
+        catch (Exception ex)
+        {
+            // Логирование неожиданных ошибок
+            Console.WriteLine($"Unexpected error: {ex.Message}");
+            throw new ApiException("An unexpected error occurred during payment confirmation.", 500);
+        }
+        
     }
 
     /// <summary>
@@ -117,28 +194,61 @@ public class BakaiPayServices : IBakaiPayService
     public async Task<BakaiPayCreateOperationResModel> PayCreate(BakaiPayCreateOperationReqModel createReq)
     {
         AddBasicAuthenticationHeader();
-        var response = await _httpClient.PostAsJsonAsync($"{_httpClient.BaseAddress}/payment/create", createReq);
-        //response.EnsureSuccessStatusCode();
-        if (response.StatusCode == HttpStatusCode.Created || response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<BakaiPayCreateOperationResModel>();
-        }
-        else if (response.StatusCode == HttpStatusCode.BadRequest)
-        {
-            var errorResponse = await response.Content.ReadFromJsonAsync<ValidBadRequest>();
 
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorResponse?.Details}");
-        }
-        else if (response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
+        try
         {
-            var errorResponse = await response.Content.ReadFromJsonAsync<BakaiPayValidationErrorResponse>();
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}: {errorResponse?.Detail?[0]?.Msg}");
+            // Отправка POST-запроса
+            var response = await _httpClient.PostAsJsonAsync($"{_httpClient.BaseAddress}/payment/create", createReq);
+
+            // Успешный запрос (201 Created)
+            if (response.StatusCode == HttpStatusCode.Created || response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<BakaiPayCreateOperationResModel>();
+            }
+
+            // Обработка 400 Bad Request
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidBadRequest>();
+                throw new BadRequestExceptionBakai(errorResponse?.Details ?? "Bad request occurred during payment creation.");
+            }
+
+            // Обработка 422 Unprocessable Entity
+            if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
+            {
+                var errorResponse = await response.Content.ReadFromJsonAsync<BakaiPayValidationErrorResponse>();
+                throw new UnprocessableEntityException(errorResponse?.Detail?[0]?.Msg ?? "Unprocessable entity error during payment creation.");
+            }
+
+            // Обработка других статусов
+            throw new ApiException($"Unexpected status code: {response.StatusCode}", (int)response.StatusCode);
         }
-        else
+        catch (UnprocessableEntityException ex)
         {
-            throw new HttpRequestException($"Request failed with status {response.StatusCode}");
+            // Логирование ошибки
+            Console.WriteLine($"Validation error: {ex.Message}");
+            throw;
+        }
+        catch (BadRequestExceptionBakai ex)
+        {
+            // Логирование ошибки
+            Console.WriteLine($"Bad request error: {ex.Message}");
+            throw;
+        }
+        catch (ApiException ex)
+        {
+            // Логирование API-ошибки
+            Console.WriteLine($"API error: {ex.Message}");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // Логирование неожиданной ошибки
+            Console.WriteLine($"Unexpected error: {ex.Message}");
+            throw new ApiException("An unexpected error occurred during payment creation.", 500);
         }
     }
+
 
     /// <summary>
     /// Аавторизация через метод Basic

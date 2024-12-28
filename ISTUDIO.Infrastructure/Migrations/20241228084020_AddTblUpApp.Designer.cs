@@ -4,6 +4,7 @@ using ISTUDIO.Infrastructure.AppDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISTUDIO.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241228084020_AddTblUpApp")]
+    partial class AddTblUpApp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,11 +72,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Platform")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("UpdateRequired")
                         .HasColumnType("bit");
@@ -338,7 +336,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 12, 28, 9, 23, 34, 325, DateTimeKind.Utc).AddTicks(574));
+                        .HasDefaultValue(new DateTime(2024, 12, 28, 8, 40, 19, 100, DateTimeKind.Utc).AddTicks(4727));
 
                     b.Property<int?>("CustomerId")
                         .IsRequired()
@@ -879,7 +877,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 12, 28, 9, 23, 34, 332, DateTimeKind.Utc).AddTicks(6311));
+                        .HasDefaultValue(new DateTime(2024, 12, 28, 8, 40, 19, 107, DateTimeKind.Utc).AddTicks(9334));
 
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
@@ -957,7 +955,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("ChangeDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 12, 28, 9, 23, 34, 356, DateTimeKind.Utc).AddTicks(7698));
+                        .HasDefaultValue(new DateTime(2024, 12, 28, 8, 40, 19, 135, DateTimeKind.Utc).AddTicks(5902));
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -1080,7 +1078,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 12, 28, 9, 23, 34, 346, DateTimeKind.Utc).AddTicks(5490));
+                        .HasDefaultValue(new DateTime(2024, 12, 28, 8, 40, 19, 124, DateTimeKind.Utc).AddTicks(8043));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -1261,7 +1259,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 12, 28, 9, 23, 34, 324, DateTimeKind.Utc).AddTicks(1900));
+                        .HasDefaultValue(new DateTime(2024, 12, 28, 8, 40, 19, 99, DateTimeKind.Utc).AddTicks(5500));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)

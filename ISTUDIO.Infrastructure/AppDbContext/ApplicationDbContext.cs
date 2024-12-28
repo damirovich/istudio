@@ -40,6 +40,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<BakaiConfirmTranResEntity> BakaiConfirmTranResponse { get; set; }
     public DbSet<BakaiCreateTranReqEntity> BakaiCreateTranRequest { get; set; }
     public DbSet<BakaiCreateTranResEntity> BakaiCreateTranResponse { get; set; }
+
+    public DbSet<AppUpdateInfoEntity> AppUpdateInfos { get; set; }
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
     protected override void OnModelCreating(ModelBuilder builder)
@@ -87,5 +89,6 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new BakaiConfirmTranResEntityConfiguration());
         builder.ApplyConfiguration(new BakaiCreateTranReqEntityConfiguration());
         builder.ApplyConfiguration(new BakaiCreateTranResEntityConfiguration());
+        builder.ApplyConfiguration(new AppUpdateInfoEntityConfiguration());
     }   
 }

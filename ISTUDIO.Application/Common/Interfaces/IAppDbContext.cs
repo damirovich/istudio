@@ -34,6 +34,7 @@ public interface IAppDbContext
     DbSet<BakaiConfirmTranResEntity> BakaiConfirmTranResponse { get; set; }
     DbSet<BakaiCreateTranReqEntity> BakaiCreateTranRequest { get; set; }
     DbSet<BakaiCreateTranResEntity> BakaiCreateTranResponse { get; set; }
+    DbSet<AppUpdateInfoEntity> AppUpdateInfos { get; set; }
     DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

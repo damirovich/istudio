@@ -1,4 +1,5 @@
 ﻿
+using FluentValidation;
 using ISTUDIO.Application.Features.Products.Queries;
 using Swashbuckle.Swagger.Annotations;
 
@@ -12,12 +13,11 @@ namespace ISTUDIO.Web.Api.Shop.Controllers.v1;
 public class ProductsController : BaseController
 {
     /// <summary>
-    /// Получение списка всех продуктов.
+    /// Получение списка продуктов всех продуктов
     /// </summary>
-    /// <param name="page">Объект пагинации, содержащий номер страницы и размер страницы.</param>
-    /// <returns>
-    /// Возвращает список продуктов, соответствующих переданным параметрам пагинации.
-    /// </returns>
+    /// <param name="pageNumber">Номер страницы (начиная с 0).</param>
+    /// <param name="pageSize">Размер страницы (количество элементов на странице).</param>
+    /// <returns>Возвращает список продуктов.</returns>
     /// <response code="200">Список продуктов успешно получен.</response>
     /// <response code="400">Неверные параметры запроса.</response>
     /// <response code="500">Ошибка сервера.</response>
@@ -40,6 +40,11 @@ public class ProductsController : BaseController
 
             return Ok(result);
         }
+        catch (ValidationException ex) // Обработка ошибок FluentValidation
+        {
+            var errors = ex.Errors.Select(e => new { e.PropertyName, e.ErrorMessage });
+            return BadRequest(new { Message = "Validation failed", Errors = errors });
+        }
         catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
@@ -47,14 +52,18 @@ public class ProductsController : BaseController
     }
 
     /// <summary>
-    /// Метод поиска по продуктам
+    /// Метод поиска продуктов с поддержкой пагинации.
     /// </summary>
-    /// <param name="page"></param>
-    /// <param name="searchTerm"></param>
-    /// <returns></returns>
+    /// <param name="page">Параметры пагинации: номер страницы и размер страницы.</param>
+    /// <param name="searchTerm">Термин для поиска продуктов.</param>
+    /// <returns>Возвращает список продуктов, соответствующих критериям поиска.</returns>
+    /// <response code="200">Список продуктов успешно получен.</response>
+    /// <response code="400">Неверные параметры запроса.</response>
+    /// <response code="500">Ошибка сервера.</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetSearchProducts([FromQuery] PaginatedListVM page, string searchTerm)
     {
         try
@@ -71,6 +80,11 @@ public class ProductsController : BaseController
 
             return Ok(result);
         }
+        catch (ValidationException ex) // Обработка ошибок FluentValidation
+        {
+            var errors = ex.Errors.Select(e => new { e.PropertyName, e.ErrorMessage });
+            return BadRequest(new { Message = "Validation failed", Errors = errors });
+        }
         catch (Exception ex)
         {
 
@@ -79,10 +93,11 @@ public class ProductsController : BaseController
     }
 
     /// <summary>
-    /// Получение новинок продуктов за последнию неделю
+    /// Получение новинок продуктов за последнюю неделю.
     /// </summary>
-    /// <param name="page"></param>
-    /// <returns></returns>
+    /// <returns>Возвращает список новинок продуктов за последнюю неделю.</returns>
+    /// <response code="200">Список новинок успешно получен.</response>
+    /// <response code="500">Ошибка сервера.</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -101,10 +116,18 @@ public class ProductsController : BaseController
     }
 
     /// <summary>
-    /// Получение списка продуктов по категории
+    /// Получение списка продуктов по категории.
     /// </summary>
-    /// <param name="page"></param>
-    /// <returns></returns>
+    /// <param name="page">Параметры пагинации: номер страницы и размер страницы.</param>
+    /// <param name="categoryId">Идентификатор категории.</param>
+    /// <returns>Возвращает список продуктов, соответствующих указанной категории.</returns>
+    /// <response code="200">Список продуктов успешно получен.</response>
+    /// <response code="400">Неверные параметры запроса.</response>
+    /// <response code="500">Ошибка сервера.</response>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -124,6 +147,11 @@ public class ProductsController : BaseController
 
             return Ok(result);
         }
+        catch (ValidationException ex) // Обработка ошибок валидации
+        {
+            var errors = ex.Errors.Select(e => new { e.PropertyName, e.ErrorMessage });
+            return BadRequest(new { Message = "Validation failed", Errors = errors });
+        }
         catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
@@ -131,13 +159,24 @@ public class ProductsController : BaseController
     }
 
     /// <summary>
-    /// Получение списка продуктов по категории
+    /// Получение списка продуктов по магазину.
     /// </summary>
-    /// <param name="page"></param>
-    /// <returns></returns>
+    /// <remarks>
+    /// Пример запроса:
+    /// 
+    ///     GET /api/v1/Products/GetProductsByMagazine?magazineId=1&pageNumber=1&pageSize=10
+    /// 
+    /// </remarks>
+    /// <param name="page">Параметры пагинации: номер страницы и размер страницы.</param>
+    /// <param name="magazineId">Идентификатор магазина.</param>
+    /// <returns>Возвращает список продуктов, принадлежащих указанному магазину.</returns>
+    /// <response code="200">Список продуктов успешно получен.</response>
+    /// <response code="400">Неверные параметры запроса.</response>
+    /// <response code="500">Ошибка сервера.</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetProductsByMagazine([FromQuery] PaginatedListVM page, int magazineId)
     {
         try
@@ -161,17 +200,33 @@ public class ProductsController : BaseController
     }
 
     /// <summary>
-    /// Получение списка продуктов по категории без пагинации
+    /// Получение списка продуктов по подкатегории без пагинации.
     /// </summary>
-    /// <param name="page"></param>
-    /// <returns></returns>
+    /// <remarks>
+    /// Пример запроса:
+    /// 
+    ///     GET /api/v1/Products/GetProductsBySubCategory?categoryId=5
+    /// 
+    /// </remarks>
+    /// <param name="categoryId">Идентификатор подкатегории.</param>
+    /// <returns>Возвращает список продуктов, принадлежащих указанной подкатегории.</returns>
+    /// <response code="200">Список продуктов успешно получен.</response>
+    /// <response code="400">Неверные параметры запроса.</response>
+    /// <response code="500">Ошибка сервера.</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetProductsBySubCategory([FromQuery] int categoryId)
     {
         try
         {
+
+            if (categoryId <= 0)
+            {
+                return BadRequest(new { Message = "Неверный categoryId. Он должен быть больше 0." });
+            }
+
             var result = await Mediator.Send(new GetProductsBySubCategoryId
             {
                 CategoryId = categoryId
@@ -186,17 +241,34 @@ public class ProductsController : BaseController
     }
 
     /// <summary>
-    /// Получение данные продукта по ProductId
+    /// Получение данных продукта по идентификатору.
     /// </summary>
-    /// <param name="page"></param>
-    /// <returns></returns>
+    /// <remarks>
+    /// Пример запроса:
+    /// 
+    ///     GET /api/v1/Products/GetProductsById?productId=10
+    /// 
+    /// </remarks>
+    /// <param name="productId">Идентификатор продукта.</param>
+    /// <returns>Возвращает данные продукта с указанным идентификатором.</returns>
+    /// <response code="200">Данные продукта успешно получены.</response>
+    /// <response code="400">Неверные параметры запроса.</response>
+    /// <response code="404">Продукт с указанным идентификатором не найден.</response>
+    /// <response code="500">Ошибка сервера.</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetProductsById([FromQuery] int productId)
     {
         try
         {
+            if (productId <= 0)
+            {
+                return BadRequest(new { Message = "Неверный productId. Он должен быть больше 0." });
+            }
+
             var result = await Mediator.Send(new GetProductsByIdQuery
             {
                 ProductId = productId
