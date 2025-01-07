@@ -1,4 +1,5 @@
-﻿using ISTUDIO.Contracts.Features.BakaiPay;
+﻿using ISTUDIO.Application.Features.Orders.Commands.EditOrders.UpdateStatusOrders;
+using ISTUDIO.Contracts.Features.BakaiPay;
 using ISTUDIO.Domain.Models.BakaiPay;
 using ISTUDIO.Web.Api.Mobile.Services.BakaiPayService;
 using ISTUDIO.Web.Api.Mobile.Services.BakaiPayService.Models;
@@ -118,7 +119,44 @@ public class BakaiPayController : BaseController
 
             if (statusSucceeded)
             {
-                return Ok(new { Success = true, Message = "Платеж успешно подтвержден." });
+                try
+                {
+                    //Обновление статуса в Базе данных
+                    var upStatusOrder = await Mediator.Send(new UpdateStatusOrdersCommand
+                    {
+                        OrderId = Convert.ToInt32(confirmResult.OrderId),
+                        OrderStatus = "OrderPaid"
+                    });
+
+                    if (upStatusOrder.Succeeded)
+                    {
+                        _logger.LogInformation($"Статус заказа {confirmResult.OrderId} успешно обновлен на 'OrderPaid'.");
+                        return Ok(new { Success = true, Message = "Платеж успешно подтвержден." });
+                    }
+                    else
+                    {
+                        // Логирование ошибок с указанием контекста
+                        _logger.LogError($"Ошибка обновления статуса заказа {confirmResult.OrderId}: {string.Join(", ", upStatusOrder.Errors)}");
+
+                        return Ok(new
+                        {
+                            Success = false,
+                            Message = "Платеж подтвержден, но обновление статуса заказа не удалось.",
+                            Errors = upStatusOrder.Errors ?? Enumerable.Empty<string>()
+                        }) ;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Логирование исключений
+                    _logger.LogError(ex, $"Неожиданная ошибка при обновлении статуса заказа {confirmResult.OrderId}.");
+                    return StatusCode(StatusCodes.Status500InternalServerError, new
+                    {
+                        Success = false,
+                        Message = "Произошла ошибка при обновлении статуса заказа.",
+                        Error = ex.Message
+                    });
+                }
             }
             else
             {

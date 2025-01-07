@@ -6,7 +6,16 @@ using ResModel = Result;
 public class UpdateStatusOrdersCommand : IRequest<ResModel>
 {
     public int OrderId { get; set; }
-    public string OrderStatus { get; set; }
+    /// <summary>
+    /// "OrderProcessing" Новый
+    /// "OrderPaid" Оплачен
+    /// "OrderShipped" Отправлено
+    /// "OrderDelivered" Доставлено
+    /// "OrderCompleted" Завершен
+    /// "OrderCanceled" Возврат
+    /// "OrderReturned" Отменен
+    /// </summary>
+    public string OrderStatus { get; set; }   
 
     public class Handler : IRequestHandler<UpdateStatusOrdersCommand, ResModel>
     {
@@ -36,9 +45,9 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
                 {
                     OrderId = existingOrder.Id,
                     Status = existingOrder.Status,
-                    ChangeDate = DateTime.UtcNow
+                    ChangeDate = DateTime.Now
                 };
-
+                
                 existingOrder.StatusHistories.Add(statusHistory);
 
                 // Проверка и обновление количества товара при изменении статуса на "OrderShipped"

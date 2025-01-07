@@ -4,6 +4,7 @@ using ISTUDIO.Application.Features.FreedomPay.InitiPay.Commands.AddRequestInitPa
 using ISTUDIO.Application.Features.FreedomPay.InitiPay.Commands.AddResponseInitPay;
 using ISTUDIO.Application.Features.FreedomPay.ResultPay.Commands.AddResultPayRequest;
 using ISTUDIO.Application.Features.FreedomPay.ResultPay.Commands.AddResultPayResponse;
+using ISTUDIO.Application.Features.Orders.Commands.EditOrders.UpdateStatusOrders;
 using ISTUDIO.Domain.Models;
 using System.Text;
 using System.Text.Json;
@@ -67,13 +68,13 @@ public class FreedomPayController : BaseController
     {
         if (requestForm == null || requestForm.Count == 0)
         {
-            _logger.LogWarning("Received null or empty request in ResultPayment");
+            _logger.LogWarning("Получен null или пустой запрос в ResultPayment");
             return BadRequest("Invalid result payment request data");
         }
 
         try
         {
-            _logger.LogInformation("Processing ResultPayment for PgOrderId: {PgOrderId}", requestForm.ContainsKey("pg_order_id") ? requestForm["pg_order_id"] : "N/A");
+            _logger.LogInformation("Обработка ResultPayment Для PgOrderId: {PgOrderId}", requestForm.ContainsKey("pg_order_id") ? requestForm["pg_order_id"] : "N/A");
 
             var requestModel = new FreedomPayResultRequestModel();
             foreach (var parameter in requestForm)
@@ -99,12 +100,29 @@ public class FreedomPayController : BaseController
                 Sig = result.PgSig
             });
 
-            _logger.LogInformation("ResultPayment processed successfully for PgOrderId: {PgOrderId}", requestModel["pg_order_id"]);
+            if (result.PgStatus == "ok")
+            {
+                if (int.TryParse(requestModel["pg_order_id"], out var orderId))
+                {
+                    var upStatusOrder = await Mediator.Send(new UpdateStatusOrdersCommand
+                    {
+                        OrderId = orderId,
+                        OrderStatus = "OrderPaid"
+                    });
+                }
+                else
+                {
+                    _logger.LogWarning("Не удалось преобразовать pg_order_id в число: {PgOrderId}", requestModel["pg_order_id"]);
+                }
+
+            }
+
+            _logger.LogInformation("ResultPayment успешно обработан для PgOrderId: {PgOrderId}", requestModel["pg_order_id"]);
             return Content(xml, "application/xml");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while processing ResultPayment for PgOrderId: {PgOrderId}", requestForm.ContainsKey("pg_order_id") ? requestForm["pg_order_id"] : "N/A");
+            _logger.LogError(ex, "Произошла ошибка при обработке ResultPayment для PgOrderId: {PgOrderId}", requestForm.ContainsKey("pg_order_id") ? requestForm["pg_order_id"] : "N/A");
             return StatusCode(500, ex.Message);
         }
     }
@@ -126,4 +144,3 @@ public class FreedomPayController : BaseController
 
 }
 
-  
