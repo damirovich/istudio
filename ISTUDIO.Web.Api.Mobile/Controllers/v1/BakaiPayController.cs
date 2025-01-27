@@ -135,6 +135,12 @@ public class BakaiPayController : BaseController
                     }
                     else
                     {
+                        //Обновление статуса в Базе данных
+                        var upStatusOrderRejected = await Mediator.Send(new UpdateStatusOrdersCommand
+                        {
+                            OrderId = Convert.ToInt32(confirmResult.OrderId),
+                            OrderStatus = "OrderRejected"
+                        });
                         // Логирование ошибок с указанием контекста
                         _logger.LogError($"Ошибка обновления статуса заказа {confirmResult.OrderId}: {string.Join(", ", upStatusOrder.Errors)}");
 
@@ -185,7 +191,7 @@ public class BakaiPayController : BaseController
         }
     }
     [ApiExplorerSettings(IgnoreApi = true)]
-    private async Task<bool> WaitForPaymentStatusAsync(int payId, int timeoutInSeconds = 60, int pollingInterval = 5)
+    private async Task<bool> WaitForPaymentStatusAsync(int payId, int timeoutInSeconds = 60, int pollingInterval = 1)
     {
         var startTime = DateTime.Now;
 
@@ -225,6 +231,7 @@ public class BakaiPayController : BaseController
             }
             catch (Exception ex)
             {
+
                 _logger.LogError(ex, "Ошибка при проверке статуса платежа PayId: {PayId}", payId);
                 return false;
             }

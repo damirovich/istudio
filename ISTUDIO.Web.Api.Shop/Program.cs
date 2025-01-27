@@ -32,9 +32,10 @@ builder.Services.AddCors(c => c.AddPolicy("IstudioApiShop", opt =>
 {
     opt.AllowAnyHeader(); // Разрешены любые заголовки.
     opt.AllowCredentials(); // Разрешены учетные данные (куки, авторизация).
-    opt.AllowAnyMethod(); // Разрешены любые HTTP-методы (GET, POST, PUT и т.д.).
-    opt.WithOrigins(builder.Configuration.GetSection("Cors:Urls").Get<string[]>()!); // Ограничение запросов только для заданных доменов.
+    opt.AllowAnyMethod(); // Разрешены любые HTTP-методы.
+    opt.WithOrigins(builder.Configuration.GetSection("Cors:Urls").Get<string[]>()!); // Ограничение по URL.
 }));
+
 
 //Версионность в API
 builder.Services.AddCustomApiVersioning();

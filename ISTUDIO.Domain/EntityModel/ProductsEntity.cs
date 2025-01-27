@@ -35,6 +35,8 @@ public class ProductsEntity
     //Идентификатор магазина, к которой относится продукт
     public int? MagazineId { get; set; }
 
+    public int? CashbackId { get; set; }
+
     // Категория, к которой относится продукт
     public CategoryEntity Category { get; set; }
 
@@ -44,10 +46,13 @@ public class ProductsEntity
     //Магазины
     public MagazineEntity Magazine { get; set; }
 
+    public CashbackEntity Cashback { get; set; }
+
     // Коллекция изображений продукта
     public ICollection<ProductImagesEntity> Images { get; set; } = new List<ProductImagesEntity>();
     public ICollection<OrderEntity> Orders { get; set; } = new List<OrderEntity>();
     public ICollection<ShoppingCartEntity> ShoppingCarts { get; set;} = new List<ShoppingCartEntity>();
     public ICollection<FavoriteProductsEntity> FavoriteProducts { get; set; } = new List<FavoriteProductsEntity>();
     public ICollection<BannerEntity> Baners { get; set; } = new List<BannerEntity>();
+    public ICollection<ProductCashbackEntity> ProductCashbacks { get; set; } = new List<ProductCashbackEntity>();// Связь с кешбэком
 }

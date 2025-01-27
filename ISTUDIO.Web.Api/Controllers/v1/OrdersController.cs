@@ -303,8 +303,15 @@ public class OrdersController : BaseController
                     .FirstOrDefaultAsync(x => x.Id == orders.OrderId);
 
                 // Определяем новый статус на основании полученного в заказе
+
+                //Предыдущая версия 
+                //string newStatus;
+                //if (!statusMapping.TryGetValue(orderData.Status, out newStatus))
+                //{
+                //    newStatus = "Unknown"; // Если статус не найден в маппинге
+                //}
                 string newStatus;
-                if (!statusMapping.TryGetValue(orderData.Status, out newStatus))
+                if (!statusMapping.TryGetValue("", out newStatus))
                 {
                     newStatus = "Unknown"; // Если статус не найден в маппинге
                 }

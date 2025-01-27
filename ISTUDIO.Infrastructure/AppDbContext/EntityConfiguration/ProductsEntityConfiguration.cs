@@ -36,6 +36,11 @@ public class ProductsEntityConfiguration : IEntityTypeConfiguration<ProductsEnti
              .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict); // Устанавливаем ограничение на удаление каскадом
 
+        builder.HasOne(p => p.Magazine)
+           .WithMany(m => m.Products)
+           .HasForeignKey(p => p.MagazineId)
+           .IsRequired(false) // Если связь не обязательная
+           .OnDelete(DeleteBehavior.Restrict); // Или другой подходящий тип удаления
 
         //// Определение связи с изображениями
         builder.HasMany(p => p.Images)
@@ -52,6 +57,20 @@ public class ProductsEntityConfiguration : IEntityTypeConfiguration<ProductsEnti
         builder.HasMany(e => e.ShoppingCarts)
                .WithMany(p => p.Products)
                .UsingEntity(j => j.ToTable("ShoppingCartProducts"));
+
+        // Добавляем связь с кешбэком
+        builder.HasMany(p => p.ProductCashbacks)
+               .WithOne(pc => pc.Product)
+               .HasForeignKey(pc => pc.ProductId)
+               .OnDelete(DeleteBehavior.Cascade); // Удаление кешбэков при удалении продукта
+
+
+        // Связь с продуктом
+        builder.HasOne(e => e.Cashback)
+            .WithMany(p => p.Products)
+            .HasForeignKey(e => e.CashbackId)
+            .OnDelete(DeleteBehavior.Cascade);
+
 
         builder.HasIndex(e => e.Id).IsUnique();
     }

@@ -35,6 +35,14 @@ public interface IAppDbContext
     DbSet<BakaiCreateTranReqEntity> BakaiCreateTranRequest { get; set; }
     DbSet<BakaiCreateTranResEntity> BakaiCreateTranResponse { get; set; }
     DbSet<AppUpdateInfoEntity> AppUpdateInfos { get; set; }
+    DbSet<PaymentMethodEntity> PaymentMethods { get; set; }
+    DbSet<PaymentTypeEntity> PaymentTypes { get; set; }
+    DbSet<OrderPaymentEntity> OrderPayments { get; set; }
+    DbSet<OrderDeliveryEntity> OrderDelivery { get; set; }
+    DbSet<CashbackTransactionEntity> CashbackTransactions { get; set; }
+    DbSet<UserCashbackEntity> UserCashbacks { get; set; }
+    DbSet<ProductCashbackEntity> ProductCashbacks { get; set; }
+    DbSet<CashbackEntity> Cashbacks { get; set; }
     DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

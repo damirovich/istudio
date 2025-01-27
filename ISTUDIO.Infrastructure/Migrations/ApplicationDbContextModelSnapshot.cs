@@ -286,6 +286,70 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("Banners", (string)null);
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CashbackEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("CashbackPercent")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cashbacks", (string)null);
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CashbackTransactionEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("CashbackTransactions", (string)null);
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CategoryEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -338,7 +402,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 12, 28, 9, 23, 34, 325, DateTimeKind.Utc).AddTicks(574));
+                        .HasDefaultValue(new DateTime(2025, 1, 20, 15, 31, 36, 348, DateTimeKind.Utc).AddTicks(993));
 
                     b.Property<int?>("CustomerId")
                         .IsRequired()
@@ -828,6 +892,52 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("OrderAddress", (string)null);
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderDeliveryEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DeliveredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeliveryMethod")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("EstimatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OrderAddressId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("TrackingNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderAddressId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("TrackingNumber");
+
+                    b.ToTable("OrderDeliveries", (string)null);
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderDetailEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -879,13 +989,12 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 12, 28, 9, 23, 34, 332, DateTimeKind.Utc).AddTicks(6311));
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
 
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
+                    b.Property<string>("OrderNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReceiptPhoto")
@@ -895,9 +1004,8 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("StatusId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18, 2)");
@@ -913,6 +1021,8 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     b.HasIndex("Id")
                         .IsUnique();
+
+                    b.HasIndex("StatusId");
 
                     b.ToTable("Orders", (string)null);
                 });
@@ -946,6 +1056,71 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("OrderNotificationRecipients", (string)null);
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderPaymentEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("TransactionId")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("PaymentMethodId");
+
+                    b.HasIndex("TransactionId");
+
+                    b.ToTable("OrderPayments", (string)null);
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderStatusEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEng")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameRus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderStatusEntity");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderStatusHistoryEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -957,7 +1132,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("ChangeDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 12, 28, 9, 23, 34, 356, DateTimeKind.Utc).AddTicks(7698));
+                        .HasDefaultValue(new DateTime(2025, 1, 20, 15, 31, 36, 379, DateTimeKind.Utc).AddTicks(6998));
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -982,17 +1157,13 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<int>("PaymentTypeId")
                         .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -1023,6 +1194,27 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("PaymentTypes", (string)null);
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductCashbackEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("MaxBonusPercent")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductCashbacks");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductImagesEntity", b =>
@@ -1069,6 +1261,9 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CashbackId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
@@ -1080,7 +1275,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 12, 28, 9, 23, 34, 346, DateTimeKind.Utc).AddTicks(5490));
+                        .HasDefaultValue(new DateTime(2025, 1, 20, 15, 31, 36, 384, DateTimeKind.Utc).AddTicks(9792));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -1112,6 +1307,8 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CashbackId");
 
                     b.HasIndex("CategoryId");
 
@@ -1239,6 +1436,43 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.ToTable("SmsNikitaStatuses", (string)null);
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.UserCashbackEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("UserCashbacks", (string)null);
+                });
+
             modelBuilder.Entity("ISTUDIO.Infrastructure.Identity.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -1261,7 +1495,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 12, 28, 9, 23, 34, 324, DateTimeKind.Utc).AddTicks(1900));
+                        .HasDefaultValue(new DateTime(2025, 1, 20, 15, 31, 36, 347, DateTimeKind.Utc).AddTicks(4022));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)
@@ -1556,6 +1790,15 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CashbackTransactionEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.OrderEntity", "Order")
+                        .WithMany("CashbackTransactions")
+                        .HasForeignKey("OrderId");
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CategoryEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.CategoryEntity", "ParentCategory")
@@ -1628,6 +1871,25 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("Orders");
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderDeliveryEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.OrderAddressEntity", "OrderAddress")
+                        .WithMany()
+                        .HasForeignKey("OrderAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ISTUDIO.Domain.EntityModel.OrderEntity", "Order")
+                        .WithMany("Deliveries")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("OrderAddress");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderDetailEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.MagazineEntity", "Magazines")
@@ -1653,6 +1915,34 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.OrderStatusEntity", "Status")
+                        .WithMany("Orders")
+                        .HasForeignKey("StatusId");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderPaymentEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.OrderEntity", "Order")
+                        .WithMany("Payments")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ISTUDIO.Domain.EntityModel.PaymentMethodEntity", "PaymentMethod")
+                        .WithMany("OrderPayments")
+                        .HasForeignKey("PaymentMethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("PaymentMethod");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderStatusHistoryEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.OrderEntity", "Order")
@@ -1675,6 +1965,17 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("PaymentType");
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductCashbackEntity", b =>
+                {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", "Product")
+                        .WithMany("ProductCashbacks")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductImagesEntity", b =>
                 {
                     b.HasOne("ISTUDIO.Domain.EntityModel.ProductsEntity", "Products")
@@ -1688,6 +1989,11 @@ namespace ISTUDIO.Infrastructure.Migrations
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.ProductsEntity", b =>
                 {
+                    b.HasOne("ISTUDIO.Domain.EntityModel.CashbackEntity", "Cashback")
+                        .WithMany("Products")
+                        .HasForeignKey("CashbackId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("ISTUDIO.Domain.EntityModel.CategoryEntity", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
@@ -1700,7 +2006,10 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     b.HasOne("ISTUDIO.Domain.EntityModel.MagazineEntity", "Magazine")
                         .WithMany("Products")
-                        .HasForeignKey("MagazineId");
+                        .HasForeignKey("MagazineId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Cashback");
 
                     b.Navigation("Category");
 
@@ -1809,6 +2118,11 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CashbackEntity", b =>
+                {
+                    b.Navigation("Products");
+                });
+
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.CategoryEntity", b =>
                 {
                     b.Navigation("Baners");
@@ -1846,6 +2160,10 @@ namespace ISTUDIO.Infrastructure.Migrations
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderEntity", b =>
                 {
+                    b.Navigation("CashbackTransactions");
+
+                    b.Navigation("Deliveries");
+
                     b.Navigation("Details");
 
                     b.Navigation("Invoice")
@@ -1853,7 +2171,19 @@ namespace ISTUDIO.Infrastructure.Migrations
 
                     b.Navigation("OrderAddresses");
 
+                    b.Navigation("Payments");
+
                     b.Navigation("StatusHistories");
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.OrderStatusEntity", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("ISTUDIO.Domain.EntityModel.PaymentMethodEntity", b =>
+                {
+                    b.Navigation("OrderPayments");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.PaymentTypeEntity", b =>
@@ -1866,6 +2196,8 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Navigation("Baners");
 
                     b.Navigation("Images");
+
+                    b.Navigation("ProductCashbacks");
                 });
 
             modelBuilder.Entity("ISTUDIO.Domain.EntityModel.SmsNikitaRequest", b =>

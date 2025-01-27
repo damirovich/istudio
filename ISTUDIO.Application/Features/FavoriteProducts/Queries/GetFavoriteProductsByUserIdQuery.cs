@@ -1,4 +1,5 @@
 ﻿using ISTUDIO.Application.Features.FavoriteProducts.DTOs;
+using ISTUDIO.Application.Features.ModelsDTO;
 using ISTUDIO.Application.Features.Products.DTOs;
 
 
@@ -20,6 +21,7 @@ public class GetFavoriteProductsByUserIdQuery : IRequest<ResModel>
             var favoriteProducts = await _appDbContext.FavoriteProducts
                 .Include(fp => fp.Products).ThenInclude(p => p.Images)
                 .Include(fp => fp.Products).ThenInclude(p => p.Discount)
+                .Include(fp => fp.Products).ThenInclude(p => p.Magazine) // Здесь Magazine
                 .AsNoTracking()
                 .Where(fp => fp.UserId == query.UserId)
                 .OrderByDescending(fp => fp.Id)
@@ -36,6 +38,7 @@ public class GetFavoriteProductsByUserIdQuery : IRequest<ResModel>
                 Description = p.Description,
                 Images = _mapper.Map<ICollection<ProductImagesDTO>>(p.Images),
                 ProductDiscount = _mapper.Map<ProductDiscountDTO>(p.ProductDiscount),
+                ProductMagazine = _mapper.Map<MagazineDTO>(p.ProductMagazine),
                 ProductCategory = p.ProductCategory
             })).ToList();
             return new ResModel

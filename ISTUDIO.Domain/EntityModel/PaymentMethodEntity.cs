@@ -6,14 +6,14 @@ public class PaymentMethodEntity
     public int Id { get; set; }
 
     // Значение (название) метода оплаты
-    public string Value { get; set; }
-
-    // Идентификатор пользователя, связанного с данным методом оплаты
-    public string UserId { get; set; }
+    public string Name { get; set; }
 
     // Идентификатор типа оплаты, к которому относится данный метод оплаты
     public int PaymentTypeId { get; set; }
 
     // Тип оплаты, к которому относится данный метод оплаты
     public PaymentTypeEntity PaymentType { get; set; }
+
+    // Связь с OrderPaymentEntity
+    public ICollection<OrderPaymentEntity> OrderPayments { get; set; } = new List<OrderPaymentEntity>();
 }

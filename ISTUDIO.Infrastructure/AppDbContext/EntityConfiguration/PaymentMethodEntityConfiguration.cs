@@ -10,7 +10,7 @@ public class PaymentMethodEntityConfiguration : IEntityTypeConfiguration<Payment
 
         builder.HasKey(e => e.Id);
 
-        builder.Property(e => e.Value).HasMaxLength(100).IsRequired();
+        builder.Property(e => e.Name).HasMaxLength(250).IsRequired();
 
         builder.HasOne(e => e.PaymentType)
             .WithMany(p => p.PaymentMethods)

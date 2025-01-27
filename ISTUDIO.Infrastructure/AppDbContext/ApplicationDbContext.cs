@@ -40,8 +40,15 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<BakaiConfirmTranResEntity> BakaiConfirmTranResponse { get; set; }
     public DbSet<BakaiCreateTranReqEntity> BakaiCreateTranRequest { get; set; }
     public DbSet<BakaiCreateTranResEntity> BakaiCreateTranResponse { get; set; }
-
+    public DbSet<PaymentMethodEntity> PaymentMethods { get; set; }
+    public DbSet<PaymentTypeEntity> PaymentTypes { get; set; }  
+    public DbSet<OrderPaymentEntity> OrderPayments { get; set; }
+    public DbSet<OrderDeliveryEntity> OrderDelivery { get; set; }
     public DbSet<AppUpdateInfoEntity> AppUpdateInfos { get; set; }
+    public DbSet<CashbackTransactionEntity> CashbackTransactions { get; set; }
+    public DbSet<UserCashbackEntity> UserCashbacks { get; set; }
+    public DbSet<ProductCashbackEntity> ProductCashbacks { get; set; }
+    public DbSet<CashbackEntity> Cashbacks { get; set; }
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
     protected override void OnModelCreating(ModelBuilder builder)
@@ -90,5 +97,11 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new BakaiCreateTranReqEntityConfiguration());
         builder.ApplyConfiguration(new BakaiCreateTranResEntityConfiguration());
         builder.ApplyConfiguration(new AppUpdateInfoEntityConfiguration());
+        builder.ApplyConfiguration(new OrderPaymentEntityConfiguration());
+        builder.ApplyConfiguration(new OrderDeliveryEntityConfiguration());
+        builder.ApplyConfiguration(new CashbackTransactionEntityConfiguration());
+        builder.ApplyConfiguration(new UserCashbackEntityConfiguration());
+        builder.ApplyConfiguration(new ProductsEntityConfiguration());
+        builder.ApplyConfiguration(new CashbackEntityConfiguration());
     }   
 }

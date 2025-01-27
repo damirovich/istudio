@@ -14,6 +14,7 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
     /// "OrderCompleted" Завершен
     /// "OrderCanceled" Возврат
     /// "OrderReturned" Отменен
+    /// "OrderRejected" Отклонено
     /// </summary>
     public string OrderStatus { get; set; }   
 
@@ -41,13 +42,22 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
                     return ResModel.Failure(new[] { $"Статус '{command.OrderStatus}' уже был присвоен заказу ранее." });
                 }
                 // Сохраните предыдущий статус в истории
+
+                //Предыдущая версия 
+                //var statusHistory = new OrderStatusHistoryEntity
+                //{
+                //    OrderId = existingOrder.Id,
+                //    Status = existingOrder.Status,
+                //    ChangeDate = DateTime.Now
+                //};
+
                 var statusHistory = new OrderStatusHistoryEntity
                 {
                     OrderId = existingOrder.Id,
-                    Status = existingOrder.Status,
+                    Status = "",
                     ChangeDate = DateTime.Now
                 };
-                
+
                 existingOrder.StatusHistories.Add(statusHistory);
 
                 // Проверка и обновление количества товара при изменении статуса на "OrderShipped"
@@ -77,7 +87,10 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
                 }
 
                 // Обновление статуса заказа
-                existingOrder.Status = command.OrderStatus;
+                //Предыдущая версия 
+                // existingOrder.Status = command.OrderStatus;
+
+                existingOrder.Status = new OrderStatusEntity();
                 await _appDbContext.SaveChangesAsync(cancellationToken);
 
                 return ResModel.Success();

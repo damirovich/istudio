@@ -14,19 +14,27 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<OrderEntity>
         builder.Property(e => e.TotalPrice).HasColumnType("decimal(18, 2)").IsRequired();
         builder.Property(e => e.TotalQuantyProduct).IsRequired();
         builder.Property(e => e.CreateDate)
-              .HasDefaultValue(DateTime.UtcNow)
+              .HasDefaultValueSql("GETDATE()")
               .ValueGeneratedOnAdd();
-        builder.Property(e => e.Status).IsRequired();
 
+        // Настройка связи с OrderStatusEntity
+        builder.HasOne(e => e.Status)
+            .WithMany(s => s.Orders)
+            .HasForeignKey(e => e.StatusId)
+            .IsRequired(false);
+
+        // Связь Many-to-Many с ProductsEntity
         builder.HasMany(e => e.Products)
             .WithMany(p => p.Orders)
             .UsingEntity(j => j.ToTable("OrderProducts"));
 
+        // Связь с OrderDetailEntity
         builder.HasMany(e => e.Details)
             .WithOne(d => d.Order)
             .HasForeignKey(d => d.OrderId)
             .IsRequired();
 
+        // Связь с InvoiceEntity
         builder.HasOne(e => e.Invoice)
             .WithOne()
             .HasForeignKey<InvoiceEntity>(e => e.OrderId)

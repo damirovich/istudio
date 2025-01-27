@@ -47,14 +47,26 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
             {
                 photoFilePath = await _fileStoreService.SaveImage(command.ReceiptPhoto);
             }
+            //Предыдущая версия 
+            //var orderEntity = new OrderEntity
+            //{
+            //    Status = "OrderProcessing",
+            //    ShippingAddress = $"{command.OrderAddress.Region} {command.OrderAddress.City} {command.OrderAddress.Address}",
+            //    TotalPrice = command.TotalAmount,
+            //    TotalQuantyProduct = command.TotalQuantyProduct,
+            //    PaymentMethod = command.PaymentMethod,
+            //    UserId = command.UserId,
+            //    ReceiptPhoto = photoFilePath,
+            //    CreateDate = DateTime.Now
+            //};
 
             var orderEntity = new OrderEntity
             {
-                Status = "OrderProcessing",
+               // Status = "OrderProcessing",
                 ShippingAddress = $"{command.OrderAddress.Region} {command.OrderAddress.City} {command.OrderAddress.Address}",
                 TotalPrice = command.TotalAmount,
                 TotalQuantyProduct = command.TotalQuantyProduct,
-                PaymentMethod = command.PaymentMethod,
+               // PaymentMethod = command.PaymentMethod,
                 UserId = command.UserId,
                 ReceiptPhoto = photoFilePath,
                 CreateDate = DateTime.Now
@@ -103,10 +115,19 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
             await _appDbContext.SaveChangesAsync(cancellationToken);
 
             // Добавляем запись в историю статусов
+
+            //Предыдущая версия 
+            //var statusHistory = new OrderStatusHistoryEntity
+            //{
+            //    OrderId = orderEntity.Id,
+            //    Status = orderEntity.Status,
+            //    ChangeDate = DateTime.UtcNow
+            //};
+
             var statusHistory = new OrderStatusHistoryEntity
             {
                 OrderId = orderEntity.Id,
-                Status = orderEntity.Status,
+                Status = "",
                 ChangeDate = DateTime.UtcNow
             };
 
