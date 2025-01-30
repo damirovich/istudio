@@ -27,7 +27,7 @@ public class AddReceipPhotoOrdersCommand  : IRequest<ResModel>
                 }
 
                 var photoFilePath = await _fileStoreService.SaveImage(command.ReceiptPhoto);
-                order.ReceiptPhoto = photoFilePath;
+               // order.ReceiptPhoto = photoFilePath;
                // order.Status = "Order paid";
 
                 _appDbContext.Orders.Update(order);

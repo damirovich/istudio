@@ -16,10 +16,10 @@ public class CreateOrdersVM : IMapWith<CreateOrdersCommand>
 
     public void Mapping(Profile profile)
     {
-        profile.CreateMap<CreateOrdersVM, CreateOrdersCommand>()
-              .ForMember(dest => dest.ReceiptPhoto, opt => opt.MapFrom(src =>
-                !string.IsNullOrEmpty(src.ReceiptPhotoBase64)
-                ? Convert.FromBase64String(src.ReceiptPhotoBase64)
-                : null));
+        profile.CreateMap<CreateOrdersVM, CreateOrdersCommand>();
+              //.ForMember(dest => dest.ReceiptPhoto, opt => opt.MapFrom(src =>
+              //  !string.IsNullOrEmpty(src.ReceiptPhotoBase64)
+              //  ? Convert.FromBase64String(src.ReceiptPhotoBase64)
+              //  : null));
     }
 }

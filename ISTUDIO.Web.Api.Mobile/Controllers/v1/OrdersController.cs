@@ -40,18 +40,18 @@ public class OrdersController : BaseController
 
             var user = await _appUserService.GetUserDetailsByUserIdAsync(orders.UserId);
 
-            var productList = string.Join("\n", orders.ProductOrders.Select(p =>
-                     $"Название: {p.Name}, Количество: {p.QuantyProductCart}, Модель : {p.Model} сом"));
+            //var productList = string.Join("\n", orders.ProductOrders.Select(p =>
+            //         $"Название: {p.Name}, Количество: {p.QuantyProductCart}, Модель : {p.Model} сом"));
 
-            await Mediator.Send(new CreateSmsNikitaReqCommand
-            {
-                PhonesNumber =  orderNotification.Select(o=>o.PhoneNumber).ToList() ,
-                Message = $"Новый заказ в marketkg\n" +
-                          $"Номер заказа {result.OrderId}\n" +
-                          $"Клиент {user.UserPhoneNumber} Товары: {productList}\n" +
-                          $"Общее количество продуктов заказа {orders.TotalQuantyProduct}\n" +
-                          $"Дата заказа {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}",
-            });
+            //await Mediator.Send(new CreateSmsNikitaReqCommand
+            //{
+            //    PhonesNumber =  orderNotification.Select(o=>o.PhoneNumber).ToList() ,
+            //    Message = $"Новый заказ в marketkg\n" +
+            //              $"Номер заказа {result.OrderId}\n" +
+            //              $"Клиент {user.UserPhoneNumber} Товары: {productList}\n" +
+            //              $"Общее количество продуктов заказа {orders.TotalQuantyProduct}\n" +
+            //              $"Дата заказа {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}",
+            //});
             //await _smsNikitaService.SendSms(smsRequest);
             var typePay = orders.PaymentMethod.ToString();  
             if (typePay == "FreedomPay")

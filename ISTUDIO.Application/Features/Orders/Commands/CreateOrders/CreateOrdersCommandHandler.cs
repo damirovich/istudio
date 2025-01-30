@@ -40,13 +40,13 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                 }
             }
 
-            
 
-            string photoFilePath = string.Empty;
-            if (command.ReceiptPhoto != null && command.ReceiptPhoto.Length > 0)
-            {
-                photoFilePath = await _fileStoreService.SaveImage(command.ReceiptPhoto);
-            }
+            //Предыдущая версия
+            //string photoFilePath = string.Empty;
+            //if (command.ReceiptPhoto != null && command.ReceiptPhoto.Length > 0)
+            //{
+            //    photoFilePath = await _fileStoreService.SaveImage(command.ReceiptPhoto);
+            //}
             //Предыдущая версия 
             //var orderEntity = new OrderEntity
             //{
@@ -68,7 +68,7 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                 TotalQuantyProduct = command.TotalQuantyProduct,
                // PaymentMethod = command.PaymentMethod,
                 UserId = command.UserId,
-                ReceiptPhoto = photoFilePath,
+               // ReceiptPhoto = photoFilePath,
                 CreateDate = DateTime.Now
             };
 
@@ -92,7 +92,7 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                     {
                         Product = productEntity,
                         Quantity = productDto.QuantyProductCart,
-                        UnitPrice = productDto.Price,
+                       // UnitPrice = productDto.Price,
                         Order = orderEntity,
                         MagazineId = (int)productEntity.MagazineId // Связь с магазином через продукт
                     };

@@ -1,28 +1,28 @@
-﻿using ISTUDIO.Application.Features.Cashbacks.Commands.CreateCashbacks;
-using ISTUDIO.Application.Features.Cashbacks.Commands.DeleteCashbacks;
-using ISTUDIO.Application.Features.Cashbacks.Commands.EditCashbacks;
-using ISTUDIO.Application.Features.Cashbacks.Queries;
-using ISTUDIO.Contracts.Features.Cashbacks;
+﻿using ISTUDIO.Application.Features.OrderPayments.Commands.CreateOrderPayment;
+using ISTUDIO.Application.Features.OrderPayments.Commands.DeleteOrderPayment;
+using ISTUDIO.Application.Features.OrderPayments.Commands.EditOrderPayment;
+using ISTUDIO.Application.Features.OrderPayments.Queries;
+using ISTUDIO.Contracts.Features.OrderPayments;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
+
 [ApiVersion("1.0")]
-public class CashbacksController : BaseController
+public class OrderPaymentsController : BaseController
 {
-    private readonly ILogger<CashbacksController> _loger;
+    private readonly ILogger<OrderPaymentsController> _logger;
     private readonly IMapper _mapper;
 
-    public CashbacksController(ILogger<CashbacksController> loger, IMapper mapper)
-        => (_loger, _mapper) = (loger, mapper);
-
+    public OrderPaymentsController(ILogger<OrderPaymentsController> logger, IMapper mapper)
+        => (_logger, _mapper) = (logger, mapper);
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> GetCashbackList([FromQuery] PaginatedListVM page)
+    public async Task<ICsmActionResult> GetOrderPaymentList([FromQuery] PaginatedListVM page)
     {
         try
         {
-            return new CsmActionResult(await Mediator.Send(new GetCashbacksQuery
+            return new CsmActionResult(await Mediator.Send(new GetOrderPaymentsQuery
             {
                 Parameters = new PaginatedParameters
                 {
@@ -37,32 +37,32 @@ public class CashbacksController : BaseController
         }
     }
 
-    //[HttpGet]
-    //[ProducesResponseType(StatusCodes.Status200OK)]
-    //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    //public async Task<ICsmActionResult> GetCashbackById([FromQuery] int id)
-    //{
-    //    try
-    //    {
-    //        return new CsmActionResult(await Mediator.Send(new GetCashbackByIdQuery
-    //        {
-    //            CashbackId = id
-    //        }));
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
-    //    }
-    //}
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetOrderPaymentById([FromQuery] int id)
+    {
+        try
+        {
+            return new CsmActionResult(await Mediator.Send(new GetOrderPaymentsByIdQuery
+            {
+                OrderPayId = id
+            }));
+        }
+        catch (Exception ex)
+        {
+            return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
+        }
+    }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> CreateCashback([FromBody] CreateCashbackVM cashback)
+    public async Task<ICsmActionResult> CreateOrderPayment([FromBody] CreateOrderPaymentVM orderPayment)
     {
         try
         {
-            var command = _mapper.Map<CreateCashbackCommand>(cashback);
+            var command = _mapper.Map<CreateOrderPaymentCommands>(orderPayment);
             var result = await Mediator.Send(command);
 
             if (result.Succeeded)
@@ -79,11 +79,11 @@ public class CashbacksController : BaseController
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> EditCashback([FromBody] EditCashbackVM cashback)
+    public async Task<ICsmActionResult> EditOrderPayment([FromBody] EditOrderPaymentVM orderPayment)
     {
         try
         {
-            var command = _mapper.Map<EditCashbackCommand>(cashback);
+            var command = _mapper.Map<EditOrderPaymentCommands>(orderPayment);
             var result = await Mediator.Send(command);
 
             return new CsmActionResult(result);
@@ -97,11 +97,11 @@ public class CashbacksController : BaseController
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ICsmActionResult> DeleteCashback([FromQuery] int id)
+    public async Task<ICsmActionResult> DeleteOrderPayment([FromQuery] int id)
     {
         try
         {
-            var result = await Mediator.Send(new DeleteCashbackCommand { Id = id });
+            var result = await Mediator.Send(new DeleteOrderPaymentCommands { Id = id });
             return new CsmActionResult(result);
         }
         catch (Exception ex)
@@ -109,5 +109,4 @@ public class CashbacksController : BaseController
             return new CsmActionResult(new CsmReturnStatus(-1, ex.Message));
         }
     }
-
 }

@@ -17,7 +17,7 @@ public class OrderEntity
 
     public DateTime CreateDate { get; set; }
 
-    public string? ReceiptPhoto { get; set; }
+    //public string? ReceiptPhoto { get; set; }
 
     // Идентификатор пользователя, сделавшего этот заказ
     public string UserId { get; set; }

@@ -24,4 +24,7 @@ public class OrderPaymentEntity
 
     // Идентификатор транзакции (например, из платёжной системы)
     public string? TransactionId { get; set; }
+
+    //Фото чека
+    public string? ReceiptPhoto { get; set; }
 }

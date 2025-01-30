@@ -14,6 +14,7 @@ public class OrderPaymentEntityConfiguration : IEntityTypeConfiguration<OrderPay
         builder.Property(e => e.Status).HasMaxLength(250).IsRequired();
         builder.Property(e => e.PaymentDate).IsRequired();
         builder.Property(e => e.TransactionId).HasMaxLength(500);
+        builder.Property(e => e.ReceiptPhoto).HasMaxLength(1000);
 
         builder.HasOne(e => e.Order)
             .WithMany(o => o.Payments)
