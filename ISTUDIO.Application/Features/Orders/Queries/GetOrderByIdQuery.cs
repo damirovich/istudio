@@ -1,6 +1,4 @@
 ﻿using ISTUDIO.Application.Features.Orders.DTOs;
-using ISTUDIO.Application.Features.Products.DTOs;
-
 namespace ISTUDIO.Application.Features.Orders.Queries;
 using ResModel = OrderResponseDTO;
 
@@ -28,6 +26,7 @@ public class GetOrderByIdQuery : IRequest<ResModel>
                     .ThenInclude(d => d.Product)   // Включаем продукты через детали заказа
                 .Include(o => o.Products)
                     .ThenInclude(o => o.Images)
+                .Include(s => s.Status)
                 .Where(o => o.Id == query.OrderId)
                 .FirstOrDefaultAsync(cancellationToken);
 

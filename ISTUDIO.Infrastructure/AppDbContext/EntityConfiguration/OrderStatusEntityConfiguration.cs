@@ -6,7 +6,7 @@ public class OrderStatusEntityConfiguration : IEntityTypeConfiguration<OrderStat
 {
     public void Configure(EntityTypeBuilder<OrderStatusEntity> builder)
     {
-        builder.ToTable("OrderStatuses");
+        builder.ToTable("OrderStatusEntity");
 
         builder.HasKey(e => e.Id);
 

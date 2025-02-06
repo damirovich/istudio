@@ -2,6 +2,7 @@
 
 namespace ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
 
+using AutoMapper.QueryableExtensions;
 using ISTUDIO.Application.Common.Interfaces;
 using ISTUDIO.Domain.EntityModel;
 using System.Threading;
@@ -11,13 +12,11 @@ using ResModel = CreateOrderResponseDTO;
 public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, ResModel>
 {
     private readonly IAppDbContext _appDbContext;
-    private readonly IFileStoreService _fileStoreService;
-    private readonly ISmsNikitaService _smsNikitaService;
-    public CreateOrdersCommandHandler(IAppDbContext appDbContext, IFileStoreService fileStoreService, ISmsNikitaService smsNikitaService)
+    private readonly IMapper _mapper;
+    public CreateOrdersCommandHandler(IAppDbContext appDbContext, IMapper mapper)
     {
         _appDbContext = appDbContext;
-        _fileStoreService = fileStoreService;
-        _smsNikitaService = smsNikitaService;
+        _mapper = mapper;
     }
 
     public async Task<ResModel> Handle(CreateOrdersCommand command, CancellationToken cancellationToken)
@@ -40,36 +39,18 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                 }
             }
 
-
-            //Предыдущая версия
-            //string photoFilePath = string.Empty;
-            //if (command.ReceiptPhoto != null && command.ReceiptPhoto.Length > 0)
-            //{
-            //    photoFilePath = await _fileStoreService.SaveImage(command.ReceiptPhoto);
-            //}
-            //Предыдущая версия 
-            //var orderEntity = new OrderEntity
-            //{
-            //    Status = "OrderProcessing",
-            //    ShippingAddress = $"{command.OrderAddress.Region} {command.OrderAddress.City} {command.OrderAddress.Address}",
-            //    TotalPrice = command.TotalAmount,
-            //    TotalQuantyProduct = command.TotalQuantyProduct,
-            //    PaymentMethod = command.PaymentMethod,
-            //    UserId = command.UserId,
-            //    ReceiptPhoto = photoFilePath,
-            //    CreateDate = DateTime.Now
-            //};
+            var status = await _appDbContext.OrderStatus.FirstOrDefaultAsync(x => x.Id == 1) ?? throw new NotFoundException("Статус заказа не найден");
 
             var orderEntity = new OrderEntity
             {
-               // Status = "OrderProcessing",
+
+                Status = status,
                 ShippingAddress = $"{command.OrderAddress.Region} {command.OrderAddress.City} {command.OrderAddress.Address}",
                 TotalPrice = command.TotalAmount,
                 TotalQuantyProduct = command.TotalQuantyProduct,
-               // PaymentMethod = command.PaymentMethod,
                 UserId = command.UserId,
-               // ReceiptPhoto = photoFilePath,
-                CreateDate = DateTime.Now
+                CreateDate = DateTime.Now,
+                OrderNumber = $"ORD-{DateTime.Now.Ticks}"
             };
 
             var orderAddress = new OrderAddressEntity
@@ -92,7 +73,7 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                     {
                         Product = productEntity,
                         Quantity = productDto.QuantyProductCart,
-                       // UnitPrice = productDto.Price,
+                        UnitPrice = productEntity.Price,
                         Order = orderEntity,
                         MagazineId = (int)productEntity.MagazineId // Связь с магазином через продукт
                     };
@@ -100,8 +81,7 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
                     orderEntity.Details.Add(orderDetail);
                     orderEntity.Products.Add(productEntity);
 
-                    orderDetails.Add(orderDetail);
-                    //await _appDbContext.OrderDetails.AddAsync(orderDetail, cancellationToken);
+                    orderDetails.Add(orderDetail);                    
                 }
                 else
                 {
@@ -116,25 +96,22 @@ public class CreateOrdersCommandHandler : IRequestHandler<CreateOrdersCommand, R
 
             // Добавляем запись в историю статусов
 
-            //Предыдущая версия 
-            //var statusHistory = new OrderStatusHistoryEntity
-            //{
-            //    OrderId = orderEntity.Id,
-            //    Status = orderEntity.Status,
-            //    ChangeDate = DateTime.UtcNow
-            //};
-
             var statusHistory = new OrderStatusHistoryEntity
             {
                 OrderId = orderEntity.Id,
-                Status = "",
-                ChangeDate = DateTime.UtcNow
+                Status = status.NameEng,
+                ChangeDate = DateTime.Now
             };
 
             await _appDbContext.OrderStatusHistories.AddAsync(statusHistory, cancellationToken);
             await _appDbContext.SaveChangesAsync(cancellationToken);
 
-            return new ResModel { OrderId = orderEntity.Id };
+
+            var payMethods = await _appDbContext.PaymentMethods.AsNoTracking().ProjectTo<OrderPayMethodResDTO>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken);
+            return new ResModel {
+                OrderId = orderEntity.Id,
+                PaymentMethods = payMethods
+            };
         }
         catch (BadRequestException ex)
         {

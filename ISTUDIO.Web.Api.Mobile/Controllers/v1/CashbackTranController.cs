@@ -71,80 +71,80 @@ public class CashbackTranController : BaseController
         }
     }
 
-    /// <summary>
-    /// Создание транзакции кэшбека
-    /// </summary>
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreateTransaction([FromBody] CreateCashTransactionVM transaction)
-    {
-        try
-        {
-            var command = _mapper.Map<CreateCashTransactionCommand>(transaction);
-            var result = await Mediator.Send(command);
+    ///// <summary>
+    ///// Создание транзакции кэшбека
+    ///// </summary>
+    //[HttpPost]
+    //[ProducesResponseType(StatusCodes.Status201Created)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public async Task<IActionResult> CreateTransaction([FromBody] CreateCashTransactionVM transaction)
+    //{
+    //    try
+    //    {
+    //        var command = _mapper.Map<CreateCashTransactionCommand>(transaction);
+    //        var result = await Mediator.Send(command);
 
-            if (result.Succeeded)
-                return CreatedAtAction(nameof(GetTransactionById), new { id = result.Succeeded }, result);
+    //        if (result.Succeeded)
+    //            return CreatedAtAction(nameof(GetTransactionById), new { id = result.Succeeded }, result);
 
-            return BadRequest(result.Errors);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при создании транзакции кэшбека");
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
-    }
+    //        return BadRequest(result.Errors);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Ошибка при создании транзакции кэшбека");
+    //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+    //    }
+    //}
 
-    /// <summary>
-    /// Редактирование транзакции кэшбека
-    /// </summary>
-    [HttpPut]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> EditTransaction([FromBody] EditCashTransactionVM transaction)
-    {
-        try
-        {
-            var command = _mapper.Map<EditCashTransactionCommand>(transaction);
-            var result = await Mediator.Send(command);
+    ///// <summary>
+    ///// Редактирование транзакции кэшбека
+    ///// </summary>
+    //[HttpPut]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public async Task<IActionResult> EditTransaction([FromBody] EditCashTransactionVM transaction)
+    //{
+    //    try
+    //    {
+    //        var command = _mapper.Map<EditCashTransactionCommand>(transaction);
+    //        var result = await Mediator.Send(command);
 
-            if (result.Succeeded)
-                return Ok(result);
+    //        if (result.Succeeded)
+    //            return Ok(result);
 
-            return BadRequest(result.Errors);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при редактировании транзакции кэшбека");
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
-    }
+    //        return BadRequest(result.Errors);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Ошибка при редактировании транзакции кэшбека");
+    //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+    //    }
+    //}
 
-    /// <summary>
-    /// Удаление транзакции кэшбека
-    /// </summary>
-    [HttpDelete("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> DeleteTransaction(int id)
-    {
-        try
-        {
-            var result = await Mediator.Send(new DeleteCashTransactionCommand { CashTranId = id });
+    ///// <summary>
+    ///// Удаление транзакции кэшбека
+    ///// </summary>
+    //[HttpDelete("{id}")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public async Task<IActionResult> DeleteTransaction(int id)
+    //{
+    //    try
+    //    {
+    //        var result = await Mediator.Send(new DeleteCashTransactionCommand { CashTranId = id });
 
-            if (result.Succeeded)
-                return Ok(result);
+    //        if (result.Succeeded)
+    //            return Ok(result);
 
-            return BadRequest(result.Errors);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при удалении транзакции с ID {Id}", id);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
-    }
+    //        return BadRequest(result.Errors);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Ошибка при удалении транзакции с ID {Id}", id);
+    //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+    //    }
+    //}
 }

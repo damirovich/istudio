@@ -1,6 +1,4 @@
-﻿using AutoMapper.QueryableExtensions;
-using ISTUDIO.Application.Features.ModelsDTO;
-using ISTUDIO.Application.Features.Products.DTOs;
+﻿using ISTUDIO.Application.Features.ModelsDTO;
 using ISTUDIO.Application.Features.ShoppingCarts.DTOs;
 using System.ComponentModel.DataAnnotations;
 
@@ -33,6 +31,11 @@ public class GetShoppingCartsByUserIdQuery : IRequest<ResModel>
                     .ThenInclude(p => p.Images)
                 .Include(sc => sc.Products)
                     .ThenInclude(p => p.Magazine)
+                .Include(sc => sc.Products)
+                    .ThenInclude(sc=>sc.Cashback)
+                .Include(sc => sc.Products)
+                     .ThenInclude(sc=>sc.ProductCashbacks)
+
                 .Where(cart => cart.UserId == query.UserId && cart.IsDeleted == false)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);

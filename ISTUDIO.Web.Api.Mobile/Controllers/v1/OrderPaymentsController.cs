@@ -1,9 +1,9 @@
-﻿
-using ISTUDIO.Application.Features.OrderPayments.Commands.CreateOrderPayment;
+﻿using ISTUDIO.Application.Features.OrderPayments.Commands.CreateOrderPayment;
 using ISTUDIO.Application.Features.OrderPayments.Commands.DeleteOrderPayment;
 using ISTUDIO.Application.Features.OrderPayments.Commands.EditOrderPayment;
 using ISTUDIO.Application.Features.OrderPayments.Queries;
 using ISTUDIO.Contracts.Features.OrderPayments;
+using Microsoft.EntityFrameworkCore;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
 
@@ -12,39 +12,38 @@ public class OrderPaymentsController : BaseController
 {
     private readonly ILogger<OrderPaymentsController> _logger;
     private readonly IMapper _mapper;
+    private readonly IAppDbContext _appDbContext;
+    public OrderPaymentsController(ILogger<OrderPaymentsController> logger, IMapper mapper, IAppDbContext appDbContext)
+        => (_logger, _mapper, _appDbContext) = (logger, mapper, appDbContext);
 
-    public OrderPaymentsController(ILogger<OrderPaymentsController> logger, IMapper mapper)
-        => (_logger, _mapper) = (logger, mapper);
 
+    ///// <summary>
+    ///// Получение списка платежей
+    ///// </summary>
+    //[HttpGet]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public async Task<IActionResult> GetPaymentList([FromQuery] PaginatedListVM page)
+    //{
+    //    try
+    //    {
+    //        var result = await Mediator.Send(new GetOrderPaymentsQuery
+    //        {
+    //            Parameters = new PaginatedParameters
+    //            {
+    //                PageNumber = page.PageNumber,
+    //                PageSize = page.PageSize
+    //            }
+    //        });
 
-
-    /// <summary>
-    /// Получение списка платежей
-    /// </summary>
-    [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetPaymentList([FromQuery] PaginatedListVM page)
-    {
-        try
-        {
-            var result = await Mediator.Send(new GetOrderPaymentsQuery
-            {
-                Parameters = new PaginatedParameters
-                {
-                    PageNumber = page.PageNumber,
-                    PageSize = page.PageSize
-                }
-            });
-
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при получении списка платежей");
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
-    }
+    //        return Ok(result);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Ошибка при получении списка платежей");
+    //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+    //    }
+    //}
 
     /// <summary>
     /// Получение платежа по ID
@@ -85,7 +84,10 @@ public class OrderPaymentsController : BaseController
     {
         try
         {
+            var status = await _appDbContext.OrderStatus.FirstOrDefaultAsync(x => x.Id == 13) ?? throw new NotFoundException("Статус заказа не найден");
             var command = _mapper.Map<CreateOrderPaymentCommands>(payment);
+            command.StatusPayment = status.NameEng;
+
             var result = await Mediator.Send(command);
 
             if (result.Succeeded)

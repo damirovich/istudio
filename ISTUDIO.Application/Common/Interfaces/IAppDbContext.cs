@@ -43,6 +43,7 @@ public interface IAppDbContext
     DbSet<UserCashbackEntity> UserCashbacks { get; set; }
     DbSet<ProductCashbackEntity> ProductCashbacks { get; set; }
     DbSet<CashbackEntity> Cashbacks { get; set; }
+    DbSet<OrderStatusEntity> OrderStatus { get; set; }
     DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

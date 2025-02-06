@@ -23,7 +23,7 @@ public class OrderEntity
     public string UserId { get; set; }
 
     public int? InvoiceId { get; set; }
-    public InvoiceEntity Invoice { get; set; }
+    public InvoiceEntity? Invoice { get; set; }
 
     // Внешний ключ для статуса
     public int? StatusId { get; set; }

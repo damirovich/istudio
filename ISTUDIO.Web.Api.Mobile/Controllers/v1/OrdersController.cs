@@ -1,13 +1,9 @@
-﻿using ISTUDIO.Application.Common.Models;
-using ISTUDIO.Application.Features.FreedomPay.InitiPay.Commands.AddRequestInitPay;
-using ISTUDIO.Application.Features.FreedomPay.ResultPay.Commands.AddResultPayRequest;
-using ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
+﻿using ISTUDIO.Application.Features.Orders.Commands.CreateOrders;
 using ISTUDIO.Application.Features.Orders.Commands.EditOrders.AddReceoptPhoto;
 using ISTUDIO.Application.Features.Orders.Queries;
 using ISTUDIO.Application.Features.SmsNikita.Commands.CreateSmsNikitaRequest;
 using ISTUDIO.Contracts.Features.Orders;
 using ISTUDIO.Domain.Models;
-using ISTUDIO.Web.Api.Mobile.Services.FreedomPayServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
@@ -18,12 +14,11 @@ public class OrdersController : BaseController
     private readonly IAppDbContext _appDbContext;
     private readonly IAppUserService _appUserService;
     private readonly ISmsNikitaService _smsNikitaService;
-    private readonly IFreedomPayApiClient _freedomPayApiClient;
     public OrdersController(IMapper mapper, IAppDbContext appDbContext, IAppUserService appUserService,
-                            ISmsNikitaService smsNikitaService, IFreedomPayApiClient freedomPayApiClient) =>
-            (_mapper, _appDbContext, _appUserService, _smsNikitaService, _freedomPayApiClient)
+                            ISmsNikitaService smsNikitaService) =>
+            (_mapper, _appDbContext, _appUserService, _smsNikitaService)
             =
-            (mapper, appDbContext, appUserService, smsNikitaService, freedomPayApiClient);
+            (mapper, appDbContext, appUserService, smsNikitaService);
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -40,44 +35,45 @@ public class OrdersController : BaseController
 
             var user = await _appUserService.GetUserDetailsByUserIdAsync(orders.UserId);
 
-            //var productList = string.Join("\n", orders.ProductOrders.Select(p =>
-            //         $"Название: {p.Name}, Количество: {p.QuantyProductCart}, Модель : {p.Model} сом"));
+            // Получаем список ID товаров из заказа
+            var productIds = orders.ProductOrders.Select(s => s.Id).ToList();
 
-            //await Mediator.Send(new CreateSmsNikitaReqCommand
-            //{
-            //    PhonesNumber =  orderNotification.Select(o=>o.PhoneNumber).ToList() ,
-            //    Message = $"Новый заказ в marketkg\n" +
-            //              $"Номер заказа {result.OrderId}\n" +
-            //              $"Клиент {user.UserPhoneNumber} Товары: {productList}\n" +
-            //              $"Общее количество продуктов заказа {orders.TotalQuantyProduct}\n" +
-            //              $"Дата заказа {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}",
-            //});
-            //await _smsNikitaService.SendSms(smsRequest);
-            var typePay = orders.PaymentMethod.ToString();  
-            if (typePay == "FreedomPay")
+            // Загружаем товары из базы данных
+            var products = await _appDbContext.Products
+                .Where(p => productIds.Contains(p.Id))
+                .ToListAsync();
+
+            // Создаём список товаров с данными из Products
+            var productList = string.Join("\n", orders.ProductOrders.Select(p =>
             {
-                var freedomPayRequest = new FreedomPayInitRequestModel
-                {
-                    PgOrderId = result.OrderId.ToString(),
-                    PgAmount = orders.TotalAmount,
-                    PgDescription = $"Номер заказа {result.OrderId}\n" +
-                                    $"Клиент {user.UserPhoneNumber} \n " +
-                                    $"Общее количество продуктов заказа {orders.TotalQuantyProduct}\n" +
-                                    $"Дата заказа {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}",
-                    PgResultUrl = "http://api.marketplace.kg:1122/api/v1/FreedomPay/ResultPayment",
-                    PgMerchantId = 560184,
-                    PgSalt = "MarketKG",
-                    PgSig = ""
-                };
+                var product = products.FirstOrDefault(prod => prod.Id == p.Id);
+                return product != null
+                    ? $"Название: {product.Name}, Количество: {p.QuantyProductCart}, Модель: {product.Model}, Цена: {product.Price} сом"
+                    : $"Неизвестный товар (ID: {p.Id}), Количество: {p.QuantyProductCart}";
+            }));
 
-                var paymentResponse = await _freedomPayApiClient.InitiatePaymentAsync(freedomPayRequest);
+            var phones = orderNotification?.Select(o => o.PhoneNumber).ToList() ?? new List<string>();
 
-                return Ok(new
-                {
-                    OrderId = result.OrderId,
-                    PaymentRedirectUrl = paymentResponse.PgRedirectUrl
-                });
-            }
+            var smsMessage = new CreateSmsNikitaReqCommand
+            {
+                PhonesNumber = phones,
+                Message = $"Новый заказ в MarketKG\n" +
+                          $"Номер заказа: {result.OrderId}\n" +
+                          $"Клиент: {user?.UserPhoneNumber ?? "Не указан"}\n" +
+                          $"Товары:\n{productList}\n" +
+                          $"Общее количество продуктов: {orders.TotalQuantyProduct}\n" +
+                          $"Дата заказа: {DateTime.Now:yyyy-MM-dd HH:mm:ss}"
+            };
+
+            // Отправка SMS
+            await Mediator.Send(smsMessage);
+
+            var smsRequest = new SmsNikitaRequestModel
+            {
+                Time = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                Phones = orderNotification.Select(o => o.PhoneNumber).ToArray()
+            };
+            await _smsNikitaService.SendSms(smsRequest);
             
             return Ok(result);
         }

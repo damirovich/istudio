@@ -21,29 +21,38 @@ public class GetOrdersByUserIdQuery : IRequest<ResModel>
 
         public async Task<ResModel> Handle(GetOrdersByUserIdQuery query, CancellationToken cancellationToken)
         {
-            var orders = await _appDbContext.Orders
-                .Include(o => o.Details)   // Включаем детали заказа
-                    .ThenInclude(d => d.Product)  // Включаем продукты через детали заказа
-                .Include(o => o.Details)
-                    .ThenInclude(d => d.Product)
-                    .ThenInclude(pd => pd.Discount) // Включаем скидки на продукты
-                .Include(o => o.Details)
-                    .ThenInclude(d => d.Magazines)  // Включаем магазины через детали заказа
-                .Include(o => o.Products)
-                    .ThenInclude(o => o.Images)
-                .Where(o => o.UserId == query.UserId)
-                .OrderByDescending(o => o.Id)
-                .ToListAsync(cancellationToken);
-
-            if (orders == null || !orders.Any())
+            try
             {
-                return new ResModel(); // Возвращаем пустой список, если заказы не найдены
+                
+                var orders = await _appDbContext.Orders
+                    .Include(o => o.Details)
+                        .ThenInclude(d => d.Product)
+                            .ThenInclude(pd => pd.Discount)
+                    .Include(o => o.Details)
+                        .ThenInclude(d => d.Magazines) // Убедитесь, что `Magazine` правильно называется
+                    .Include(o => o.Products)
+                        .ThenInclude(p => p.Images)
+                    .Include(s => s.Status)
+                    .Where(o => o.UserId != null && o.UserId == query.UserId) // Проверка UserId
+                    .OrderByDescending(o => o.Id)
+                    .ToListAsync(cancellationToken);
+
+
+                if (orders == null || !orders.Any())
+                {
+                    return new ResModel(); // Возвращаем пустой список, если заказы не найдены
+                }
+
+                // Маппим найденные заказы в DTO
+                var responseDto = _mapper.Map<ResModel>(orders);
+
+                return responseDto;
+
             }
-
-            // Маппим найденные заказы в DTO
-            var responseDto = _mapper.Map<ResModel>(orders);
-
-            return responseDto;
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

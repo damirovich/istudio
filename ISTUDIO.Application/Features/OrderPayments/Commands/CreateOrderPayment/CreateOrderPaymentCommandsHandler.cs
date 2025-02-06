@@ -1,31 +1,118 @@
 ﻿namespace ISTUDIO.Application.Features.OrderPayments.Commands.CreateOrderPayment;
 
 using ISTUDIO.Domain.EntityModel;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
 using ResModel = Result;
 public class CreateOrderPaymentCommandsHandler : IRequestHandler<CreateOrderPaymentCommands, ResModel>
 {
     private readonly IAppDbContext _appDbContext;
-    private readonly IMapper _mapper;
 
-    public CreateOrderPaymentCommandsHandler(IAppDbContext appDbContext, IMapper mapper)
-        => (_appDbContext, _mapper) = (appDbContext, mapper);
+    public CreateOrderPaymentCommandsHandler(IAppDbContext appDbContext)
+        => _appDbContext = appDbContext;
 
     public async Task<ResModel> Handle(CreateOrderPaymentCommands command, CancellationToken cancellationToken)
     {
+        await using var transaction = await _appDbContext.Database.BeginTransactionAsync(cancellationToken);
         try
-        { 
-            var orderPayEntity = _mapper.Map<OrderPaymentEntity>(command);
-            orderPayEntity.PaymentDate = DateTime.Now;
+        {
+            var orderPayment = new OrderPaymentEntity
+            {
+                OrderId = command.OrderId,
+                PaymentMethodId = command.PaymentMethodId,
+                Amount = command.Amount,
+                ReceiptPhoto = command.ReceiptPhoto,
+                PaymentDate = DateTime.Now,
+                Status = command.StatusPayment
+            };
 
-            _appDbContext.OrderPayments.Add(orderPayEntity);
+            var order = await _appDbContext.Orders
+                .FirstOrDefaultAsync(c => c.Id == command.OrderId, cancellationToken);
+
+            if (order != null)
+            {
+                var orderStatus = await _appDbContext.OrderStatus
+                    .FirstOrDefaultAsync(s => s.NameEng == command.StatusPayment, cancellationToken);
+
+                if (orderStatus != null)
+                {
+                    order.Status = orderStatus;
+                    _appDbContext.Orders.Update(order);
+
+                    var orderStatusHistory = new OrderStatusHistoryEntity
+                    {
+                        OrderId = command.OrderId,
+                        Status = command.StatusPayment,
+                        ChangeDate = DateTime.UtcNow
+                    };
+
+                    await _appDbContext.OrderStatusHistories.AddAsync(orderStatusHistory, cancellationToken);
+                }
+            }
+
+
+            _appDbContext.OrderPayments.Add(orderPayment);
+
+            var userCashback = await _appDbContext.UserCashbacks
+                .FirstOrDefaultAsync(x => x.UserId == command.UserId, cancellationToken);
+
+            if (command.CreditBonusAmount > 0)
+            {
+                await ApplyCashback(command.UserId, command.OrderId, (decimal)command.CreditBonusAmount, "Credit", userCashback, cancellationToken);
+            }
+
+            if (command.DebitBonusAmount > 0)
+            {
+                await ApplyCashback(command.UserId, command.OrderId, (decimal)-command.DebitBonusAmount, "Debit", userCashback, cancellationToken);
+            }
 
             await _appDbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
 
             return ResModel.Success();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            return ResModel.Failure(new[] {ex.Message});
+            await transaction.RollbackAsync(cancellationToken);
+            return ResModel.Failure(new[] { ex.Message });
+        }
+    }
+
+    //Метод для транзакции по бонусам 
+    private async Task ApplyCashback(string userId, int orderId, decimal amount, string transactionType, UserCashbackEntity userCashback, CancellationToken cancellationToken)
+    {
+        var cashbackTransaction = new CashbackTransactionEntity
+        {
+            UserId = userId,
+            OrderId = orderId,
+            Amount = Math.Abs(amount),
+            TransactionType = transactionType,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _appDbContext.CashbackTransactions.AddAsync(cashbackTransaction, cancellationToken);
+
+        if (userCashback != null)
+        {
+            userCashback.Amount += amount;
+            userCashback.ExpirationDate = userCashback.ExpirationDate.AddMonths(1);
+            _appDbContext.UserCashbacks.Update(userCashback);
+        }
+        else
+        {
+            var newUserCashback = new UserCashbackEntity
+            {
+                UserId = userId,
+                Amount = amount,
+                CreatedAt = DateTime.UtcNow,
+                ExpirationDate = DateTime.UtcNow.AddMonths(3),
+                Status = "Active"
+            };
+
+            await _appDbContext.UserCashbacks.AddAsync(newUserCashback, cancellationToken);
         }
     }
 }

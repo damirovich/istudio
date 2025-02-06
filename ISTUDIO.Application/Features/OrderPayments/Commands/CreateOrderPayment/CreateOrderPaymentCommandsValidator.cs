@@ -13,12 +13,12 @@ public class CreateOrderPaymentCommandsValidator : AbstractValidator<CreateOrder
         RuleFor(x => x.Amount)
             .GreaterThan(0).WithMessage("Сумма платежа должна быть больше 0.");
 
-        RuleFor(x => x.Status)
-            .NotEmpty().WithMessage("Статус обязателен для заполнения.")
-            .MaximumLength(50).WithMessage("Статус не должен превышать 50 символов.");
+        //RuleFor(x => x.Status)
+        //    .NotEmpty().WithMessage("Статус обязателен для заполнения.")
+        //    .MaximumLength(50).WithMessage("Статус не должен превышать 50 символов.");
 
-        RuleFor(x => x.TransactionId)
-            .MaximumLength(100).WithMessage("TransactionId не должен превышать 100 символов.");
+        //RuleFor(x => x.TransactionId)
+        //    .MaximumLength(100).WithMessage("TransactionId не должен превышать 100 символов.");
 
         RuleFor(x => x.ReceiptPhoto)
             .Must(BeAValidBase64).When(x => !string.IsNullOrEmpty(x.ReceiptPhoto))

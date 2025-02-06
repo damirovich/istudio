@@ -9,8 +9,6 @@ public class CreateOrdersVM : IMapWith<CreateOrdersCommand>
     public string UserId { get; set; }
     public decimal TotalAmount { get; set; }
     public int TotalQuantyProduct { get; set; }
-    public string PaymentMethod { get; set; }
-    public string? ReceiptPhotoBase64 { get; set; }
     public OrderAddressDTO OrderAddress { get; set; }
     public ICollection<ProductOrderDTO> ProductOrders { get; set; } = new List<ProductOrderDTO>();
 

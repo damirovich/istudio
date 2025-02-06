@@ -70,77 +70,77 @@ public class UserCashbacksController : BaseController
         }
     }
 
-    /// <summary>
-    /// Создание нового кэшбека для пользователя
-    /// </summary>
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreateUserCashback([FromBody] CreateCashUserVM userCashback)
-    {
-        try
-        {
-            var command = _mapper.Map<CreateCashUserCommand>(userCashback);
-            var result = await Mediator.Send(command);
+    ///// <summary>
+    ///// Создание нового кэшбека для пользователя
+    ///// </summary>
+    //[HttpPost]
+    //[ProducesResponseType(StatusCodes.Status201Created)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public async Task<IActionResult> CreateUserCashback([FromBody] CreateCashUserVM userCashback)
+    //{
+    //    try
+    //    {
+    //        var command = _mapper.Map<CreateCashUserCommand>(userCashback);
+    //        var result = await Mediator.Send(command);
 
-            if (result.Succeeded)
-                return CreatedAtAction(nameof(GetUserCashbackById), new { userId = result.Succeeded }, result);
+    //        if (result.Succeeded)
+    //            return CreatedAtAction(nameof(GetUserCashbackById), new { userId = result.Succeeded }, result);
 
-            return BadRequest(result.Errors);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
-    }
+    //        return BadRequest(result.Errors);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+    //    }
+    //}
 
-    /// <summary>
-    /// Редактирование кэшбека пользователя
-    /// </summary>
-    [HttpPut]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> EditUserCashback([FromBody] EditCashUserVM userCashback)
-    {
-        try
-        {
-            var command = _mapper.Map<EditCashUserCommand>(userCashback);
-            var result = await Mediator.Send(command);
+    ///// <summary>
+    ///// Редактирование кэшбека пользователя
+    ///// </summary>
+    //[HttpPut]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public async Task<IActionResult> EditUserCashback([FromBody] EditCashUserVM userCashback)
+    //{
+    //    try
+    //    {
+    //        var command = _mapper.Map<EditCashUserCommand>(userCashback);
+    //        var result = await Mediator.Send(command);
 
-            if (result.Succeeded)
-                return Ok(result);
+    //        if (result.Succeeded)
+    //            return Ok(result);
 
-            return BadRequest(result.Errors);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
-    }
+    //        return BadRequest(result.Errors);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+    //    }
+    //}
 
-    /// <summary>
-    /// Удаление кэшбека пользователя
-    /// </summary>
-    [HttpDelete("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> DeleteUserCashback(int id)
-    {
-        try
-        {
-            var result = await Mediator.Send(new DeleteCashUserCommand { CashbackId = id });
+    ///// <summary>
+    ///// Удаление кэшбека пользователя
+    ///// </summary>
+    //[HttpDelete("{id}")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public async Task<IActionResult> DeleteUserCashback(int id)
+    //{
+    //    try
+    //    {
+    //        var result = await Mediator.Send(new DeleteCashUserCommand { CashbackId = id });
 
-            if (result.Succeeded)
-                return Ok(result);
+    //        if (result.Succeeded)
+    //            return Ok(result);
 
-            return BadRequest(result.Errors);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        }
-    }
+    //        return BadRequest(result.Errors);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+    //    }
+    //}
 }

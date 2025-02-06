@@ -21,7 +21,7 @@ public class OrderResponseDTO : IMapWith<OrderEntity>
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.TotalPrice))
             .ForMember(dest => dest.TotalQuentyProduct, opt => opt.MapFrom(src => src.TotalQuantyProduct))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.NameRus))
             .ForMember(dest => dest.ShippingAddress, opt => opt.MapFrom(src => src.ShippingAddress))
             .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customers.FirstOrDefault().FullName))
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
