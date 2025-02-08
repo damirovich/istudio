@@ -163,31 +163,31 @@ public class OrdersController : BaseController
         }
     }
 
-    /// <summary>
-    /// Добавление фотографии квитанции к заказу
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddReceiptPhoto([FromBody] AddReceiptPhotoOrderVM model)
-    {
-        try
-        {
-            var command = _mapper.Map<AddReceipPhotoOrdersCommand>(model);
-            var result = await Mediator.Send(command);
+    ///// <summary>
+    ///// Добавление фотографии квитанции к заказу
+    ///// </summary>
+    ///// <param name="model"></param>
+    ///// <returns></returns>
+    //[HttpPost]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //public async Task<IActionResult> AddReceiptPhoto([FromBody] AddReceiptPhotoOrderVM model)
+    //{
+    //    try
+    //    {
+    //        var command = _mapper.Map<AddReceipPhotoOrdersCommand>(model);
+    //        var result = await Mediator.Send(command);
 
-            if (result.Succeeded)
-            {
-                return Ok(result);
-            }
+    //        if (result.Succeeded)
+    //        {
+    //            return Ok(result);
+    //        }
 
-            return BadRequest(result.Errors);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
-        }
-    }
+    //        return BadRequest(result.Errors);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+    //    }
+    //}
 }

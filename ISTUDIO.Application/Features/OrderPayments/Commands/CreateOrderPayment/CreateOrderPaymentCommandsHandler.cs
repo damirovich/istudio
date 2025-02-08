@@ -24,7 +24,6 @@ public class CreateOrderPaymentCommandsHandler : IRequestHandler<CreateOrderPaym
                 OrderId = command.OrderId,
                 PaymentMethodId = command.PaymentMethodId,
                 Amount = command.Amount,
-                ReceiptPhoto = command.ReceiptPhoto,
                 PaymentDate = DateTime.Now,
                 Status = command.StatusPayment
             };
@@ -46,28 +45,30 @@ public class CreateOrderPaymentCommandsHandler : IRequestHandler<CreateOrderPaym
                     {
                         OrderId = command.OrderId,
                         Status = command.StatusPayment,
-                        ChangeDate = DateTime.UtcNow
+                        ChangeDate = DateTime.Now
                     };
 
                     await _appDbContext.OrderStatusHistories.AddAsync(orderStatusHistory, cancellationToken);
                 }
             }
 
-
-            _appDbContext.OrderPayments.Add(orderPayment);
+            int TranChashId = 0;
+            
 
             var userCashback = await _appDbContext.UserCashbacks
                 .FirstOrDefaultAsync(x => x.UserId == command.UserId, cancellationToken);
 
             if (command.CreditBonusAmount > 0)
             {
-                await ApplyCashback(command.UserId, command.OrderId, (decimal)command.CreditBonusAmount, "Credit", userCashback, cancellationToken);
+                TranChashId = await ApplyCashback(command.UserId, command.OrderId, (decimal)-command.CreditBonusAmount, "Credit", userCashback, cancellationToken);
             }
 
             if (command.DebitBonusAmount > 0)
             {
-                await ApplyCashback(command.UserId, command.OrderId, (decimal)-command.DebitBonusAmount, "Debit", userCashback, cancellationToken);
+                TranChashId = await ApplyCashback(command.UserId, command.OrderId, (decimal)command.DebitBonusAmount, "Debit", userCashback, cancellationToken);
             }
+            orderPayment.TransactionId = TranChashId.ToString();
+            _appDbContext.OrderPayments.Add(orderPayment);
 
             await _appDbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
@@ -82,7 +83,7 @@ public class CreateOrderPaymentCommandsHandler : IRequestHandler<CreateOrderPaym
     }
 
     //Метод для транзакции по бонусам 
-    private async Task ApplyCashback(string userId, int orderId, decimal amount, string transactionType, UserCashbackEntity userCashback, CancellationToken cancellationToken)
+    private async Task<int> ApplyCashback(string userId, int orderId, decimal amount, string transactionType, UserCashbackEntity userCashback, CancellationToken cancellationToken)
     {
         var cashbackTransaction = new CashbackTransactionEntity
         {
@@ -90,7 +91,7 @@ public class CreateOrderPaymentCommandsHandler : IRequestHandler<CreateOrderPaym
             OrderId = orderId,
             Amount = Math.Abs(amount),
             TransactionType = transactionType,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         await _appDbContext.CashbackTransactions.AddAsync(cashbackTransaction, cancellationToken);
@@ -107,12 +108,15 @@ public class CreateOrderPaymentCommandsHandler : IRequestHandler<CreateOrderPaym
             {
                 UserId = userId,
                 Amount = amount,
-                CreatedAt = DateTime.UtcNow,
-                ExpirationDate = DateTime.UtcNow.AddMonths(3),
-                Status = "Active"
+                CreatedAt = DateTime.Now,
+                ExpirationDate = DateTime.Now.AddMonths(3),
+                Status = "Active",
+                
             };
 
             await _appDbContext.UserCashbacks.AddAsync(newUserCashback, cancellationToken);
         }
+        await _appDbContext.SaveChangesAsync(cancellationToken);
+        return cashbackTransaction.Id;
     }
 }

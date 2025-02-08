@@ -14,8 +14,15 @@ public class CreateCashUserCommandValidator : AbstractValidator<CreateCashUserCo
            .NotEmpty().WithMessage("Дата не может быть пустой.") 
            .Must(date => date != default(DateTime)).WithMessage("Дата должна быть корректной.");
 
-
+        // Проверка статуса
         RuleFor(v => v.Status)
-            .MaximumLength(500).WithMessage("Описание не должно превышать 500 символов.");
+            .NotEmpty().WithMessage("Статус не может быть пустым.")
+            .Must(IsValidStatus).WithMessage("Указан недопустимый статус.");
+    }
+    private bool IsValidStatus(string status)
+    {
+        // Предположим, допустимые статусы: Active, Inactive, Expired
+        var validStatuses = new[] { "Active", "Inactive", "Expired" };
+        return validStatuses.Contains(status);
     }
 }

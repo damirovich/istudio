@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ISTUDIO.Contracts.Features.BakaiPay;
+﻿namespace ISTUDIO.Contracts.Features.BakaiPay;
 
 public class BakaiConfirmPayVMy
 {

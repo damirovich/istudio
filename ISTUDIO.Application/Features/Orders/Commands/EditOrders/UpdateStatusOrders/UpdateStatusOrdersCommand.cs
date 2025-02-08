@@ -54,7 +54,7 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
                 var statusHistory = new OrderStatusHistoryEntity
                 {
                     OrderId = existingOrder.Id,
-                    Status = "",
+                    Status = command.OrderStatus,
                     ChangeDate = DateTime.Now
                 };
 
@@ -85,10 +85,11 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
                         _appDbContext.Products.Update(product);
                     }
                 }
-
+                var orderStatus = await _appDbContext.OrderStatus.FirstOrDefaultAsync(s => s.NameEng == command.OrderStatus);
+                
                 // Обновление статуса заказа
                 //Предыдущая версия 
-                // existingOrder.Status = command.OrderStatus;
+                 existingOrder.StatusId = orderStatus.Id;
 
                 existingOrder.Status = new OrderStatusEntity();
                 await _appDbContext.SaveChangesAsync(cancellationToken);

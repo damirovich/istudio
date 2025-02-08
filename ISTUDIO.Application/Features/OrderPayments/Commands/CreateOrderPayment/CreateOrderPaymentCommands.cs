@@ -9,6 +9,6 @@ public class CreateOrderPaymentCommands : IRequest<Result>
     public decimal? DebitBonusAmount { get; set; }
     public decimal? CreditBonusAmount { get; set; }
     public string? StatusPayment { get; set; }
-    public string? ReceiptPhoto { get; set; }
+   // public string? ReceiptPhoto { get; set; }
 
 }

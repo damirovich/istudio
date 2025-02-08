@@ -21,6 +21,11 @@
     <Folder Include="Features\OrderHistories\Commands\" />
     <Folder Include="Features\PayMethodts\Commands\" />
     <Folder Include="Features\SmsNikita\Queries\" />
+    <Folder Include="Features\Stories\DTOs\" />
+    <Folder Include="Features\Stories\Queries\" />
+    <Folder Include="Features\StoryContents\Commands\" />
+    <Folder Include="Features\StoryContents\DTOs\" />
+    <Folder Include="Features\StoryContents\Queries\" />
     <Folder Include="Features\SubCategories\DTOs\" />
     <Folder Include="Features\TotalOrdersFavorite\Commands\" />
     <Folder Include="Features\UpAppInfo\Commands\" />

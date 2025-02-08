@@ -44,37 +44,37 @@ public class BakaiPayController : BaseController
         return HandleRequestAsync(() => _apiClient.PayCheckProps(phoneNumber));
     }
 
-    [HttpGet("check-status")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetCheckStatusPay([FromQuery, Required, Range(1, int.MaxValue)] int payId)
-    {
-        if (!ModelState.IsValid)
-            return Task.FromResult<IActionResult>(BadRequest(ModelState));
+    //[HttpGet("check-status")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public Task<IActionResult> GetCheckStatusPay([FromQuery, Required, Range(1, int.MaxValue)] int payId)
+    //{
+    //    if (!ModelState.IsValid)
+    //        return Task.FromResult<IActionResult>(BadRequest(ModelState));
 
-        return HandleRequestAsync(() => _apiClient.CheckStatusPay(payId));
-    }
+    //    return HandleRequestAsync(() => _apiClient.CheckStatusPay(payId));
+    //}
 
-    [HttpPost("create")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> CreatePay([FromBody, Required] BakaiCreatePayVM request)
-    {
-        if (!ModelState.IsValid)
-            return Task.FromResult<IActionResult>(BadRequest(ModelState));
+    //[HttpPost("create")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public Task<IActionResult> CreatePay([FromBody, Required] BakaiCreatePayVM request)
+    //{
+    //    if (!ModelState.IsValid)
+    //        return Task.FromResult<IActionResult>(BadRequest(ModelState));
 
-        var requestBakaiPay = new BakaiPayCreateOperationReqModel()
-        {
-            PhoneNumber = request.PhoneNumber,
-            Amount = request.SumProducts,
-            PaymentCode = request.OrderId.ToString(),
-            OrderId = request.OrderId.ToString()
-        };
+    //    var requestBakaiPay = new BakaiPayCreateOperationReqModel()
+    //    {
+    //        PhoneNumber = request.PhoneNumber,
+    //        Amount = request.SumProducts,
+    //        PaymentCode = request.OrderId.ToString(),
+    //        OrderId = request.OrderId.ToString()
+    //    };
 
-        return HandleRequestAsync(() => _apiClient.PayCreate(requestBakaiPay));
-    }
+    //    return HandleRequestAsync(() => _apiClient.PayCreate(requestBakaiPay));
+    //}
 
     //[HttpPost("confirm")]
     //[ProducesResponseType(StatusCodes.Status200OK)]

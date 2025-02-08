@@ -1,26 +1,29 @@
-﻿using ISTUDIO.Application.Features.OrderPayments.Commands.CreateOrderPayment;
+﻿namespace ISTUDIO.Contracts.Features.OrderPayments;
 
-namespace ISTUDIO.Contracts.Features.OrderPayments;
-
-public class CreateOrderPaymentVM //: IMapWith<CreateOrderPaymentCommands>
+public class CreateOrderPaymentVM 
 {
-    //Номер Заказа 
+    //Пользователь который оплатил
+    public string UserId { get; set; }  
+    // Номер заказа
     public int OrderId { get; set; }
-    //Id метод платаже (2	bakai
-                        //3	mbank
-                        //4	optimaBank
-                        //5	cash
-                        //6	FreedomPay)
+
+    // ID метода оплаты (2 - Bakai, 3 - mBank, 4 - Optima Bank, 5 - Cash, 6 - FreedomPay)
     public int PaymentMethodId { get; set; }
-    //Сумма оплаты общая сумма заказа 
-    public decimal Amount { get; set; }
-    
 
-    //Оплата наличнымы
-    public string? ReceiptPhoto { get; set; }
+    // Сумма заказа до применения бонусов
+    public decimal? InitialAmount { get; set; }
 
-    //public void Mapping(Profile profile)
-    //{
-    //    profile.CreateMap<CreateOrderPaymentVM, CreateOrderPaymentCommands>();
-    //}
+    // Итоговая сумма после вычета бонусов
+    public decimal FinalAmount { get; set; }
+
+    // Примененная сумма бонусов
+    public decimal? BonusAmount { get; set; }
+
+    // Начисленная сумма бонусов
+    public decimal? EarnedBonusAmount { get; set; }
+
+    // Номер телефона при оплате через Bakai Bank
+    public string? BakaiPhoneNumber { get; set; }
+
+
 }

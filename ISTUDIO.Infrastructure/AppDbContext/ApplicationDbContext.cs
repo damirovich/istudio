@@ -50,6 +50,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<ProductCashbackEntity> ProductCashbacks { get; set; }
     public DbSet<CashbackEntity> Cashbacks { get; set; }
     public DbSet<OrderStatusEntity> OrderStatus { get; set; }
+    public DbSet<StoriesEntity> Stories { get; set; }   
+    public DbSet<StoryContentEntity> StoryContents { get; set; }
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
     protected override void OnModelCreating(ModelBuilder builder)
@@ -105,5 +107,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new ProductsEntityConfiguration());
         builder.ApplyConfiguration(new CashbackEntityConfiguration());
         builder.ApplyConfiguration(new OrderStatusEntityConfiguration());
+        builder.ApplyConfiguration(new StoriesEntityConfiguration());
+        builder.ApplyConfiguration(new StoryContentEntityConfiguration());
     }   
 }
