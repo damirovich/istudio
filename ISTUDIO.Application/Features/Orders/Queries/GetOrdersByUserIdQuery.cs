@@ -1,5 +1,4 @@
 ﻿using ISTUDIO.Application.Features.Orders.DTOs;
-using Microsoft.EntityFrameworkCore;
 
 namespace ISTUDIO.Application.Features.Orders.Queries;
 using ResModel = List<OrderResponseDTO>;
@@ -29,7 +28,7 @@ public class GetOrdersByUserIdQuery : IRequest<ResModel>
                         .ThenInclude(d => d.Product)
                             .ThenInclude(pd => pd.Discount)
                     .Include(o => o.Details)
-                        .ThenInclude(d => d.Magazines) // Убедитесь, что `Magazine` правильно называется
+                        .ThenInclude(d => d.Magazines) 
                     .Include(o => o.Products)
                         .ThenInclude(p => p.Images)
                     .Include(s => s.Status)

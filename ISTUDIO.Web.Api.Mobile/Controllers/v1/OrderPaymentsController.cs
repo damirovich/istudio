@@ -95,7 +95,7 @@ public class OrderPaymentsController : BaseController
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var status = await _appDbContext.OrderStatus.FirstOrDefaultAsync(x => x.Id == 1002)
+            var status = await _appDbContext.OrderStatus.FirstOrDefaultAsync(x => x.Id == 10)//В ожидании оплаты
                          ?? throw new Application.Common.Exceptions.NotFoundException("Статус заказа не найден");
 
             var payOrder = new CreateOrderPaymentCommands()
@@ -109,7 +109,12 @@ public class OrderPaymentsController : BaseController
                 StatusPayment = status.NameEng,
             };
 
-            if (payment.PaymentMethodId == 2) // Если оплата через Бакай Банк
+            var payMethod = await _appDbContext.PaymentMethods.FirstOrDefaultAsync(s => s.Id == payment.PaymentMethodId);
+
+            if (payMethod == null)
+                return BadRequest("Не было найдено метод оплаты ");
+
+            if (payment.PaymentMethodId == 1) // Если оплата через Бакай Банк
             {
                 if (string.IsNullOrWhiteSpace(payment.BakaiPhoneNumber))
                     return BadRequest("Для оплаты через Бакай Банк необходимо указать номер телефона.");

@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISTUDIO.SmsNotificationServ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISTUDIO.Web.Api.FreedomPay", "ISTUDIO.Web.Api.FreedomPay\ISTUDIO.Web.Api.FreedomPay.csproj", "{7C1E599F-5B9F-4A73-9964-9E4F54C03800}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISTUDIO.Web.Api.BakaiPay", "ISTUDIO.Web.Api.BakaiPay\ISTUDIO.Web.Api.BakaiPay.csproj", "{430E3856-D1C6-4D79-B375-6870C88A498D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISTUDIO.Web.Api.BakaiPay", "ISTUDIO.Web.Api.BakaiPay\ISTUDIO.Web.Api.BakaiPay.csproj", "{430E3856-D1C6-4D79-B375-6870C88A498D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISTUDIO.BankPaymentStatusCheckerService", "ISTUDIO.BankPaymentStatusCheckerService\ISTUDIO.BankPaymentStatusCheckerService.csproj", "{FB7BE4A3-460A-4887-9CA3-01E112AC7E52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,6 +100,12 @@ Global
 		{430E3856-D1C6-4D79-B375-6870C88A498D}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{430E3856-D1C6-4D79-B375-6870C88A498D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{430E3856-D1C6-4D79-B375-6870C88A498D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB7BE4A3-460A-4887-9CA3-01E112AC7E52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB7BE4A3-460A-4887-9CA3-01E112AC7E52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB7BE4A3-460A-4887-9CA3-01E112AC7E52}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB7BE4A3-460A-4887-9CA3-01E112AC7E52}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{FB7BE4A3-460A-4887-9CA3-01E112AC7E52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB7BE4A3-460A-4887-9CA3-01E112AC7E52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
