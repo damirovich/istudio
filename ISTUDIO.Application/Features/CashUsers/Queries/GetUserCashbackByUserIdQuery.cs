@@ -23,6 +23,7 @@ public class GetUserCashbackByUserIdQuery : IRequest<ResModel>
             .AsNoTracking()
             .OrderByDescending(c => c.Id)
             .ProjectTo<ResModel>(_mapper.ConfigurationProvider)
+            .Where(s => s.UserId == request.UserId)
             .FirstOrDefaultAsync(cancellationToken);
 
             if (userCashback == null)

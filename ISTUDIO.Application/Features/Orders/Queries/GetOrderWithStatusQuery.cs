@@ -20,8 +20,8 @@ public class GetOrderWithStatusQuery : IRequest<ResModel>
             var orderStatus = await _appDbContext.Orders
                   .Include(o => o.Status)
                   .Include(o => o.Payments).ThenInclude(p => p.PaymentMethod)
-                  .OrderByDescending(o => o.Id)
                   .Where(o => o.Payments.Any(p => p.Status == request.OrderStatus))
+                  .OrderByDescending(o => o.Id)
                   .ProjectTo<GetOrderWithStatusDTO>(_mapper.ConfigurationProvider)
                   .ToListAsync(cancellationToken);
 
