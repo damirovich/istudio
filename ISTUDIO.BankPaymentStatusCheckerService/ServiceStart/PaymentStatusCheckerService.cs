@@ -7,7 +7,7 @@ public class PaymentStatusCheckerService : BackgroundService
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<PaymentStatusCheckerService> _logger;
-    private readonly TimeSpan _interval = TimeSpan.FromSeconds(30);
+    private readonly TimeSpan _interval = TimeSpan.FromSeconds(180);
 
     public PaymentStatusCheckerService(IServiceScopeFactory serviceScopeFactory,
                                        ILogger<PaymentStatusCheckerService> logger)

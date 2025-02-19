@@ -7,6 +7,7 @@ using ISTUDIO.BankPaymentStatusCheckerService.ServiceStart;
 using ISTUDIO.Application;
 using ISTUDIO.Infrastructure;
 using Microsoft.Extensions.Options;
+using ISTUDIO.Infrastructure.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -29,6 +30,7 @@ builder.Services.AddHttpClient<IBakaiPaymentClient, BakaiPaymentClient>((service
 });
 
 builder.Services.AddScoped<IOrderServices, OrderServices>();
+builder.Services.AddScoped<IAppUserService, AppUserServices>();
 
 // Регистрируем обработчики платежей
 builder.Services.AddScoped<BakaiPaymentStatusChecker>();

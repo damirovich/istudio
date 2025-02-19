@@ -9,6 +9,7 @@ public class GetOrderWithStatusDTO : IMapWith<OrderEntity>
     public string OrderPayStatus { get; set; }
     public int CreateTranId { get; set; }
     public string PaymentMethod { get; set; }
+    public string UserId { get; set; }
 
     public void Mapping(Profile profile)
     {
@@ -17,6 +18,7 @@ public class GetOrderWithStatusDTO : IMapWith<OrderEntity>
             .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status.NameEng))
             .ForMember(dest => dest.OrderPayStatus, opt => opt.MapFrom(src => src.Payments.FirstOrDefault().Status))
             //.ForMember(dest => dest.CreateTranId, opt => opt.MapFrom(src => src.BakaiConfirmTranRes.FirstOrDefault().CreateTranId))
-            .ForMember(dest => dest.PaymentMethod, opt => opt.MapFrom(src => src.Payments.FirstOrDefault().PaymentMethod.Name));
+            .ForMember(dest => dest.PaymentMethod, opt => opt.MapFrom(src => src.Payments.FirstOrDefault().PaymentMethod.Name))
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId));
     }
 }

@@ -180,23 +180,23 @@ public class OrdersController : BaseController
                 // Проверка, является ли searchTerm пользовательским представлением статуса
                 var internalStatus = statusMapping.ContainsKey(searchTerm) ? statusMapping[searchTerm] : null;
 
-                var filteredItems = orders
-                 .Where(o => o.Id.ToString().Contains(searchTerm) ||
-                             (isDateSearch && o.CreateDate.Date == searchDate.Date) || // Поиск по точной дате
-                             (internalStatus != null && o.Status == internalStatus) || // Поиск по статусу
-                             o.TotalAmount.ToString().Contains(searchTerm) ||
-                             (!string.IsNullOrEmpty(o.UserPhoneNumber) && o.UserPhoneNumber.Contains(searchTerm))
-                            ).ToList();
+                //var filteredItems = orders
+                // .Where(o => o.Id.ToString().Contains(searchTerm) ||
+                //             (isDateSearch && o.CreateDate.Date == searchDate.Date) || // Поиск по точной дате
+                //             (internalStatus != null && o.Status == internalStatus) || // Поиск по статусу
+                //             o.TotalAmount.ToString().Contains(searchTerm) ||
+                //             (!string.IsNullOrEmpty(o.UserPhoneNumber) && o.UserPhoneNumber.Contains(searchTerm))
+                //            ).ToList();
 
-                // Создание нового PaginatedList с отфильтрованными элементами
-                var paginatedList = new PaginatedList<OrderResponseDTO>(
-                     filteredItems,
-                     filteredItems.Count,
-                     page.PageNumber,
-                     page.PageSize
-                 );
+                //// Создание нового PaginatedList с отфильтрованными элементами
+                //var paginatedList = new PaginatedList<OrderResponseDTO>(
+                //     filteredItems,
+                //     filteredItems.Count,
+                //     page.PageNumber,
+                //     page.PageSize
+                // );
 
-                return new CsmActionResult(paginatedList);
+                return new CsmActionResult();
             }
             return new CsmActionResult();
         }

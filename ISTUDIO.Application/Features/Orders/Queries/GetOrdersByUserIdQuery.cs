@@ -21,8 +21,7 @@ public class GetOrdersByUserIdQuery : IRequest<ResModel>
         public async Task<ResModel> Handle(GetOrdersByUserIdQuery query, CancellationToken cancellationToken)
         {
             try
-            {
-                
+            {   
                 var orders = await _appDbContext.Orders
                     .Include(o => o.Details)
                         .ThenInclude(d => d.Product)
@@ -35,7 +34,6 @@ public class GetOrdersByUserIdQuery : IRequest<ResModel>
                     .Where(o => o.UserId != null && o.UserId == query.UserId) // Проверка UserId
                     .OrderByDescending(o => o.Id)
                     .ToListAsync(cancellationToken);
-
 
                 if (orders == null || !orders.Any())
                 {

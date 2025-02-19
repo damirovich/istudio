@@ -91,7 +91,6 @@ public class UpdateStatusOrdersCommand : IRequest<ResModel>
                 //Предыдущая версия 
                  existingOrder.StatusId = orderStatus.Id;
 
-                existingOrder.Status = new OrderStatusEntity();
                 await _appDbContext.SaveChangesAsync(cancellationToken);
 
                 return ResModel.Success();

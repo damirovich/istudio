@@ -21,7 +21,7 @@
         <MudTd DataLabel="OrderNumber">@context.Id</MudTd>
         <MudTd DataLabel="CustomerName">@context.UserPhoneNumber</MudTd>
         <MudTd DataLabel="Status">
-            <MudSelect  Label="Статус" Dense="true" T="string" Variant="Variant.Text" Placeholder="Please Select" Required="true"
+         @*    <MudSelect  Label="Статус" Dense="true" T="string" Variant="Variant.Text" Placeholder="Please Select" Required="true"
                        Value="context.Status" ValueChanged="value => UpdateStatus(context.Id, value)">
                 <MudSelectItem T="string" Value="@("OrderProcessing")">Новый</MudSelectItem>
                 <MudSelectItem T="string" Value="@("OrderPaid")">Оплачен</MudSelectItem>
@@ -30,7 +30,7 @@
                 <MudSelectItem T="string" Value="@("OrderCompleted")">Завершен</MudSelectItem>
                 <MudSelectItem T="string" Value="@("OrderCanceled")">Возврат</MudSelectItem>
                 <MudSelectItem T="string" Value="@("OrderReturned")">Отменен</MudSelectItem>
-            </MudSelect>
+            </MudSelect> *@
         </MudTd>
         <MudTd DataLabel="CreatedDate">@context.CreateDate.ToString("dd.MM.yyyy")</MudTd>
         <MudTd DataLabel="TotalQuentyProduct">@context.TotalQuentyProduct</MudTd>
@@ -146,9 +146,9 @@
             case "Customers":
                 data = data.OrderByDirection(state.SortDirection, o => o.UserPhoneNumber);
                 break;
-            case "Status":
-                data = data.OrderByDirection(state.SortDirection, o => o.Status);
-                break;
+            // case "Status":
+            //     data = data.OrderByDirection(state.SortDirection, o => o.Status);
+            //     break;
             case "CreatedDate":
                 data = data.OrderByDirection(state.SortDirection, o => o.CreateDate);
                 break;

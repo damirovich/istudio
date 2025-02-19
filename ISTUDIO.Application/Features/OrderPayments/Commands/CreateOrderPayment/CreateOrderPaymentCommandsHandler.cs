@@ -41,14 +41,14 @@ public class CreateOrderPaymentCommandsHandler : IRequestHandler<CreateOrderPaym
                     order.Status = orderStatus;
                     _appDbContext.Orders.Update(order);
 
-                    var orderStatusHistory = new OrderStatusHistoryEntity
-                    {
-                        OrderId = command.OrderId,
-                        Status = command.StatusPayment,
-                        ChangeDate = DateTime.Now
-                    };
+                    //var orderStatusHistory = new OrderStatusHistoryEntity
+                    //{
+                    //    OrderId = command.OrderId,
+                    //    Status = command.StatusPayment,
+                    //    ChangeDate = DateTime.Now
+                    //};
 
-                    await _appDbContext.OrderStatusHistories.AddAsync(orderStatusHistory, cancellationToken);
+                    //await _appDbContext.OrderStatusHistories.AddAsync(orderStatusHistory, cancellationToken);
                 }
             }
 

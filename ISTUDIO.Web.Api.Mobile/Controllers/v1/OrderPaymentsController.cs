@@ -127,6 +127,8 @@ public class OrderPaymentsController : BaseController
                     OrderId = payment.OrderId.ToString()
                 };
 
+                payOrder.StatusPayment = "OrderPaymentVerification";
+
                 var result = await Mediator.Send(payOrder);
 
                 if (result.Succeeded)

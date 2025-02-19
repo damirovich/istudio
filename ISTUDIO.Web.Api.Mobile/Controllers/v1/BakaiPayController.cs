@@ -172,6 +172,8 @@ public class BakaiPayController : BaseController
                     OrderStatus = "OrderPaymentVerification"
                 });
 
+                
+
                 if (upStatusOrder.Succeeded)
                 {
                     _logger.LogInformation($"Статус заказа {confirmResult.OrderId} успешно обновлен на 'OrderPaymentVerification'.");
