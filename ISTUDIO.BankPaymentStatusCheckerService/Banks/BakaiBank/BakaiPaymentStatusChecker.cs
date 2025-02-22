@@ -31,7 +31,13 @@ public class BakaiPaymentStatusChecker : IPaymentStatusChecker
         foreach (var order in orders)
         {
             var user = await _appUserService.GetUserDetailsByUserIdAsync(order.UserId);
-            if (order.PaymentMethod == "bakai")
+            if (order.PaymentMethod == "bakai" && order.CreateTranId == 0)
+            {
+                await _orderService.UpdateStatusOrderPay(order.OrderId, "OrderRejected");
+
+                _logger.LogInformation("Заказ {OrderId} платеж отклонен через Бакай Банк.", order.OrderId);
+            }
+            if (order.PaymentMethod == "bakai" && order.CreateTranId != 0) 
             {
                 var paymentStatus = await _bakaiPaymentClient.CheckStatusPay(order.CreateTranId);
 
@@ -66,7 +72,7 @@ public class BakaiPaymentStatusChecker : IPaymentStatusChecker
                 }
                 else if (paymentStatus.Status == "EXPIRED")
                 {
-                    await _orderService.UpdateStatusOrderPay(order.OrderId, "EXPIRED");
+                    await _orderService.UpdateStatusOrderPay(order.OrderId, "OrderRejected");
                     var smsMessage = new CreateSmsNikitaReqCommand
                     {
                         PhonesNumber = string.IsNullOrWhiteSpace(user.UserPhoneNumber)
@@ -80,6 +86,7 @@ public class BakaiPaymentStatusChecker : IPaymentStatusChecker
                 }
                
             }
+            
         }
     }
 }

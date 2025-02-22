@@ -18,12 +18,13 @@ public class GetOrderWithStatusQuery : IRequest<ResModel>
         public async Task<ResModel> Handle(GetOrderWithStatusQuery request, CancellationToken cancellationToken)
         {
             var orderStatus = await _appDbContext.Orders
-                  .Include(o => o.Status)
-                  .Include(o => o.Payments).ThenInclude(p => p.PaymentMethod)
-                  .Where(o => o.Payments.Any(p => p.Status == request.OrderStatus))
-                  .OrderByDescending(o => o.Id)
-                  .ProjectTo<GetOrderWithStatusDTO>(_mapper.ConfigurationProvider)
-                  .ToListAsync(cancellationToken);
+                      .Include(o => o.Status)
+                      .Include(o => o.Payments).ThenInclude(p => p.PaymentMethod)
+                      .Where(o => o.Status.NameEng == request.OrderStatus &&
+                                  o.Payments.Any(p => p.Status == request.OrderStatus))
+                      .OrderByDescending(o => o.Id)
+                      .ProjectTo<GetOrderWithStatusDTO>(_mapper.ConfigurationProvider)
+                      .ToListAsync(cancellationToken);
 
             // Для каждого заказа нужно подтянуть CreateTranId из BakaiConfirmTranResponse
             foreach (var order in orderStatus)

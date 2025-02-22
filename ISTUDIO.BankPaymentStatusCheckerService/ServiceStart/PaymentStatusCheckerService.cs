@@ -1,5 +1,4 @@
 ﻿using ISTUDIO.BankPaymentStatusCheckerService.Factory;
-using ISTUDIO.BankPaymentStatusCheckerService.Interfaces;
 
 namespace ISTUDIO.BankPaymentStatusCheckerService.ServiceStart;
 
@@ -7,7 +6,7 @@ public class PaymentStatusCheckerService : BackgroundService
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<PaymentStatusCheckerService> _logger;
-    private readonly TimeSpan _interval = TimeSpan.FromSeconds(180);
+    private readonly TimeSpan _interval = TimeSpan.FromSeconds(300);
 
     public PaymentStatusCheckerService(IServiceScopeFactory serviceScopeFactory,
                                        ILogger<PaymentStatusCheckerService> logger)
@@ -18,6 +17,7 @@ public class PaymentStatusCheckerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await Task.Delay(60000, stoppingToken);
         while (!stoppingToken.IsCancellationRequested)
         {
             try

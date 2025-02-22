@@ -6,8 +6,8 @@ using ISTUDIO.BankPaymentStatusCheckerService.ServiceStart;
 
 using ISTUDIO.Application;
 using ISTUDIO.Infrastructure;
-using Microsoft.Extensions.Options;
 using ISTUDIO.Infrastructure.Services;
+using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -28,6 +28,23 @@ builder.Services.AddHttpClient<IBakaiPaymentClient, BakaiPaymentClient>((service
     client.BaseAddress = new Uri(baseAddress);
     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 });
+
+//Логиреование
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+
+
+
+builder.Services.AddWindowsService(options =>
+{
+    options.ServiceName = "BankPayStatusCheckServices";
+});
+
 
 builder.Services.AddScoped<IOrderServices, OrderServices>();
 builder.Services.AddScoped<IAppUserService, AppUserServices>();
