@@ -2,17 +2,19 @@
 using ISTUDIO.Application.Features.Orders.Commands.DeleteOrders;
 using ISTUDIO.Application.Features.Orders.Commands.EditOrders.AddReceoptPhoto;
 using ISTUDIO.Application.Features.Orders.Commands.EditOrders.UpdateStatusOrders;
-using ISTUDIO.Application.Features.Orders.DTOs;
 using ISTUDIO.Application.Features.Orders.Queries;
 using ISTUDIO.Application.Features.SmsNikita.Commands.CreateSmsNikitaRequest;
 using ISTUDIO.Contracts.Features.Orders;
 using ISTUDIO.Infrastructure.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
+[ApiVersion("1.0")]
+[Authorize]
 public class OrdersController : BaseController
 {
     private readonly IMapper _mapper;

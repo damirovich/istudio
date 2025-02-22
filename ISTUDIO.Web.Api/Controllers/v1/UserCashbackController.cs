@@ -3,10 +3,12 @@ using ISTUDIO.Application.Features.CashUsers.Commands.DeleteCashUsers;
 using ISTUDIO.Application.Features.CashUsers.Commands.EditCashUsers;
 using ISTUDIO.Application.Features.CashUsers.Queries;
 using ISTUDIO.Contracts.Features.UserCashback;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class UserCashbackController : BaseController
 {
     private readonly IMapper _mapper;

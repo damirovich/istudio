@@ -3,10 +3,12 @@ using ISTUDIO.Application.Features.Stories.Commands.DeleteStories;
 using ISTUDIO.Application.Features.Stories.Commands.EditStories;
 using ISTUDIO.Application.Features.Stories.Queries;
 using ISTUDIO.Contracts.Features.Stories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class StoriesController : BaseController
 {
     private readonly IMapper _mapper;

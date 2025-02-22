@@ -2,9 +2,12 @@
 using ISTUDIO.Application.Features.FavoriteProducts.Commands.CreateFavoriteProducts;
 using ISTUDIO.Application.Features.FavoriteProducts.Queries;
 using ISTUDIO.Contracts.Features.FavoriteProducts;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
+[ApiVersion("1.0")]
+[Authorize]
 public class FavoriteProductsController : BaseController
 {
 

@@ -1,6 +1,9 @@
-﻿namespace ISTUDIO.Web.Api.Controllers.v1;
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class FilesStoreController : BaseController
 {
     private readonly IFileStoreService _fileStoreService;

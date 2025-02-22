@@ -3,10 +3,12 @@ using ISTUDIO.Application.Features.OrderAddress.Commands.DeleteOrderAddress;
 using ISTUDIO.Application.Features.OrderAddress.Commands.EditOrderAddress;
 using ISTUDIO.Application.Features.OrderAddress.Queries;
 using ISTUDIO.Contracts.Features.OrderAddress;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class OrderAddressesController : BaseController
 {
     private readonly IMapper _mapper;

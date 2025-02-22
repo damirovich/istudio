@@ -3,10 +3,12 @@ using ISTUDIO.Application.Features.ShoppingCarts.Commands.DeleteShoppingCarts;
 using ISTUDIO.Application.Features.ShoppingCarts.Commands.EditShoppinCarts;
 using ISTUDIO.Application.Features.ShoppingCarts.Queries;
 using ISTUDIO.Contracts.Features.ShoppingsCarts;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class ShopingCartsController : BaseController
 {
     private readonly IMapper _mapper;

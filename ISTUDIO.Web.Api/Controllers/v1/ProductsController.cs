@@ -7,9 +7,11 @@ using ISTUDIO.Application.Features.Products.Commands.UpdateProductSum;
 using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Application.Features.Products.Queries;
 using ISTUDIO.Contracts.Features.Products;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 [ApiVersion("1.0")]
+[Authorize]
 public class ProductsController : BaseController
 {
     private readonly IFileStoreService _fileStoreService;

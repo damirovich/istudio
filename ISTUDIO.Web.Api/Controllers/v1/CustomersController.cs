@@ -5,10 +5,12 @@ using ISTUDIO.Application.Features.Customers.Commands.EditCustomers;
 using ISTUDIO.Application.Features.Customers.Queries;
 using ISTUDIO.Application.Helpers;
 using ISTUDIO.Contracts.Features.Customers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class CustomersController : BaseController
 {
     private readonly IMapper _mapper;

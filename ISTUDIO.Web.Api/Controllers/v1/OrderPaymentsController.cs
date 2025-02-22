@@ -3,10 +3,12 @@ using ISTUDIO.Application.Features.OrderPayments.Commands.DeleteOrderPayment;
 using ISTUDIO.Application.Features.OrderPayments.Commands.EditOrderPayment;
 using ISTUDIO.Application.Features.OrderPayments.Queries;
 using ISTUDIO.Contracts.Features.OrderPayments;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class OrderPaymentsController : BaseController
 {
     private readonly ILogger<OrderPaymentsController> _logger;

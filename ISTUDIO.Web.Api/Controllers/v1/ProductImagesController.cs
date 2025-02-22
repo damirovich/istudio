@@ -5,9 +5,11 @@ using ISTUDIO.Application.Features.Products.Commands.EditPhotosProducts;
 using ISTUDIO.Application.Features.Products.DTOs;
 using ISTUDIO.Application.Features.Products.Queries;
 using ISTUDIO.Contracts.Features.Products;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 [ApiVersion("1.0")]
+[Authorize]
 public class ProductImagesController : BaseController
 {
     private readonly IFileStoreService _fileStoreService;

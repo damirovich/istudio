@@ -2,10 +2,12 @@
 using ISTUDIO.Application.Features.CashbackProduct.Commands;
 using ISTUDIO.Application.Features.CashbackProduct.Queries;
 using ISTUDIO.Contracts.Features.CashbackProducts;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class CashbackProductController : BaseController
 {
     private readonly ILogger<CashbackProductController> _loger;

@@ -1,11 +1,12 @@
 ﻿using ISTUDIO.Application.Features.SubCategories.Commands.CreateSubCategories;
 using ISTUDIO.Application.Features.SubCategories.Commands.EditSubCategories;
 using ISTUDIO.Contracts.Features.SubCategories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
-//[Authorize]
 [ApiVersion("1.0")]
+[Authorize]
 public class SubCategoriesController : BaseController
 {
     private readonly IMapper _mapper;

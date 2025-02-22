@@ -4,10 +4,12 @@ using ISTUDIO.Application.Features.Magazines.Commands.DeleteMagazines;
 using ISTUDIO.Application.Features.Magazines.Commands.EditMagazines;
 using ISTUDIO.Application.Features.Magazines.Queries;
 using ISTUDIO.Contracts.Features.Magazines;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class MagazinesController : BaseController
 {
     private readonly IMapper _mapper;

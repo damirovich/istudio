@@ -1,13 +1,14 @@
-﻿
-using ISTUDIO.Application.Features.CashbackTransactions.Commands.CreateCashTrans;
+﻿using ISTUDIO.Application.Features.CashbackTransactions.Commands.CreateCashTrans;
 using ISTUDIO.Application.Features.CashbackTransactions.Commands.DeleteCashTrans;
 using ISTUDIO.Application.Features.CashbackTransactions.Commands.EditCashTrans;
 using ISTUDIO.Application.Features.CashbackTransactions.Queries;
 using ISTUDIO.Contracts.Features.CashbackTransaction;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class CashbackTranController : BaseController    
 {
     private readonly ILogger _loger;

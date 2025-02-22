@@ -3,9 +3,11 @@ using ISTUDIO.Application.Features.Cashbacks.Commands.DeleteCashbacks;
 using ISTUDIO.Application.Features.Cashbacks.Commands.EditCashbacks;
 using ISTUDIO.Application.Features.Cashbacks.Queries;
 using ISTUDIO.Contracts.Features.Cashbacks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 [ApiVersion("1.0")]
+[Authorize]
 public class CashbacksController : BaseController
 {
     private readonly ILogger<CashbacksController> _loger;

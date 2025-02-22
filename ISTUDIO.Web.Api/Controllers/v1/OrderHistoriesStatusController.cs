@@ -1,10 +1,11 @@
 ﻿
 using ISTUDIO.Application.Features.OrderHistories.Queries;
-using ISTUDIO.Application.Features.Orders.Queries;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class OrderHistoriesStatusController : BaseController
 {
     /// <summary>

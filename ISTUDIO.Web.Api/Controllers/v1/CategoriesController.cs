@@ -3,11 +3,12 @@ using ISTUDIO.Application.Features.Categories.Commands.DeleteCategories;
 using ISTUDIO.Application.Features.Categories.Commands.EditCategories;
 using ISTUDIO.Application.Features.Categories.Queries;
 using ISTUDIO.Contracts.Features.Categories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
-//[Authorize]
 [ApiVersion("1.0")]
+[Authorize]
 public class CategoriesController : BaseController
 {
     private readonly IMapper _mapper;

@@ -3,9 +3,11 @@ using ISTUDIO.Application.Features.Banners.Commands.DeleteBannes;
 using ISTUDIO.Application.Features.Banners.Commands.EditBanners;
 using ISTUDIO.Application.Features.Banners.Queries;
 using ISTUDIO.Contracts.Features.Banners;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 [ApiVersion("1.0")]
+[Authorize]
 public class BannersController : BaseController
 {
     private readonly IMapper _mapper;

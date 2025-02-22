@@ -3,11 +3,13 @@ using ISTUDIO.Application.Features.Discounts.Commands.DeleteDiscounts;
 using ISTUDIO.Application.Features.Discounts.Commands.EditDiscounts;
 using ISTUDIO.Application.Features.Discounts.Queries;
 using ISTUDIO.Contracts.Features.Discounts;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class DiscountsController : BaseController
 {
     private readonly IMapper _mapper;

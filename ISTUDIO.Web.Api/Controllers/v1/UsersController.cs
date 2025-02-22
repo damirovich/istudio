@@ -3,11 +3,13 @@ using ISTUDIO.Application.Features.UserManagement.Commands.EditUserProfile;
 using ISTUDIO.Application.Features.UserManagement.Commands.UpdatePassword;
 using ISTUDIO.Application.Features.UserManagement.Queries;
 using ISTUDIO.Contracts.Features.UserManagement;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
-//[Authorize]
+
 [ApiVersion("1.0")]
+[Authorize]
 public class UsersController : BaseController
 {
     private readonly IMapper _mapper;
