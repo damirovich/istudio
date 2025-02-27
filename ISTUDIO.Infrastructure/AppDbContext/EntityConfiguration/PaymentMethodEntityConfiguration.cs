@@ -17,6 +17,13 @@ public class PaymentMethodEntityConfiguration : IEntityTypeConfiguration<Payment
             .HasForeignKey(e => e.PaymentTypeId)
             .IsRequired();
 
+        builder.Property(e => e.IsAvailable)
+            .IsRequired()
+            .HasDefaultValue(true);
+        builder.Property(e => e.IsTechnicalBreak)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         builder.HasIndex(e => e.Id).IsUnique();
     }
 }

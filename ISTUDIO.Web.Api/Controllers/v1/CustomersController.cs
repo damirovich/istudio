@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
-[ApiVersion("1.0")]
+[ApiVersion("1.0", Deprecated = true)]
 [Authorize]
 public class CustomersController : BaseController
 {

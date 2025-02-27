@@ -1,6 +1,4 @@
-﻿
-
-using AutoMapper.QueryableExtensions;
+﻿using AutoMapper.QueryableExtensions;
 using ISTUDIO.Application.Features.Products.DTOs;
 
 namespace ISTUDIO.Application.Features.Products.Queries;

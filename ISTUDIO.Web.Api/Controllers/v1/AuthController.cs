@@ -9,7 +9,7 @@ using System.Net;
 
 namespace ISTUDIO.Web.Api.Controllers.v1;
 
-[ApiVersion("1.0")]
+[ApiVersion("1.0", Deprecated = true)]
 public class AuthController : BaseController
 {
     private readonly IMapper _mapper;

@@ -14,6 +14,9 @@ public class PaymentMethodEntity
     // Тип оплаты, к которому относится данный метод оплаты
     public PaymentTypeEntity PaymentType { get; set; }
 
+    public bool IsAvailable { get; set; }
+    public bool IsTechnicalBreak { get; set; }
+
     // Связь с OrderPaymentEntity
     public ICollection<OrderPaymentEntity> OrderPayments { get; set; } = new List<OrderPaymentEntity>();
 }

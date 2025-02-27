@@ -223,4 +223,21 @@ public class IdentityService : IIdentityService
             return Result.Failure(new[] { $"An error occurred while updating user profile Photo. {ex.Message}" });
         }
     }
+
+    public async Task<List<string>> GetUserPermissionsAsync(string userId)
+    {
+        var userRoles = await _appDbContext.UserRoles
+            .Where(ur => ur.UserId == userId)
+            .Select(ur => ur.RoleId)
+            .ToListAsync();
+
+        var permissions = await _appDbContext.RolePermissions
+            .Where(rp => userRoles.Contains(rp.RoleId))
+            .Select(rp => rp.Permission.Name)
+            .Distinct()
+            .ToListAsync();
+
+        return permissions;
+    }
+
 }

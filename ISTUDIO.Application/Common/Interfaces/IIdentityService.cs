@@ -14,4 +14,5 @@ public interface IIdentityService
 
     Task<Result> UpdateUserProfile(string userId, string phoneNumber, string email);
     Task<Result> UpdateUserPhotoProfile(string photoUrl, string userId);
+    Task<List<string>> GetUserPermissionsAsync(string userId);
 }

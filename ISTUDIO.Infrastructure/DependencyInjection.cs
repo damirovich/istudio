@@ -62,7 +62,7 @@ public static class DependencyInjection
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IAppUserService, AppUserServices>();
         services.AddScoped<IJwtUtils, JwtUtils>();
-        services.AddScoped<ICurrentHttpRequest, CurrentHttpRequest>();
+
         services.AddHttpClient<ISmsNikitaService, SmsNikitaService>(client =>
         {
             client.BaseAddress = new Uri("https://smspro.nikita.kg/api/message");
@@ -85,6 +85,7 @@ public static class DependencyInjection
         {
             return new FileStoreService(commonStoragePath);
         });
+
         //services.AddSingleton<IFileStoreService>(provider =>
         //{
         //    var storagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");

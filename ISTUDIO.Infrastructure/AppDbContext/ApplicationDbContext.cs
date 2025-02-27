@@ -52,6 +52,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<OrderStatusEntity> OrderStatus { get; set; }
     public DbSet<StoriesEntity> Stories { get; set; }   
     public DbSet<StoryContentEntity> StoryContents { get; set; }
+    public DbSet<RolePermissionEntity> RolePermissions { get; set; }
+    public DbSet<PermissionEntity> Permissions { get; set; }
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
    
     protected override void OnModelCreating(ModelBuilder builder)
@@ -109,5 +111,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>, IAppDbContext
         builder.ApplyConfiguration(new OrderStatusEntityConfiguration());
         builder.ApplyConfiguration(new StoriesEntityConfiguration());
         builder.ApplyConfiguration(new StoryContentEntityConfiguration());
+        builder.ApplyConfiguration(new PermissionEntityConfiguration());
+        builder.ApplyConfiguration(new RolePermissionEntityConfiguration());
     }   
 }

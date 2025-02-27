@@ -1,9 +1,14 @@
-﻿
-namespace ISTUDIO.Web.Api.Mobile.Controllers.v1;
+﻿using ISTUDIO.Domain.Enums;
+using ISTUDIO.Web.Api.AppStart;
+using Microsoft.AspNetCore.Authorization;
 
-[ApiVersion("1.0")]
+namespace ISTUDIO.Web.Api.Controllers.v1;
+
+[ApiVersion("1.0", Deprecated = true)]
+[Authorize]
 public class TestController : BaseController
 {
+    [AuthorizePermission(PermissionEnum.CanManageUsers)]
     [HttpGet]
     public async Task<IActionResult> TestWorking()
     {

@@ -5,51 +5,53 @@ using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
 using Ardalis.GuardClauses;
+using ISTUDIO.Application.Common.Interfaces;
 
 namespace ISTUDIO.Infrastructure.Identity;
 
 public class JwtUtils : IJwtUtils
 {
     private readonly IConfiguration _configProvider;
-    public JwtUtils(IConfiguration configProvider)
+    private readonly IIdentityService _identityService;
+    public JwtUtils(IConfiguration configProvider, IIdentityService identityService)
     {
         _configProvider = configProvider;
+        _identityService = identityService;
     }
     public async Task<string> GenerateToken(string userId, string userName, IList<string> roles)
     {
-        // Получение настроек JWT из конфигурации
         var jwtSettings = _configProvider.GetSection("JwtOptions");
-        Guard.Against.Null(jwtSettings, message: "JwtOptions not found.");
+        var key = jwtSettings["Secret"];
+        var issuer = jwtSettings["Issuer"];
+        var audience = jwtSettings["Audience"];
+        var expirMinutes = int.Parse(jwtSettings["expiryInMinutes"]);
 
-        // Извлечение ключа, издателя, аудитории и времени истечения из настроек JWT
-        var key = Guard.Against.NullOrEmpty(jwtSettings["Secret"], message: "'Secret' not found or empty.");
-        var issuer = Guard.Against.NullOrEmpty(jwtSettings["Issuer"], message: "'Issuer' not found or empty.");
-        var audience = Guard.Against.NullOrEmpty(jwtSettings["Audience"], message: "'Audience' not found or empty.");
-        var expirMinutes = Guard.Against.NullOrEmpty(jwtSettings["expiryInMinutes"], message: "'expiryInMinutes' not found or empty.");
-
-        // Создание симметричного ключа безопасности и установка подписи
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
 
-        // Формирование claims для включения в токен
-        var claims = new List<Claim>()
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, userName),
-            new Claim(JwtRegisteredClaimNames.Jti, userId),
-            new (ClaimTypes.NameIdentifier, userId),
-            new (ClaimTypes.Name, userName!),
-            new Claim("UserId", userId)
-        };
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+        // Получаем Permissions пользователя
+        var permissions = await _identityService.GetUserPermissionsAsync(userId);
+       
+        var claims = new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, userName),
+        new Claim(JwtRegisteredClaimNames.Jti, userId),
+        new Claim(ClaimTypes.NameIdentifier, userId),
+        new Claim(ClaimTypes.Name, userName)
+    };
 
-        // Создание JWT токена с Claims, audience, утверждений и времени истечения
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+        claims.AddRange(permissions.Select(permission => new Claim("permission", permission.ToString()))); // Enum → String
+
         var token = new JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
+            issuer: _configProvider["JwtOptions:Issuer"],
+            audience: _configProvider["JwtOptions:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(expirMinutes)),
-            signingCredentials: signingCredentials
-            );
+            expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(_configProvider["JwtOptions:expiryInMinutes"])),
+            signingCredentials: new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configProvider["JwtOptions:Secret"])),
+                SecurityAlgorithms.HmacSha512)
+        );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }

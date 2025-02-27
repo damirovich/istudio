@@ -4,6 +4,7 @@ using ISTUDIO.Infrastructure.AppDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISTUDIO.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250223094712_AddPermi")]
+    partial class AddPermi
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -402,7 +405,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 2, 26, 15, 27, 29, 961, DateTimeKind.Utc).AddTicks(5471));
+                        .HasDefaultValue(new DateTime(2025, 2, 23, 9, 47, 11, 887, DateTimeKind.Utc).AddTicks(4817));
 
                     b.Property<int?>("CustomerId")
                         .IsRequired()
@@ -1139,7 +1142,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("ChangeDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 2, 26, 15, 27, 29, 972, DateTimeKind.Utc).AddTicks(8642));
+                        .HasDefaultValue(new DateTime(2025, 2, 23, 9, 47, 11, 897, DateTimeKind.Utc).AddTicks(3341));
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -1163,16 +1166,6 @@ namespace ISTUDIO.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsAvailable")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsTechnicalBreak")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1325,7 +1318,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 2, 26, 15, 27, 29, 975, DateTimeKind.Utc).AddTicks(4877));
+                        .HasDefaultValue(new DateTime(2025, 2, 23, 9, 47, 11, 899, DateTimeKind.Utc).AddTicks(6764));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -1606,7 +1599,7 @@ namespace ISTUDIO.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 2, 26, 15, 27, 29, 961, DateTimeKind.Utc).AddTicks(3109));
+                        .HasDefaultValue(new DateTime(2025, 2, 23, 9, 47, 11, 887, DateTimeKind.Utc).AddTicks(2398));
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)

@@ -7,3 +7,4 @@ global using Microsoft.AspNetCore.Mvc;
 global using ISTUDIO.Contracts.Features;
 global using ISTUDIO.Application.Common.Exceptions;
 global using ISTUDIO.Application.Features.ModelsDTO;
+global using ISTUDIO.Web.Api.Data.Interface;

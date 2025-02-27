@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using MediatR;
-using System.Net;
 
 namespace ISTUDIO.Web.Api.Controllers;
 
@@ -14,100 +13,69 @@ public class BaseController : ControllerBase
     protected IMediator Mediator =>
         _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
 
-
-    protected async Task<IActionResult> HandleQuery<TResponse>(IRequest<TResponse> query)
+    /// <summary>
+    /// Обработка запросов (GET)
+    /// </summary>
+    [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status500InternalServerError)]
+    protected async Task<CsmActionResult> HandleQuery<TResponse>(IRequest<TResponse> query)
     {
         try
         {
             var result = await Mediator.Send(query);
-            return Ok(result);
+            return new CsmActionResult(result);
         }
         catch (ValidationException ex)
         {
-            var errors = ex.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(e => e.ErrorMessage).ToArray()
-                );
-
-            var errorResponse = new
-            {
-                error = "Validation Error",
-                message = "One or more validation errors occurred.",
-                errors = errors
-            };
-
-            return BadRequest(errorResponse);
+            return new CsmActionResult(new CsmReturnStatus(400, "Validation Error", ex.Errors.Select(e => e.ErrorMessage)));
         }
         catch (NotFoundException ex)
         {
-            var errorResponse = new
-            {
-                error = "Not Found",
-                message = ex.Message
-            };
-
-            return NotFound(errorResponse);
+            return new CsmActionResult(new CsmReturnStatus(404, "Not Found", new { ex.Message }));
         }
         catch (Exception ex)
         {
-            var errorResponse = new
-            {
-                error = "Internal Server Error",
-                message = "An unexpected error occurred.",
-                details = ex.Message // Только для разработки
-            };
-
-            return StatusCode((int)HttpStatusCode.InternalServerError, errorResponse);
+            // В продакшене лучше скрывать детали ошибок
+            var errorMessage = "An unexpected error occurred.";
+            #if DEBUG
+                    errorMessage = ex.Message;
+            #endif
+            return new CsmActionResult(new CsmReturnStatus(500, "Internal Server Error", errorMessage));
         }
     }
 
-    protected async Task<IActionResult> HandleCommand<T>(IRequest<T> command)
+    /// <summary>
+    /// Обработка команд (POST, PUT, DELETE)
+    /// </summary>
+    [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status500InternalServerError)]
+    protected async Task<CsmActionResult> HandleCommand<T>(IRequest<T> command)
     {
         try
         {
-            await Mediator.Send(command);
-            return Ok();
+            var result = await Mediator.Send(command);
+            return new CsmActionResult(result);
         }
         catch (ValidationException ex)
         {
-            var errors = ex.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(e => e.ErrorMessage).ToArray()
-                );
-
-            var errorResponse = new
-            {
-                error = "Validation Error",
-                message = "One or more validation errors occurred.",
-                errors = errors
-            };
-
-            return BadRequest(errorResponse);
+            return new CsmActionResult(new CsmReturnStatus(400, "Validation Error", ex.Errors.Select(e => e.ErrorMessage)));
         }
         catch (NotFoundException ex)
         {
-            var errorResponse = new
-            {
-                error = "Not Found",
-                message = ex.Message
-            };
-
-            return NotFound(errorResponse);
+            return new CsmActionResult(new CsmReturnStatus(404, "Not Found", new { ex.Message }));
         }
         catch (Exception ex)
         {
-            var errorResponse = new
-            {
-                error = "Internal Server Error",
-                message = "An unexpected error occurred.",
-                details = ex.Message // Только для разработки
-            };
-
-            return StatusCode((int)HttpStatusCode.InternalServerError, errorResponse);
+            var errorMessage = "An unexpected error occurred.";
+            #if DEBUG
+                    errorMessage = ex.Message;
+            #endif
+            return new CsmActionResult(new CsmReturnStatus(500, "Internal Server Error", errorMessage));
         }
     }
+
 }

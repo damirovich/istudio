@@ -1,158 +1,106 @@
-﻿using System.Collections;
+﻿using ISTUDIO.Web.Api.Data.Interface;
+using System.Collections;
 
 namespace ISTUDIO.Web.Api.Data;
 
 
-public interface ICsmActionResult
-{
-    IList<CsmReturnStatus> CsmReturnStatuses { get; set; }
-    object Data { get; set; }
-}
-
+// Класс-ответ с дженериком для унифицированных API-ответов
 public class CsmActionResult<T> : ICsmActionResult where T : class, new()
 {
-    public IList<CsmReturnStatus> CsmReturnStatuses { get; set; }
+    public IList<CsmReturnStatus> CsmReturnStatuses { get; set; } = new List<CsmReturnStatus>();
     public object Data { get; set; }
 
-    public CsmActionResult()
-    {
-        CsmReturnStatuses = new List<CsmReturnStatus>();
-        Data = new T();
-    }
+    public CsmActionResult() => Data = new T();
 
-    public CsmActionResult(CsmReturnStatus csmReturnStatus)
-    {
-        CsmReturnStatuses = new List<CsmReturnStatus>();
-        CsmReturnStatuses.Add(csmReturnStatus);
-    }
+    public CsmActionResult(CsmReturnStatus status) => CsmReturnStatuses.Add(status);
 
-    public CsmActionResult(IList<CsmReturnStatus> csmReturnStatuses)
-    {
-        CsmReturnStatuses = csmReturnStatuses;
-    }
+    public CsmActionResult(IList<CsmReturnStatus> statuses) => CsmReturnStatuses = statuses;
 
-    public CsmActionResult(CsmReturnStatus csmReturnStatus, object data)
+    public CsmActionResult(CsmReturnStatus status, object data)
     {
-        CsmReturnStatuses = new List<CsmReturnStatus>();
-        CsmReturnStatuses.Add(csmReturnStatus);
+        CsmReturnStatuses.Add(status);
         Data = data;
     }
 
-    public CsmActionResult(IList<CsmReturnStatus> csmReturnStatuses, object data)
+    public CsmActionResult(IList<CsmReturnStatus> statuses, object data)
     {
-        CsmReturnStatuses = csmReturnStatuses;
+        CsmReturnStatuses = statuses;
         Data = data;
     }
 
     public CsmActionResult(T data)
     {
-        CsmReturnStatuses = new List<CsmReturnStatus>();
-
         if (data == null)
-        {
-            CsmReturnStatuses.Add(new CsmReturnStatus() { Status = 1, Message = "Empty!" });
-        }
+            CsmReturnStatuses.Add(new CsmReturnStatus(1, "Empty!"));
         else
         {
-            CsmReturnStatuses.Add(new CsmReturnStatus() { Status = 0, Message = "Success!" });
+            CsmReturnStatuses.Add(new CsmReturnStatus(0, "Success!"));
             Data = data;
         }
     }
 
     public CsmActionResult(IEnumerable<T> datas)
     {
-        CsmReturnStatuses = new List<CsmReturnStatus>();
-
         if (!datas.Any())
-        {
             CsmReturnStatuses.Add(new CsmReturnStatus(1, "Empty!"));
-        }
         else
         {
-            CsmReturnStatuses.Add(new CsmReturnStatus() { Status = 0, Message = "Success!", IntOutput = datas.Count() });
+            CsmReturnStatuses.Add(new CsmReturnStatus(0, "Success!", datas.Count()));
             Data = datas;
         }
     }
 
-    public Task ExecuteResultAsync(ActionContext context)
+    public async Task ExecuteResultAsync(ActionContext context)
     {
-        throw new NotImplementedException();
+        var jsonResult = new JsonResult(this) { StatusCode = 200 };
+        await jsonResult.ExecuteResultAsync(context);
     }
 }
 
+// Обычный CsmActionResult без дженерика
 public class CsmActionResult : ICsmActionResult
 {
-    public IList<CsmReturnStatus> CsmReturnStatuses { get; set; }
+    public IList<CsmReturnStatus> CsmReturnStatuses { get; set; } = new List<CsmReturnStatus>();
     public object Data { get; set; }
 
-    public CsmActionResult()
-    {
-        CsmReturnStatuses = new List<CsmReturnStatus>();
-    }
-
-
+    public CsmActionResult() { }
 
     public CsmActionResult(int status, string message)
-    {
-        CsmReturnStatuses = new List<CsmReturnStatus>();
-        CsmReturnStatuses.Add(new CsmReturnStatus(status, message));
-    }
+        => CsmReturnStatuses.Add(new CsmReturnStatus(status, message));
 
-    public CsmActionResult(IList<CsmReturnStatus> csmReturnStatuses)
+    public CsmActionResult(CsmReturnStatus status, object data)
     {
-        CsmReturnStatuses = csmReturnStatuses;
-    }
-
-    public CsmActionResult(CsmReturnStatus csmReturnStatus, object data)
-    {
-        CsmReturnStatuses = new List<CsmReturnStatus>();
-        CsmReturnStatuses.Add(csmReturnStatus);
+        CsmReturnStatuses.Add(status);
         Data = data;
     }
 
-    public CsmActionResult(IList<CsmReturnStatus> csmReturnStatuses, object data)
+    public CsmActionResult(IList<CsmReturnStatus> statuses, object data)
     {
-        CsmReturnStatuses = csmReturnStatuses;
+        CsmReturnStatuses = statuses;
         Data = data;
     }
 
     public CsmActionResult(object data)
     {
-        CsmReturnStatuses = new List<CsmReturnStatus>();
-
         if (data == null)
-        {
             CsmReturnStatuses.Add(new CsmReturnStatus(1, "Empty!"));
+        else if (data is IList list && list.Count == 0)
+            CsmReturnStatuses.Add(new CsmReturnStatus(1, "Empty!"));
+        else if (data is CsmReturnStatus status)
+        {
+            CsmReturnStatuses.Add(status);
+            Data = status.Output;
         }
         else
         {
-            if (data is IList list && data.GetType().IsGenericType && data.GetType().GetGenericTypeDefinition() == typeof(List<>))
-            {
-                if (list.Count == 0)
-                {
-                    CsmReturnStatuses.Add(new CsmReturnStatus(1, "Empty!"));
-                }
-                else
-                {
-                    CsmReturnStatuses.Add(new CsmReturnStatus(0, "Success!"));
-                    Data = data;
-                }
-            }
-            else if (data is CsmReturnStatus returnStatus)
-            {
-                CsmReturnStatuses.Add(returnStatus);
-                Data = returnStatus.Output;
-            }
-            else
-            {
-                CsmReturnStatuses.Add(new CsmReturnStatus(0, "Success!"));
-                Data = data;
-            }
+            CsmReturnStatuses.Add(new CsmReturnStatus(0, "Success!"));
+            Data = data;
         }
     }
 
-    public Task ExecuteResultAsync(ActionContext context)
+    public async Task ExecuteResultAsync(ActionContext context)
     {
-        throw new NotImplementedException();
+        var jsonResult = new JsonResult(this) { StatusCode = 200 };
+        await jsonResult.ExecuteResultAsync(context);
     }
 }

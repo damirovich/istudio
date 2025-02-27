@@ -40,7 +40,7 @@ public class TokenExpirationMiddleware
         {
             var jsonToken = handler.ReadToken(accessToken) as JwtSecurityToken;
 
-            return jsonToken?.ValidTo != null && jsonToken.ValidTo < DateTime.UtcNow;
+            return jsonToken?.ValidTo != null && jsonToken.ValidTo < DateTime.Now;
         }
 
         // Если токен не валиден, возможно, он отсутствует или имеет неверный формат

@@ -8,43 +8,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Asp.Versioning.ApiExplorer;
+using System.Reflection;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddCustomAutoMapper();
-
-
-//Json чтобы был как в моделях
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNamingPolicy = null;
-    });
-
-//CORS
-builder.Services.AddCors(c => c.AddPolicy("IstudioCustomAllow", opt =>
-{
-    opt.AllowAnyHeader(); // Разрешены любые заголовки.
-    opt.AllowCredentials(); // Разрешены учетные данные (куки, авторизация).
-    opt.AllowAnyMethod(); // Разрешены любые HTTP-методы (GET, POST, PUT и т.д.).
-    opt.WithOrigins(builder.Configuration.GetSection("Cors:Urls").Get<string[]>()!); // Ограничение запросов только для заданных доменов.
-}));
-//Версионность в API
-builder.Services.AddCustomApiVersioning();
-//Swagger
-builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.OperationFilter<SwaggerDefaultValues>();
-});
-//Логиреование
+// Логирование
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -52,7 +23,55 @@ var logger = new LoggerConfiguration()
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
-//Аудентификация JWT
+// Добавление сервисов
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null; // JSON, как в моделях
+    });
+
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCustomAutoMapper();
+
+// CORS
+builder.Services.AddCors(c => c.AddPolicy("IstudioCustomAllow", opt =>
+{
+    opt.AllowAnyHeader();
+    opt.AllowCredentials();
+    opt.AllowAnyMethod();
+    opt.WithOrigins(builder.Configuration.GetSection("Cors:Urls").Get<string[]>()!);
+}));
+
+// Версионность API
+builder.Services.AddCustomApiVersioning();
+
+// Swagger
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.OperationFilter<SwaggerDefaultValues>();
+
+    var basePath = AppContext.BaseDirectory;
+    var xmlPathMain = Path.Combine(basePath, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+    var xmlPathContracts = Path.Combine(basePath, "ISTUDIO.Contracts.xml");
+
+    // Подключаем XML-документацию только если файлы существуют
+    SwaggerExtensions.IncludeXmlCommentsIfExists(options, xmlPathMain);
+    SwaggerExtensions.IncludeXmlCommentsIfExists(options, xmlPathContracts);
+
+    options.SchemaFilter<EnumTypesSchemaFilter>(basePath);
+});
+
+
+// Отключаем автоматическую обработку ошибок валидации
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressMapClientErrors = true;
+});
+
+// Аутентификация JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {
@@ -73,35 +92,44 @@ builder.Services.AddAuthorization(opt => opt.DefaultPolicy =
         .RequireAuthenticatedUser()
         .Build());
 
-
-
 var app = builder.Build();
 
-
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
+// Использование Swagger
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
-    var descriptions = app.DescribeApiVersions();
+    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 
-    foreach (var description in descriptions)
+    foreach (var description in provider.ApiVersionDescriptions)
     {
         var url = $"/swagger/{description.GroupName}/swagger.json";
         var name = description.GroupName;
+
+        if (description.IsDeprecated)
+        {
+            name += " (Deprecated)";
+        }
+
         options.SwaggerEndpoint(url, name);
-        options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
     }
+
+    options.RoutePrefix = "swagger";
+    options.DefaultModelsExpandDepth(-1); // Полностью скрывает Models (Schemas)
+    options.DefaultModelExpandDepth(0);   // Скрывает все эндпоинты
+    options.DocExpansion(DocExpansion.None); // Запрещает авто-раскрытие устаревших API
+
+    options.DisplayOperationId(); // Показывает ID, но не разворачивает
+    options.DisplayRequestDuration(); // Показывает время выполнения запроса
 });
-//}
+
+// Middleware
 app.UseMiddleware<TokenExpirationMiddleware>();
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors("IstudioCustomAllow");
 
+// Контроллеры
 app.MapControllers();
 
 app.Run();
