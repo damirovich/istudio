@@ -9,7 +9,7 @@ namespace ISTUDIO.Web.Api.Controllers.v1;
 
 [ApiVersion("1.0", Deprecated = true)]
 [Authorize]
-public class CashbackTranController : BaseController    
+public class CashbackTranController : BaseController
 {
     private readonly ILogger _loger;
     private readonly IMapper _mapper;

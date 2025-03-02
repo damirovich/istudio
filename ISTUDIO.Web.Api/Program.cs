@@ -114,7 +114,7 @@ app.UseSwaggerUI(options =>
     }
 
     options.RoutePrefix = "swagger";
-    options.DefaultModelsExpandDepth(-1); // Полностью скрывает Models (Schemas)
+    options.DefaultModelsExpandDepth(0); // Полностью скрывает Models (Schemas)
     options.DefaultModelExpandDepth(0);   // Скрывает все эндпоинты
     options.DocExpansion(DocExpansion.None); // Запрещает авто-раскрытие устаревших API
 

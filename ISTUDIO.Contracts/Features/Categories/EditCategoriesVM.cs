@@ -1,20 +1,44 @@
-﻿
-
-using ISTUDIO.Application.Features.Categories.Commands.EditCategories;
+﻿using ISTUDIO.Application.Features.Categories.Commands.EditCategories;
 using ISTUDIO.Application.Features.Categories.DTOs;
 
 namespace ISTUDIO.Contracts.Features.Categories;
 
+/// <summary>
+/// Модель запроса для редактирования категории
+/// </summary>
 public class EditCategoriesVM : IMapWith<EditCategoriesCommand>
 {
-    [Required(ErrorMessage = "Id  is required")]
+    /// <summary>
+    /// Идентификатор категории (обязательно)
+    /// </summary>
+    [Required(ErrorMessage = "Идентификатор категории обязателен.")]
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Name Category is required.")]
+    /// <summary>
+    /// Название категории (обязательно)
+    /// </summary>
+    [Required(ErrorMessage = "Название категории обязательно.")]
     public string Name { get; set; }
+
+    /// <summary>
+    /// Описание категории (необязательно)
+    /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Фото категории в формате Base64
+    /// </summary>
     public string PhotoCategoryBase64 { get; set; }
+
+    /// <summary>
+    /// Иконка категории в формате Base64
+    /// </summary>
     public string IcontPhotoCategoryBase64 { get; set; }
+
+    /// <summary>
+    /// Настройка маппинга между EditCategoriesVM и EditCategoriesCommand
+    /// </summary>
+    /// <param name="profile">Профиль AutoMapper</param>
     public void Mapping(Profile profile)
     {
         profile.CreateMap<EditCategoriesVM, EditCategoriesCommand>()

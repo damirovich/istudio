@@ -133,7 +133,7 @@ public class AuthController : BaseController
         }
     }
     private ICsmActionResult BadRequest(string message)
-    {
+    {   
         return new CsmActionResult(new CsmReturnStatus
         {
             Status = (int)HttpStatusCode.BadRequest,

@@ -4,20 +4,47 @@ using ISTUDIO.Application.Features.Banners.DTOs;
 
 namespace ISTUDIO.Contracts.Features.Banners;
 
+/// <summary>
+/// Модель запроса для редактирования баннера
+/// </summary>
 public class EditBannerVM : IMapWith<EditBannerCommand>
 {
-    [Required(ErrorMessage = "BannerId is required.")]
+    /// <summary>
+    /// Идентификатор баннера (обязательно)
+    /// </summary>
+    [Required(ErrorMessage = "Идентификатор баннера обязателен.")]
     public int BannerId { get; set; }
 
+    /// <summary>
+    /// Фото баннера в формате Base64 (необязательно)
+    /// </summary>
     public string? PhotoBannerBase64 { get; set; }
 
-    [Required(ErrorMessage = "Status is required.")]
+    /// <summary>
+    /// Статус баннера (обязательно)
+    /// </summary>
+    [Required(ErrorMessage = "Статус обязателен.")]
     public int Status { get; set; }
 
+    /// <summary>
+    /// Идентификатор категории (необязательно)
+    /// </summary>
     public int? CategoryId { get; set; }
+
+    /// <summary>
+    /// Идентификатор скидки (необязательно)
+    /// </summary>
     public int? DiscountId { get; set; }
+
+    /// <summary>
+    /// Идентификатор продукта (необязательно)
+    /// </summary>
     public int? ProductId { get; set; }
 
+    /// <summary>
+    /// Настройка маппинга между EditBannerVM и EditBannerCommand
+    /// </summary>
+    /// <param name="profile">Профиль AutoMapper</param>
     public void Mapping(Profile profile)
     {
         profile.CreateMap<EditBannerVM, EditBannerCommand>()
