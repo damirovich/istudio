@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Asp.Versioning.ApiExplorer;
 using System.Reflection;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using Microsoft.OpenApi.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

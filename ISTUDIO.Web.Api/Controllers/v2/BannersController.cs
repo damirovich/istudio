@@ -30,9 +30,11 @@ public class BannersController : BaseController2
     /// <returns>Список баннеров</returns>
     /// <response code="200">Успешное получение списка</response>
     /// <response code="401">Пользователь не авторизован</response>
+    /// <response code="500">Внутренная ошибка </response>
     [HttpGet]
     [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ICsmActionResult> GetBannersList()
     {
         return await HandleQuery(new GetBannersListQuery());
@@ -46,10 +48,12 @@ public class BannersController : BaseController2
     /// <response code="200">Успешное получение данных</response>
     /// <response code="400">Некорректные данные запроса</response>
     /// <response code="401">Пользователь не авторизован</response>
+    /// <response code="500">Внутренная ошибка </response>
     [HttpGet]
     [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ICsmActionResult> GetBannersById([FromQuery] int id)
     {
         return await HandleQuery(new GetBannersByIdQuery { BannerId = id });
@@ -63,10 +67,12 @@ public class BannersController : BaseController2
     /// <response code="200">Баннер успешно добавлен</response>
     /// <response code="400">Ошибка валидации</response>
     /// <response code="401">Пользователь не авторизован</response>
+    /// <response code="500">Внутренная ошибка </response>
     [HttpPost]
     [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ICsmActionResult> CreateBanner([FromBody] CreateBannerVM banner)
     {
         var command = _mapper.Map<CreateBannersCommand>(banner);
@@ -81,10 +87,12 @@ public class BannersController : BaseController2
     /// <response code="200">Баннер успешно обновлен</response>
     /// <response code="400">Ошибка валидации</response>
     /// <response code="401">Пользователь не авторизован</response>
+    /// <response code="500">Внутренная ошибка </response>
     [HttpPut]
     [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ICsmActionResult> EditBanner([FromBody] EditBannerVM banner)
     {
         var command = _mapper.Map<EditBannerCommand>(banner);
@@ -99,10 +107,12 @@ public class BannersController : BaseController2
     /// <response code="200">Баннер успешно удален</response>
     /// <response code="400">Ошибка валидации</response>
     /// <response code="401">Пользователь не авторизован</response>
+    /// <response code="500">Внутренная ошибка сервера</response>
     [HttpDelete]
     [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ICsmActionResult> DeleteBanner([FromQuery] int id)
     {
         return await HandleCommand(new DeleteBannerCommand { BannerId = id });

@@ -39,7 +39,10 @@ public class CustomersController : BaseController2
     public async Task<ICsmActionResult> IdentifyCustomers([FromForm] string userId, List<IFormFile> photoCustomers)
     {
         var customerImages = await ProcessCustomerImages(userId, photoCustomers);
-        var result = await Mediator.Send(new CreateCustomerImgCommand { CustomerImages = customerImages });
+        var result = await Mediator.Send(new CreateCustomerImgCommand
+        {
+            CustomerImages = customerImages
+        });
         return new CsmActionResult(result);
     }
 
@@ -57,6 +60,27 @@ public class CustomersController : BaseController2
     }
 
     /// <summary>
+    /// Получение всех фотографий паспортов который отправили на идентификациию
+    /// </summary>
+    /// <param name="userId">Идентификатор пользователя</param>
+    /// <returns>Статус идентификации</returns>
+    [HttpGet("identification-status")]
+    [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ICsmActionResult> GetCustomerIdentListQuery([FromQuery] PaginatedListVM page)
+    {
+        return await HandleQuery(new GetCustomerIdentListQuery 
+        {
+            Parameters = new PaginatedParameters 
+            { 
+                PageNumber = page.PageNumber,
+                PageSize = page.PageSize
+            } 
+        });
+    }
+
+
+    /// <summary>
     /// Получение списка клиентов
     /// </summary>
     /// <param name="page">Параметры пагинации</param>
@@ -66,7 +90,14 @@ public class CustomersController : BaseController2
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ICsmActionResult> GetCustomers([FromQuery] PaginatedListVM page)
     {
-        return await HandleQuery(new GetCustomersListQuery { Parameters = new PaginatedParameters { PageNumber = page.PageNumber, PageSize = page.PageSize } });
+        return await HandleQuery(new GetCustomersListQuery 
+        { 
+            Parameters = new PaginatedParameters 
+            {
+                PageNumber = page.PageNumber,
+                PageSize = page.PageSize 
+            } 
+        });
     }
 
     /// <summary>
@@ -97,7 +128,7 @@ public class CustomersController : BaseController2
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ICsmActionResult> EditCustomers([FromForm] EditCustomersVM customers, List<IFormFile> photoCustomers)
     {
-        var customerImages = await xProcessCustomerImages(null, photoCustomers);
+        var customerImages = await ProcessCustomerImages(null, photoCustomers);
         var command = _mapper.Map<EditCustomersCommand>(customers);
         command.CustomerImages = customerImages;
         return await HandleCommand(command);

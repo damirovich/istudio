@@ -21,40 +21,39 @@ public class JwtUtils : IJwtUtils
     public async Task<string> GenerateToken(string userId, string userName, IList<string> roles)
     {
         var jwtSettings = _configProvider.GetSection("JwtOptions");
-        var key = jwtSettings["Secret"];
-        var issuer = jwtSettings["Issuer"];
-        var audience = jwtSettings["Audience"];
-        var expirMinutes = int.Parse(jwtSettings["expiryInMinutes"]);
-
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]));
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
+        var expirationTime = DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["expiryInMinutes"]));
 
         // Получаем Permissions пользователя
         var permissions = await _identityService.GetUserPermissionsAsync(userId);
-       
+
         var claims = new List<Claim>
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, userName),
-        new Claim(JwtRegisteredClaimNames.Jti, userId),
-        new Claim(ClaimTypes.NameIdentifier, userId),
-        new Claim(ClaimTypes.Name, userName)
-    };
+                {
+                    new(JwtRegisteredClaimNames.Sub, userName),
+                    new(JwtRegisteredClaimNames.Jti, userId),
+                    new(ClaimTypes.NameIdentifier, userId),
+                    new(ClaimTypes.Name, userName)
+                };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-        claims.AddRange(permissions.Select(permission => new Claim("permission", permission.ToString()))); // Enum → String
+        claims.AddRange(permissions.Select(permission => new Claim("permission", permission.ToString())));
 
-        var token = new JwtSecurityToken(
-            issuer: _configProvider["JwtOptions:Issuer"],
-            audience: _configProvider["JwtOptions:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(_configProvider["JwtOptions:expiryInMinutes"])),
-            signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configProvider["JwtOptions:Secret"])),
-                SecurityAlgorithms.HmacSha512)
-        );
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Issuer = jwtSettings["Issuer"],
+            Audience = jwtSettings["Audience"],
+            Subject = new ClaimsIdentity(claims),
+            Expires = expirationTime,
+            SigningCredentials = signingCredentials
+        };
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+
+        return tokenHandler.WriteToken(token);
     }
+
     public ClaimsPrincipal ValidateToken(string token)
     {
         // Получение настроек JWT из конфигурации

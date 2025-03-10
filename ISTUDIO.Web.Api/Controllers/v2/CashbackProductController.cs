@@ -31,6 +31,7 @@ public class CashbackProductController : BaseController2
     [HttpGet]
     [ProducesResponseType(typeof(CsmActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ICsmActionResult> GetCashbackProductsList([FromQuery] PaginatedListVM page)
     {
         return await HandleQuery(new GetCashbackProductsQuery
