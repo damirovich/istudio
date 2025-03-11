@@ -24,9 +24,7 @@ public class TokenVM : IMapWith<RefreshJWTCommand>
     public void Mapping(Profile profile)
     {
         profile.CreateMap<TokenVM, RefreshJWTCommand>()
-            .ForMember(t => t.AccessToken,
-                x => x.MapFrom(rt => rt.AccessToken))
-            .ForMember(t => t.RefreshToken,
-                x => x.MapFrom(rt => rt.RefreshToken));
+            .ForMember(t => t.AccessToken, x => x.MapFrom(rt => rt.AccessToken))
+            .ForMember(t => t.RefreshToken, x => x.MapFrom(rt => rt.RefreshToken));
     }
 }

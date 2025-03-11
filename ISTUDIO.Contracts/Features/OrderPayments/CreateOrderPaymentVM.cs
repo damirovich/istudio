@@ -1,29 +1,50 @@
 ﻿namespace ISTUDIO.Contracts.Features.OrderPayments;
-
-public class CreateOrderPaymentVM 
+/// <summary>
+/// Модель для создания оплаты заказа.
+/// </summary>
+public class CreateOrderPaymentVM
 {
-    //Пользователь который оплатил
-    public string UserId { get; set; }  
-    // Номер заказа
+    /// <summary>
+    /// Идентификатор пользователя, который совершил оплату.
+    /// </summary>
+    public string UserId { get; set; }
+
+    /// <summary>
+    /// Уникальный номер заказа.
+    /// </summary>
+    [Required(ErrorMessage = "OrderId is required.")]
     public int OrderId { get; set; }
 
-    // ID метода оплаты (2 - Bakai, 3 - mBank, 4 - Optima Bank, 5 - Cash, 6 - FreedomPay)
+    /// <summary>
+    /// ID метода оплаты:
+    /// 2 - Bakai, 3 - mBank, 4 - Optima Bank, 5 - Cash, 6 - FreedomPay.
+    /// </summary>
+    [Required(ErrorMessage = "PaymentMethodId is required.")]
     public int PaymentMethodId { get; set; }
 
-    // Сумма заказа до применения бонусов
+    /// <summary>
+    /// Сумма заказа до применения бонусов.
+    /// </summary>
     public decimal? InitialAmount { get; set; }
 
-    // Итоговая сумма после вычета бонусов
+    /// <summary>
+    /// Итоговая сумма после вычета бонусов.
+    /// </summary>
+    [Required(ErrorMessage = "FinalAmount is required.")]
     public decimal FinalAmount { get; set; }
 
-    // Примененная сумма бонусов
+    /// <summary>
+    /// Примененная сумма бонусов.
+    /// </summary>
     public decimal? BonusAmount { get; set; }
 
-    // Начисленная сумма бонусов
+    /// <summary>
+    /// Начисленная сумма бонусов.
+    /// </summary>
     public decimal? EarnedBonusAmount { get; set; }
 
-    // Номер телефона при оплате через Bakai Bank
+    /// <summary>
+    /// Номер телефона, используемый при оплате через Bakai Bank (необязательно).
+    /// </summary>
     public string? BakaiPhoneNumber { get; set; }
-
-
 }

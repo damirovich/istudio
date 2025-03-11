@@ -2,15 +2,44 @@
 
 namespace ISTUDIO.Contracts.Features.Magazines;
 
+/// <summary>
+/// Модель для создания магазина.
+/// </summary>
 public class CreateMagazineVM : IMapWith<CreateMagazinesCommand>
 {
+    /// <summary>
+    /// Название магазина.
+    /// </summary>
     public string Name { get; set; }
+
+    /// <summary>
+    /// Описание магазина.
+    /// </summary>
     public string Description { get; set; }
+
+    /// <summary>
+    /// Адрес магазина.
+    /// </summary>
     public string Address { get; set; }
+
+    /// <summary>
+    /// Контактный номер телефона магазина.
+    /// </summary>
     public string PhoneNumber { get; set; }
+
+    /// <summary>
+    /// Логотип магазина в формате Base64.
+    /// </summary>
     public string PhotoLogoBase64 { get; set; }
+
+    /// <summary>
+    /// Идентификатор пользователя (владельца магазина).
+    /// </summary>
     public string UserId { get; set; }
 
+    /// <summary>
+    /// Конфигурация маппинга между CreateMagazineVM и CreateMagazinesCommand.
+    /// </summary>
     public void Mapping(Profile profile)
     {
         profile.CreateMap<CreateMagazineVM, CreateMagazinesCommand>()

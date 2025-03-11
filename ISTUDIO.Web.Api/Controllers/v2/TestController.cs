@@ -1,10 +1,6 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
-
-namespace ISTUDIO.Web.Api.Controllers.v2;
+﻿namespace ISTUDIO.Web.Api.Controllers.v2;
 
 [ApiVersion("2.0")]
-[Authorize]
 public class TestController : BaseController2
 {
     private readonly ILogger<TestController> _logger;

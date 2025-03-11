@@ -2,20 +2,53 @@
 
 namespace ISTUDIO.Contracts.Features.UserManagement;
 
+/// <summary>
+/// Модель для создания пользователя.
+/// </summary>
 public class CreateUserVM : IMapWith<CreateUserCommand>
 {
-    [Required]
+    /// <summary>
+    /// Имя пользователя.
+    /// </summary>
+    [Required(ErrorMessage = "UserName is required.")]
     public string UserName { get; set; }
-    [Required]
+
+    /// <summary>
+    /// Номер телефона пользователя.
+    /// </summary>
+    [Required(ErrorMessage = "PhoneNumber is required.")]
     public string PhoneNumber { get; set; }
-    [Required]
+
+    /// <summary>
+    /// Электронная почта пользователя.
+    /// </summary>
+    [Required(ErrorMessage = "Email is required.")]
     public string Email { get; set; }
-    [Required]
+
+    /// <summary>
+    /// Пароль пользователя.
+    /// </summary>
+    [Required(ErrorMessage = "Password is required.")]
     public string Password { get; set; }
+
+    /// <summary>
+    /// Пользователь согласен с политикой конфиденциальности.
+    /// </summary>
     public bool HasAgreedToPrivacyPolicy { get; set; }
+
+    /// <summary>
+    /// Пользователь согласен с пользовательским соглашением.
+    /// </summary>
     public bool ConsentToTheUserAgreement { get; set; }
+
+    /// <summary>
+    /// Список ролей пользователя.
+    /// </summary>
     public List<string> Roles { get; set; }
 
+    /// <summary>
+    /// Конфигурация маппинга между CreateUserVM и CreateUserCommand.
+    /// </summary>
     public void Mapping(Profile profile)
     {
         profile.CreateMap<CreateUserVM, CreateUserCommand>()

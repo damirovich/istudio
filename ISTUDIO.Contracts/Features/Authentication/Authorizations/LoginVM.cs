@@ -26,9 +26,7 @@ public class LoginVM : IMapWith<AuthUserCommand>
     public void Mapping(Profile profile)
     {
         profile.CreateMap<LoginVM, AuthUserCommand>()
-             .ForMember(u => u.UserName,
-                x => x.MapFrom(c => c.UserName))
-            .ForMember(u => u.Password,
-                x => x.MapFrom(c => c.Password));
+            .ForMember(u => u.UserName, x => x.MapFrom(c => c.UserName))
+            .ForMember(u => u.Password, x => x.MapFrom(c => c.Password));
     }
 }
